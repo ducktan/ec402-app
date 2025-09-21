@@ -37,4 +37,7 @@ class TColors {
   //border colors
   static const Color borderPrimary = Color(0xffd9d9d9);
   static const Color borderSecondary = Color(0xffe6e6e6);
+
+  static const Color black = Colors.black;
+  static const Color white = Colors.white;
 }

@@ -1,4 +1,4 @@
-import 'package:ec402_app/utils/navigation_menu.dart';
+import 'package:ec402_app/navigation_menu.dart';
 import 'package:flutter/material.dart';
 
 void main() {
