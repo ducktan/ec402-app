@@ -6,4 +6,15 @@ class TImages {
   // Social Logos
   static const String google = "";
   static const String facebook = "";
+
+  //Category Icons
+  static const String sportIcon = "";
+  static const String clothIcon = "";
+  static const String shoeIcon = "assets/icons/categories/shoeIcon.png";
+  static const String cosmeticsIcon = "";
+  static const String animalIcon = "";
+  static const String toyIcon = "";
+  static const String furnitureIcon = "";
+  static const String jeweleryIcon = "";
+  static const String electronicsIcon = "";
 }
