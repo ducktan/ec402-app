@@ -1,14 +1,17 @@
+import 'package:carousel_slider/carousel_slider.dart' as cs;
 import 'package:ec402_app/common/widgets/appbar/appbar.dart';
 import 'package:ec402_app/common/widgets/appbar/primary_header_container.dart';
+import 'package:ec402_app/common/widgets/custom_shapes/containers/circular_container.dart';
 import 'package:ec402_app/common/widgets/custom_shapes/containers/search_container.dart';
+import 'package:ec402_app/common/widgets/images/t_rounded_image.dart';
 import 'package:ec402_app/common/widgets/texts/section_heading.dart';
 import 'package:ec402_app/features/shop/screens/home/widgets/home_appbar.dart';
 import 'package:ec402_app/features/shop/screens/home/widgets/home_categories.dart';
+import 'package:ec402_app/features/shop/screens/home/widgets/promo_slider.dart';
 import 'package:ec402_app/utils/constants/colors.dart';
 import 'package:ec402_app/utils/constants/image_strings.dart';
 import 'package:ec402_app/utils/constants/sizes.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get_connect/http/src/utils/utils.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -43,6 +46,17 @@ class HomeScreen extends StatelessWidget {
                       ],
                     ),
                   ),
+                ],
+              ),
+            ),
+
+            Padding(
+              padding: EdgeInsets.all(TSizes.defaultSpace),
+              child: TPromoSlider(
+                banners: [
+                  TImages.promoBanner1,
+                  TImages.promoBanner1,
+                  TImages.promoBanner1,
                 ],
               ),
             ),

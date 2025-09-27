@@ -1,5 +1,3 @@
-import 'dart:nativewrappers/_internal/vm/lib/ffi_native_type_patch.dart';
-
 import 'package:ec402_app/utils/constants/colors.dart';
 import 'package:ec402_app/utils/constants/device_ultility.dart';
 import 'package:ec402_app/utils/constants/sizes.dart';
