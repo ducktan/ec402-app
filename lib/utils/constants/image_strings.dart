@@ -4,6 +4,6 @@ class TImages {
   static const String lightAppLogo = "";
 
   // Social Logos
-  static const String google = "";
-  static const String facebook = "";
+  static const String google = "assets/logos/google-icon.png";
+  static const String facebook = "assets/logos/facebook-icon.png";
 }
