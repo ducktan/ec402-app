@@ -42,4 +42,5 @@ class TColors {
   static const Color white = Colors.white;
   static const Color grey = Colors.grey;
   static final Color darkerGrey = Colors.grey.shade600;
+  static const Color bg1 = Color(0xffE0E0E0);
 }

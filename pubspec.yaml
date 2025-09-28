@@ -81,6 +81,7 @@ flutter:
     - assets/images/animations/
     - assets/icons/categories/
     - assets/images/banners/
+    - assets/images/products/
 
   # For details regarding adding assets from package dependencies, see
   # https://flutter.dev/to/asset-from-package

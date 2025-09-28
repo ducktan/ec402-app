@@ -4,6 +4,8 @@ import 'package:ec402_app/common/widgets/appbar/primary_header_container.dart';
 import 'package:ec402_app/common/widgets/custom_shapes/containers/circular_container.dart';
 import 'package:ec402_app/common/widgets/custom_shapes/containers/search_container.dart';
 import 'package:ec402_app/common/widgets/images/t_rounded_image.dart';
+import 'package:ec402_app/common/widgets/layouts/gird_layout.dart';
+import 'package:ec402_app/common/widgets/products/product_cards/product_card_vertical.dart';
 import 'package:ec402_app/common/widgets/texts/section_heading.dart';
 import 'package:ec402_app/features/shop/screens/home/widgets/home_appbar.dart';
 import 'package:ec402_app/features/shop/screens/home/widgets/home_categories.dart';
@@ -52,11 +54,21 @@ class HomeScreen extends StatelessWidget {
 
             Padding(
               padding: EdgeInsets.all(TSizes.defaultSpace),
-              child: TPromoSlider(
-                banners: [
-                  TImages.promoBanner1,
-                  TImages.promoBanner1,
-                  TImages.promoBanner1,
+              child: Column(
+                children: [
+                  TPromoSlider(
+                    banners: [
+                      TImages.promoBanner1,
+                      TImages.promoBanner1,
+                      TImages.promoBanner1,
+                    ],
+                  ),
+                  const SizedBox(height: TSizes.spaceBtwItems),
+
+                  TGirdLayout(
+                    iTemCount: 4,
+                    itemBuilder: (_, int index) => const TProductCardVertical(),
+                  ),
                 ],
               ),
             ),
