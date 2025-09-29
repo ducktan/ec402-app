@@ -1,3 +1,5 @@
+import 'package:ec402_app/signup.dart';
+import 'package:ec402_app/features/authentication/screens/login/login.dart';
 import 'package:ec402_app/navigation_menu.dart';
 import 'package:flutter/material.dart';
 
@@ -16,7 +18,7 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         fontFamily: 'Poppins',
       ),
-      home: const NavigationMenu(),
+      home: const LoginScreen(),
     );
   }
 }

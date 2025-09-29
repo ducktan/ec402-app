@@ -1,7 +1,7 @@
 class TImages {
   // app logos
-  static const String darkAppLogo = "";
-  static const String lightAppLogo = "";
+  static const String darkAppLogo = "../assets/images/logo/dark_logo.png";
+  static const String lightAppLogo = "../assets/images/logo/light_logo.png";
 
   // Social Logos
   static const String google = "";
@@ -28,4 +28,9 @@ class TImages {
   static const String productImage2 = "";
   static const String productImage3 = "";
   static const String productImage4 = "";
+
+  // -- OnBoarding Screen Images
+  static const String tOnBoardingImage1 = "assets/images/on_boarding_images/on-boarding-image-1.png";
+  static const String tOnBoardingImage2 = "assets/images/on_boarding_images/on-boarding-image-2.png";
+  static const String tOnBoardingImage3 = "assets/images/on_boarding_images/on-boarding-image-3.png";
 }

@@ -1,8 +1,14 @@
 class TTexts {
   //Onboarding text
-  static const String onBoardingTitle1 = "Choose your product";
-  static const String onBoardingTitle2 = "Select Payment Method";
-  static const String onBoardingTitle3 = "Deliver at your door step";
+  static const String tOnBoardingTitle1 = "Build Awesome Apps";
+  static const String tOnBoardingTitle2 = "Learn from YouTube";
+  static const String tOnBoardingTitle3 = "Get Code & Resources";
+  static const String tOnBoardingSubTitle1 = "Let's start your journey with us on this amazing and easy platform.";
+  static const String tOnBoardingSubTitle2 = "Get Video Tutorials of each topic to learn things easily.";
+  static const String tOnBoardingSubTitle3 = "Save time by just copy pasting complete apps you learned from videos.";
+  static const String tOnBoardingCounter1 = "1/3";
+  static const String tOnBoardingCounter2 = "2/3";
+  static const String tOnBoardingCounter3 = "3/3";
 
   static const String onBoardingSubTitle1 =
       "Welcome to a World of Limitless Choices - Your Perfect Product Awaits!";
@@ -62,6 +68,7 @@ class TTexts {
       "Your account successfully created!";
   static const String yourAccountCreatedSubTitle =
       "Wecome to Your Ultimate Shopping Destination: Your Account is Created, Unleash the Joy of Seamless Online Shopping!";
+  static const String signupTitle = "Let's create your account";
 
   // Home
 }
