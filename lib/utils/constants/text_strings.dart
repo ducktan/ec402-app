@@ -29,8 +29,8 @@ class TTexts {
   static const String appName = "";
 
   // Authentications From Text
-  static const String firstName = "first Name";
-  static const String lastName = "last Name";
+  static const String firstName = "First name";
+  static const String lastName = "Last name";
   static const String email = "E-Mail";
   static const String password = "Password";
   static const String newPassword = "New Password";

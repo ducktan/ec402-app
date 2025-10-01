@@ -28,6 +28,7 @@ environment:
 # the latest version available on pub.dev. To see which dependencies have newer
 # versions available, run `flutter pub outdated`.
 dependencies:
+  flutter_animate: ^4.5.0   # hoặc version mới nhất
   flutter:
     sdk: flutter
   get: ^4.6.6
@@ -76,13 +77,10 @@ flutter:
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images
   assets:
-    - assets/logos/
-    - assets/icons/brands/
-    - assets/images/on_boarding_images/
-    - assets/images/animations/
-    - assets/icons/categories/
-    - assets/images/banners/
-    - assets/images/products/
+    - assets/logo/ 
+    - assets/images/
+    - assets/icons/
+    - assets/fonts/
 
   # For details regarding adding assets from package dependencies, see
   # https://flutter.dev/to/asset-from-package
@@ -127,3 +125,4 @@ flutter:
   #
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/to/font-from-package
+
