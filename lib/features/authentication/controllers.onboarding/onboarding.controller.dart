@@ -1,4 +1,4 @@
-import 'package:ec402_app/features/authentication/screens/login/login.dart';
+import 'package:ec402_app/features/authentication/screens/login.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
 import 'package:ec402_app/features/authentication/controllers.onboarding/onboarding.controller.dart';

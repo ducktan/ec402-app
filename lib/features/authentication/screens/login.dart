@@ -1,11 +1,13 @@
-import 'dart:convert';
 import 'package:ec402_app/utils/constants/colors.dart';
 import 'package:flutter/material.dart';
 import 'package:iconsax/iconsax.dart';
 import 'signup.dart';
 import 'welcome.dart';
 import '../../../models/login_model.dart';
-import 'package:http/http.dart' as http;
+import '../../../services/api_service.dart'; // ✅ import ApiService
+import '../../../navigation_menu.dart'; // ✅ import NavigationScreen
+import 'package:get/get.dart';
+import '../../shop/controllers/home_controller.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -21,30 +23,6 @@ class _LoginScreenState extends State<LoginScreen> {
   // --- TextEditingController cho email & password
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
-
-  // --- Hàm gọi API login
-  Future<LoginResponse?> loginApi(String email, String password) async {
-    const String url = "https://example.com/api/login"; // thay bằng API thật
-
-    try {
-      final response = await http.post(
-        Uri.parse(url),
-        headers: {"Content-Type": "application/json"},
-        body: jsonEncode({"email": email, "password": password}),
-      );
-
-      if (response.statusCode == 200) {
-        final data = jsonDecode(response.body);
-        return LoginResponse.fromJson(data);
-      } else {
-        print("Login failed: ${response.statusCode}");
-        return null;
-      }
-    } catch (e) {
-      print("Login error: $e");
-      return null;
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -161,10 +139,9 @@ class _LoginScreenState extends State<LoginScreen> {
                     return;
                   }
 
-                  final res = await loginApi(email, password);
+                  final res = await ApiService.login(email, password); // ✅ gọi ApiService
 
-                  if (res != null && res.success) {
-                    // Test API thành công
+                  if (res != null) {
                     print("Token: ${res.token}");
                     print("User: ${res.user.name} - ${res.user.email}");
 
@@ -174,8 +151,11 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                     );
 
-                    // Điều hướng sang màn chính nếu cần
-                    // Navigator.pushReplacement(...);
+                    // 👉 Điều hướng sang màn hình Navigation
+                    Get.offAll(() => const NavigationMenu());
+                    HomeController.instance.setUser(res.user.name);
+
+
                   } else {
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(

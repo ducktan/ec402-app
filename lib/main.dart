@@ -3,9 +3,18 @@ import 'package:ec402_app/features/authentication/screens/login.dart';
 import 'package:ec402_app/navigation_menu.dart';
 import 'package:ec402_app/features/authentication/screens/welcome.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart'; // 👈 import GetX
+import './features/shop/controllers/home_controller.dart';
 
 void main() {
   runApp(const MyApp());
+}
+
+class InitialBindings extends Bindings {
+  @override
+  void dependencies() {
+    Get.put(HomeController()); // đăng ký HomeController ở startup
+  }
 }
 
 class MyApp extends StatelessWidget {
@@ -13,7 +22,9 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return GetMaterialApp(
+      initialBinding: InitialBindings(),   // 👈 thay MaterialApp bằng GetMaterialApp
+      debugShowCheckedModeBanner: false,
       title: 'Flutter Demo',
       theme: ThemeData(
         fontFamily: 'Poppins',

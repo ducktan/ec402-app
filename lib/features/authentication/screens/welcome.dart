@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:get/get.dart'; // ✅ import GetX
 import '../../../utils/constants/sizes.dart';
 import 'login.dart';
-
+import 'signup.dart';
 
 class WelcomeScreen extends StatelessWidget {
   const WelcomeScreen({super.key});
@@ -20,7 +21,6 @@ class WelcomeScreen extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                /// Logo/Image trên cùng
                 Image.asset(
                   "assets/logo/t-store-splash-logo-black.png",
                   height: 250,
@@ -28,7 +28,6 @@ class WelcomeScreen extends StatelessWidget {
 
                 const SizedBox(height: 24),
 
-                /// Title
                 Text(
                   "Welcome to T STORE",
                   style: theme.textTheme.headlineSmall!.copyWith(
@@ -46,24 +45,19 @@ class WelcomeScreen extends StatelessWidget {
 
                 const SizedBox(height: 32),
 
-                /// Nút Login Email (ăn theo elevatedButtonTheme)
+                /// ✅ Nút Login (dùng GetX)
                 SizedBox(
                   width: double.infinity,
                   child: ElevatedButton.icon(
                     icon: const Icon(Icons.email),
                     label: const Text("Login with Email & Password"),
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) => const LoginScreen()),
-                      );
-                    },
+                    onPressed: () => Get.to(() => const LoginScreen()),
                   ),
                 ).animate().fade(duration: 900.ms).slideX(begin: -0.3, end: 0),
 
                 const SizedBox(height: 16),
 
-                /// Nút Login Phone (ăn theo outlinedButtonTheme)
+                /// Nút Login Phone
                 SizedBox(
                   width: double.infinity,
                   child: OutlinedButton.icon(
@@ -94,13 +88,13 @@ class WelcomeScreen extends StatelessWidget {
 
                 const SizedBox(height: 24),
 
-                /// Sign Up link
+                /// ✅ Link Sign Up (dùng GetX)
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     const Text("Don't have an account? "),
                     GestureDetector(
-                      onTap: () {},
+                      onTap: () => Get.to(() => const SignupScreen()),
                       child: Text(
                         "Sign up",
                         style: TextStyle(
@@ -108,7 +102,7 @@ class WelcomeScreen extends StatelessWidget {
                           fontWeight: FontWeight.bold,
                         ),
                       ),
-                    )
+                    ),
                   ],
                 ).animate().fade(duration: 1200.ms),
               ],
