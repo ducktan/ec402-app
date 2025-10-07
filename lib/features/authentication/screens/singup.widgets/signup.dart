@@ -36,7 +36,9 @@ class SignupScreen extends StatelessWidget {
                     children: [
                       Expanded(child: TextFormField(
                         expands: false,
-                        decoration: InputDecoration(labelText: TTexts.firstName, prefixIcon: Icon(Iconsax.user)),
+                        decoration: InputDecoration(labelText: TTexts.firstName, prefixIcon: Icon(Iconsax.user),
+                        
+                        ),
                       ),
                       ),
                       const SizedBox(width: TSizes.spaceBtwInputFields),
@@ -84,7 +86,7 @@ class SignupScreen extends StatelessWidget {
                   Row(
                     children: [
                       SizedBox(width: 24, height: 24, child: Checkbox(value: true, onChanged: (value){})),
-                      const SizedBox(height: TSizes.spaceBtwItems),
+                      const SizedBox(width: TSizes.spaceBtwItems),
                       Text.rich(TextSpan(
                         children: [
                           TextSpan(text: '${TTexts.iAgreeTo}', style: Theme.of(context).textTheme.bodySmall),
@@ -111,7 +113,7 @@ class SignupScreen extends StatelessWidget {
               ),
               const SizedBox(height: TSizes.spaceBtwSection),
               ///Didiver
-              TFormDidiver(dividerText: TTexts.orSignUpWith.capitalize!),
+              TFormDivider(dividerText: TTexts.orSignUpWith.capitalize!),
               const SizedBox(height: TSizes.spaceBtwSection),
 
               ///Social Buttons

@@ -1,3 +1,4 @@
+import 'package:ec402_app/features/personalization/screens/settings/settings.dart';
 import 'package:ec402_app/navigation_menu.dart';
 import 'package:flutter/material.dart';
 import 'package:ec402_app/features/authentication/screens/singup.widgets/signup.dart';
@@ -16,7 +17,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
       ),
-      home: const SignupScreen(),
+      home: const SettingsScreen(),
     );
   }
 }

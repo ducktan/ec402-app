@@ -2,8 +2,8 @@ import 'package:ec402_app/utils/constants/colors.dart';
 import 'package:ec402_app/utils/helpers/helper_functions.dart';
 import 'package:flutter/material.dart';
 
-class TFormDidiver extends StatelessWidget {
-  const TFormDidiver ({super.key, required this.dividerText});
+class TFormDivider extends StatelessWidget {
+  const TFormDivider ({super.key, required this.dividerText});
   final String dividerText;
   @override
 

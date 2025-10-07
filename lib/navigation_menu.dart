@@ -1,3 +1,4 @@
+import 'package:ec402_app/features/personalization/screens/settings/settings.dart';
 import 'package:ec402_app/features/shop/screens/home/home.dart';
 import 'package:ec402_app/utils/constants/colors.dart';
 import 'package:flutter/material.dart';
@@ -43,6 +44,7 @@ class NavigationController extends GetxController {
 
   final screens = [
     const HomeScreen(),
+    const SettingsScreen(),
     Container(color: Colors.purple),
     Container(color: Colors.orange),
     Container(color: Colors.blue),
