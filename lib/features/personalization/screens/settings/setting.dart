@@ -1,0 +1,92 @@
+import 'package:ec402_app/common/widgets/appbar/appbar.dart';
+import 'package:ec402_app/common/widgets/appbar/primary_header_container.dart';
+import 'package:ec402_app/common/widgets/images/t_circular_image.dart';
+import 'package:ec402_app/common/widgets/list_tiles/user_profile_tile.dart';
+import 'package:ec402_app/common/widgets/texts/section_heading.dart';
+import 'package:ec402_app/features/personalization/screens/settings/settings_menu_tile.dart';
+import 'package:ec402_app/utils/constants/colors.dart';
+import 'package:ec402_app/utils/constants/image_strings.dart';
+import 'package:ec402_app/utils/constants/sizes.dart';
+
+import 'package:flutter/material.dart';
+import 'package:get/get_connect/http/src/utils/utils.dart';
+import 'package:iconsax/iconsax.dart';
+
+class SettingsScreen extends StatelessWidget {
+  const SettingsScreen({super.key});
+  @override 
+  Widget build(BuildContext context){
+    return Scaffold(
+      body: SingleChildScrollView(
+        child: Column(
+          children: [
+          /// -- Header
+          TPrimaryHeaderContainer(
+            child: Column(
+              children: [
+                /// Appbar
+                TAppBar(title: Text('Account', style: Theme.of(context).textTheme.headlineMedium!.apply(color: TColors.white))),
+
+                ///user profile card 
+                const TUserProfileTile(),
+                const SizedBox(height: TSizes.spaceBtwSections),
+              ],
+          ),
+          ),
+          /// -- Body
+          Padding(
+            padding: const EdgeInsets.all(TSizes.defaultSpace),
+            child: Column(
+              children: [
+                /// -- Account Settings
+                TSectionHeading(title: 'Account Settings', showActionButton: false,),
+                SizedBox(height: TSizes.spaceBtwItems),
+
+                TSettingsMenuTile(icon: Iconsax.safe_home, title: 'My Address', subTitle: 'Set shopping delivery address'),
+                TSettingsMenuTile(icon: Iconsax.shopping_cart, title: 'My Cart', subTitle: 'Add, remove products and move to checkout'),
+                TSettingsMenuTile(icon: Iconsax.bag_tick, title: 'My Orders', subTitle: 'In-progress and Complete Orders'),
+                TSettingsMenuTile(icon: Iconsax.bank, title: 'Bank Account', subTitle: 'Withdraw balance to registered bank account'),
+                TSettingsMenuTile(icon: Iconsax.discount_shape, title: 'My Coupons', subTitle: 'List of all the discounted coupons'),
+                TSettingsMenuTile(icon: Iconsax.notification, title: 'Notifications', subTitle: 'Set any kind of notification message'),
+                TSettingsMenuTile(icon: Iconsax.security_card, title: 'Account Privacy', subTitle: 'Manage data usage and connected accounts'),
+
+                /// -- App Settings
+                SizedBox(height: TSizes.spaceBtwSections),
+                TSectionHeading(title: 'App Settings', showActionButton: false),
+                SizedBox(height: TSizes.spaceBtwItems),
+                TSettingsMenuTile(icon: Iconsax.document_upload, title: 'Load Data', subTitle: 'Upload Data to your Cloud Firebase'),
+                TSettingsMenuTile(
+                  icon: Iconsax.location,
+                  title: 'Geolocation', 
+                  subTitle: 'Set recomendation based on location',
+                  trailing: Switch(value: true, onChanged: (value){}),
+                ),
+                TSettingsMenuTile(
+                  icon: Iconsax.security_user,
+                  title: 'Safe Mode', 
+                  subTitle: 'Search result is safe for all ages',
+                  trailing: Switch(value: false, onChanged: (value){}),
+                ),
+                TSettingsMenuTile(
+                  icon: Iconsax.image,
+                  title: 'HD Image Quality', 
+                  subTitle: 'Set image quality to be seen',
+                  trailing: Switch(value: false, onChanged: (value){}),
+                ),
+
+                /// -- Logout Button
+                const SizedBox(height: TSizes.spaceBtwSections),
+                SizedBox(
+                  width: double.infinity,
+                  child: OutlinedButton(onPressed: (){}, child: const Text('Logout')),
+                ),
+                const SizedBox(height: TSizes.spaceBtwSections * 2.5),
+              ],
+            ),
+          ),
+          ],
+        ),
+      ),
+    );
+  }
+}

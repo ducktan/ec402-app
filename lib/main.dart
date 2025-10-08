@@ -88,7 +88,7 @@ class MyApp extends StatelessWidget {
         ),
       ),
 
-      home: const ProductReviewsScreen(),
+      home: const NavigationMenu(),
     );
   }
 }

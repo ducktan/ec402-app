@@ -33,4 +33,7 @@ class TImages {
   static const String tOnBoardingImage1 = "assets/images/on_boarding_images/on-boarding-image-1.png";
   static const String tOnBoardingImage2 = "assets/images/on_boarding_images/on-boarding-image-2.png";
   static const String tOnBoardingImage3 = "assets/images/on_boarding_images/on-boarding-image-3.png";
+
+  // --Profile
+  static const String user = "assets/images/user.png";
 }
