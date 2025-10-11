@@ -5,7 +5,9 @@ import 'package:flutter/material.dart';
 import 'package:iconsax/iconsax.dart';
 
 class TUserProfileTile extends StatelessWidget {
-  const TUserProfileTile({super.key});
+
+  const TUserProfileTile({super.key, required this.onPressed,});
+  final VoidCallback onPressed;
   @override
   Widget build(BuildContext context) {
     return ListTile(

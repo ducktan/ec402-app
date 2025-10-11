@@ -1,3 +1,4 @@
+import 'package:ec402_app/features/personalization/screens/profile/profile.dart';
 import 'package:ec402_app/features/personalization/screens/settings/settings.dart';
 import 'package:ec402_app/navigation_menu.dart';
 import 'package:flutter/material.dart';
@@ -17,7 +18,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
       ),
-      home: const SettingsScreen(),
+      home: const ProfileScreen(),
     );
   }
 }
