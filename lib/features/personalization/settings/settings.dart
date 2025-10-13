@@ -3,17 +3,20 @@ import 'package:ec402_app/common/widgets/appbar/primary_header_container.dart';
 import 'package:ec402_app/common/widgets/images/t_circular_image.dart';
 import 'package:ec402_app/common/widgets/list_tiles/user_profile_tile.dart';
 import 'package:ec402_app/common/widgets/texts/section_heading.dart';
-import 'package:ec402_app/features/personalization/screens/settings/settings_menu_tile.dart';
+import 'package:ec402_app/features/personalization/profile/profile.dart';
+import 'package:ec402_app/features/personalization/settings/settings_menu_tile.dart';
 import 'package:ec402_app/utils/constants/colors.dart';
 import 'package:ec402_app/utils/constants/image_strings.dart';
 import 'package:ec402_app/utils/constants/sizes.dart';
-
 import 'package:flutter/material.dart';
 import 'package:get/get_connect/http/src/utils/utils.dart';
+import 'package:get/get_core/src/get_main.dart';
+import 'package:get/get_navigation/get_navigation.dart';
 import 'package:iconsax/iconsax.dart';
 
 class SettingsScreen extends StatelessWidget {
   const SettingsScreen({super.key});
+  
   @override 
   Widget build(BuildContext context){
     return Scaffold(
@@ -28,7 +31,7 @@ class SettingsScreen extends StatelessWidget {
                 TAppBar(title: Text('Account', style: Theme.of(context).textTheme.headlineMedium!.apply(color: TColors.white))),
 
                 ///user profile card 
-                const TUserProfileTile(),
+                TUserProfileTile(onPressed: () => Get.to(() => const ProfileScreen())),
                 const SizedBox(height: TSizes.spaceBtwSections),
               ],
           ),
