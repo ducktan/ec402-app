@@ -2,8 +2,8 @@ import 'package:ec402_app/utils/constants/colors.dart';
 import 'package:ec402_app/utils/helpers/helper_functions.dart';
 import 'package:flutter/material.dart';
 
-class TFormDivider extends StatelessWidget {
-  const TFormDivider ({super.key, required this.dividerText});
+class TFormDidiver extends StatelessWidget {
+  const TFormDidiver ({super.key, required this.dividerText});
   final String dividerText;
   @override
 
@@ -12,9 +12,9 @@ class TFormDivider extends StatelessWidget {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        Flexible(child: Divider(color: dark ? TColors.darkGrey : TColors.grey, thickness: 0.5, indent: 60, endIndent: 5)),
+        Flexible(child: Divider(color: dark ? TColors.darkerGrey : TColors.grey, thickness: 0.5, indent: 60, endIndent: 5)),
         Text(dividerText, style: Theme.of(context).textTheme.labelMedium),
-        Flexible(child: Divider(color: dark ? TColors.darkGrey : TColors.grey, thickness: 0.5, indent: 5, endIndent: 60)),
+        Flexible(child: Divider(color: dark ? TColors.darkerGrey : TColors.grey, thickness: 0.5, indent: 5, endIndent: 60)),
       ],
     );
   }

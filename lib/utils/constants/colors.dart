@@ -35,10 +35,12 @@ class TColors {
   static const Color buttonDisabled = Color(0xffc4c4c4);
 
   //border colors
+  static const Color borderPrimary = Color(0xffd9d9d9);
+  static const Color borderSecondary = Color(0xffe6e6e6);
 
   static const Color black = Colors.black;
   static const Color white = Colors.white;
   static const Color grey = Colors.grey;
-  static final Color darkGrey = Colors.grey.shade600;
+  static final Color darkerGrey = Colors.grey.shade600;
   static const Color bg1 = Color(0xffE0E0E0);
 }

@@ -6,7 +6,7 @@ class TSectionHeading extends StatelessWidget {
     required this.title,
     this.textColor,
     this.showActionButton = true,
-    this.buttonTitle = 'View All',
+    this.buttonTitle = 'See All',
     this.onPressed,
   });
 
@@ -18,18 +18,22 @@ class TSectionHeading extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      mainAxisAlignment: MainAxisAlignment.spaceBetween, // 🔹 canh hai đầu
       children: [
         Text(
-          title,
-          style: Theme.of(
-            context,
-          ).textTheme.headlineSmall!.apply(color: textColor),
+          title, // ✅ fix ở đây
+          style: Theme.of(context)
+              .textTheme
+              .headlineSmall!
+              .apply(color: textColor),
           maxLines: 1,
-          overflow: TextOverflow.ellipsis
+          overflow: TextOverflow.ellipsis,
         ),
         if (showActionButton)
-          TextButton(onPressed: onPressed, child: Text(buttonTitle))
+          TextButton(
+            onPressed: onPressed,
+            child: Text(buttonTitle), // ✅ dùng biến
+          ),
       ],
     );
   }

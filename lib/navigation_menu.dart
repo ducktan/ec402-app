@@ -1,10 +1,15 @@
 import 'package:ec402_app/features/personalization/screens/settings/settings.dart';
 import 'package:ec402_app/features/shop/screens/home/home.dart';
+import 'package:ec402_app/features/shop/screens/product_detail/product_detail_screen.dart';
 import 'package:ec402_app/utils/constants/colors.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get/get_connect/http/src/utils/utils.dart';
 import 'package:iconsax/iconsax.dart';
+import 'package:ec402_app/features/personalization/settings/settings.dart';
+import 'package:ec402_app/features/personalization/profile/profile.dart';
+import 'package:ec402_app/features/shop/screens/search/search_screen.dart';
+import 'package:ec402_app/features/shop/screens/brands/all_brand.dart';
 
 class NavigationMenu extends StatelessWidget {
   const NavigationMenu({super.key});
@@ -44,9 +49,9 @@ class NavigationController extends GetxController {
 
   final screens = [
     const HomeScreen(),
+    const SearchScreen(),
+    // Container(color: Colors.orange),
+    const AllBrandsScreen(), 
     const SettingsScreen(),
-    Container(color: Colors.purple),
-    Container(color: Colors.orange),
-    Container(color: Colors.blue),
   ];
 }
