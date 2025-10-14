@@ -8,6 +8,7 @@ import 'package:iconsax/iconsax.dart';
 import 'package:ec402_app/features/personalization/settings/settings.dart';
 import 'package:ec402_app/features/personalization/profile/profile.dart';
 import 'package:ec402_app/features/shop/screens/search/search_screen.dart';
+import 'package:ec402_app/features/shop/screens/brands/all_brand.dart';
 
 class NavigationMenu extends StatelessWidget {
   const NavigationMenu({super.key});
@@ -49,7 +50,7 @@ class NavigationController extends GetxController {
     const HomeScreen(),
     const SearchScreen(),
     // Container(color: Colors.orange),
-    const ProductDetailScreen(), 
+    const AllBrandsScreen(), 
     const SettingsScreen(),
   ];
 }
