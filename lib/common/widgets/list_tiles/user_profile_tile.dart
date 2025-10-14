@@ -5,13 +5,18 @@ import 'package:flutter/material.dart';
 import 'package:iconsax/iconsax.dart';
 
 class TUserProfileTile extends StatelessWidget {
+  const TUserProfileTile({
+    super.key,
+    required this.onPressed,
+  });
 
-  const TUserProfileTile({super.key, required this.onPressed,});
   final VoidCallback onPressed;
+
   @override
   Widget build(BuildContext context) {
     return ListTile(
-      leading: TCircularImage(
+      onTap: onPressed, // ✅ Bổ sung dòng này để click được toàn tile
+      leading: const TCircularImage(
         image: TImages.user,
         width: 50,
         height: 50,
@@ -19,18 +24,20 @@ class TUserProfileTile extends StatelessWidget {
       ),
       title: Text(
         'Coding with T',
-        style: Theme.of(
-          context,
-        ).textTheme.headlineSmall!.apply(color: TColors.white),
+        style: Theme.of(context)
+            .textTheme
+            .headlineSmall!
+            .apply(color: TColors.white),
       ),
       subtitle: Text(
         'nhomMobile@gmail.com',
-        style: Theme.of(
-          context,
-        ).textTheme.bodyMedium!.apply(color: TColors.white),
+        style: Theme.of(context)
+            .textTheme
+            .bodyMedium!
+            .apply(color: TColors.white),
       ),
       trailing: IconButton(
-        onPressed: () {},
+        onPressed: onPressed, // hoặc để riêng nếu muốn khác hành động
         icon: const Icon(Iconsax.edit, color: TColors.white),
       ),
     );

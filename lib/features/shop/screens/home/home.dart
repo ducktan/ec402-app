@@ -14,6 +14,7 @@ import 'package:ec402_app/utils/constants/colors.dart';
 import 'package:ec402_app/utils/constants/image_strings.dart';
 import 'package:ec402_app/utils/constants/sizes.dart';
 import 'package:flutter/material.dart';
+import 'package:ec402_app/features/shop/screens/search/search_screen.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -30,7 +31,13 @@ class HomeScreen extends StatelessWidget {
                   const THomeAppBar(),
                   const SizedBox(height: TSizes.spaceBtwSections),
 
-                  TSearchContainer(text: 'Search in Store'),
+                  TSearchContainer(
+                    text: 'Search in Store',
+                    onTap: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (_) => const SearchScreen()),
+                    ),
+                  ),
                   SizedBox(height: TSizes.spaceBtwSections),
 
                   Padding(
