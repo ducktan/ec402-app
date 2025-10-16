@@ -25,7 +25,7 @@ class SignupScreen extends StatelessWidget {
             children: [
               ///title
               Text(TTexts.signupTitle, style: Theme.of(context).textTheme.headlineMedium),
-              const SizedBox(height: TSizes.spaceBtwSection),
+              const SizedBox(height: TSizes.spaceBtwSections),
 
               ///Form
               Form(
@@ -54,7 +54,7 @@ class SignupScreen extends StatelessWidget {
                   /// Username
                   TextFormField(
                         expands: false,
-                        decoration: InputDecoration(labelText: TTexts.userName, prefixIcon: Icon(Iconsax.user_edit)),
+                        decoration: InputDecoration(labelText: TTexts.username, prefixIcon: Icon(Iconsax.user_edit)),
                   ),
                   const SizedBox(height: TSizes.spaceBtwInputFields),
                   /// Email
@@ -96,7 +96,7 @@ class SignupScreen extends StatelessWidget {
                             decorationColor: dark ? TColors.white : TColors.primary,
                           )),
                           TextSpan(text: '${TTexts.and}', style: Theme.of(context).textTheme.bodySmall),
-                            TextSpan(text: TTexts.termOfUse, style: Theme.of(context).textTheme.bodyMedium!.apply(
+                            TextSpan(text: TTexts.termsOfUse, style: Theme.of(context).textTheme.bodyMedium!.apply(
                             color: dark ? TColors.white : TColors.primary,
                             decoration: TextDecoration.underline,
                             decorationColor: dark ? TColors.white : TColors.primary,
@@ -105,16 +105,16 @@ class SignupScreen extends StatelessWidget {
                       ),
                     ],
                   ),
-                  const SizedBox(height: TSizes.spaceBtwSection),
+                  const SizedBox(height: TSizes.spaceBtwSections),
                   ///Sign Up Button
                   SizedBox(width: double.infinity, child: ElevatedButton(onPressed: (){}, child: const Text(TTexts.createAccount)),)
                 ],
               ),
               ),
-              const SizedBox(height: TSizes.spaceBtwSection),
+              const SizedBox(height: TSizes.spaceBtwSections),
               ///Didiver
-              TFormDivider(dividerText: TTexts.orSignUpWith.capitalize!),
-              const SizedBox(height: TSizes.spaceBtwSection),
+              TFormDidiver(dividerText: TTexts.orSignUpwith.capitalize!),
+              const SizedBox(height: TSizes.spaceBtwSections),
 
               ///Social Buttons
               const TSocialButton(),

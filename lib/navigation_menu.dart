@@ -1,4 +1,3 @@
-import 'package:ec402_app/features/personalization/screens/settings/settings.dart';
 import 'package:ec402_app/features/shop/screens/home/home.dart';
 import 'package:ec402_app/features/shop/screens/product_detail/product_detail_screen.dart';
 import 'package:ec402_app/utils/constants/colors.dart';
