@@ -1,8 +1,11 @@
 import 'package:ec402_app/common/widgets/custom_shapes/containers/rounded_container.dart';
+import 'package:ec402_app/features/personalization/screens/order/order_detail.dart';
 import 'package:ec402_app/utils/constants/colors.dart';
 import 'package:ec402_app/utils/constants/sizes.dart';
 import 'package:ec402_app/utils/helpers/helper_functions.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:get/get_core/src/get_main.dart';
 import 'package:iconsax/iconsax.dart';
 
 class TOrderListItems extends StatelessWidget {
@@ -54,7 +57,7 @@ class TOrderListItems extends StatelessWidget {
 
               /// 3 - Icon
               IconButton(
-                onPressed: () {},
+                onPressed: () { Get.to(() => const OrderDetailScreen()); },
                 icon: const Icon(Iconsax.arrow_right_34, size: TSizes.iconSm),
               ),
             ],
