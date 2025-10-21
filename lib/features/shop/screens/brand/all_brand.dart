@@ -3,7 +3,7 @@ import 'package:ec402_app/common/widgets/brands/brand_card.dart';
 import 'package:ec402_app/common/widgets/layouts/gird_layout.dart';
 import 'package:ec402_app/common/widgets/products/sortable/sortable_products.dart';
 import 'package:ec402_app/common/widgets/texts/section_heading.dart';
-import 'package:ec402_app/features/shop/screens/brands/brand_product.dart';
+import 'package:ec402_app/features/shop/screens/brand/brand_product.dart';
 import 'package:ec402_app/utils/constants/sizes.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
