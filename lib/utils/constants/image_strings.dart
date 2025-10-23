@@ -9,7 +9,7 @@ class TImages {
 
   //Category Icons
   static const String sportIcon = "";
-  static const String clothIcon = "";
+  static const String clothIcon = "assets/icons/categories/shoeIcon.png";
   static const String shoeIcon = "assets/icons/categories/shoeIcon.png";
   static const String cosmeticsIcon = "";
   static const String animalIcon = "";

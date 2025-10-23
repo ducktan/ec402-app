@@ -1,7 +1,7 @@
 import 'package:ec402_app/common/widgets/appbar/appbar.dart';
 import 'package:ec402_app/common/widgets/images/t_circular_image.dart';
 import 'package:ec402_app/common/widgets/texts/section_heading.dart';
-import 'package:ec402_app/features/personalization/profile/profile_menu.dart';
+import 'package:ec402_app/features/personalization/screens/profile/profile_menu.dart';
 import 'package:ec402_app/utils/constants/image_strings.dart';
 import 'package:ec402_app/utils/constants/sizes.dart';
 import 'package:flutter/material.dart';

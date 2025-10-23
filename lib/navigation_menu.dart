@@ -5,12 +5,13 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get/get_connect/http/src/utils/utils.dart';
 import 'package:iconsax/iconsax.dart';
-import 'package:ec402_app/features/personalization/settings/settings.dart';
-import 'package:ec402_app/features/personalization/profile/profile.dart';
+import 'package:ec402_app/features/personalization/screens/settings/settings.dart';
+import 'package:ec402_app/features/personalization/screens/profile/profile.dart';
 import 'package:ec402_app/features/shop/screens/search/search_screen.dart';
 import 'package:ec402_app/features/shop/screens/brand/all_brand.dart';
 import 'package:ec402_app/features/shop/screens/cart/cart.dart';
 import 'package:ec402_app/features/shop/screens/wishlist/wishlist.dart';
+import 'package:ec402_app/features/personalization/screens/address/address.dart';
 
 class NavigationMenu extends StatelessWidget {
   const NavigationMenu({super.key});
@@ -50,9 +51,9 @@ class NavigationController extends GetxController {
 
   final screens = [
     const HomeScreen(),
-    const WishlistScreen(),
+    const AllBrandsScreen(),
     // Container(color: Colors.orange),
-    const AllBrandsScreen(), 
+    const WishlistScreen(), 
     const SettingsScreen(),
   ];
 }
