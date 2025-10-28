@@ -12,37 +12,49 @@ import 'package:get/get_connect/http/src/utils/utils.dart';
 import 'package:iconsax/iconsax.dart';
 
 class TProductCardVertical extends StatelessWidget {
-  const TProductCardVertical({super.key});
+  const TProductCardVertical({
+    super.key,
+    required this.title,
+    required this.price,
+    required this.shop,
+    required this.imageUrl,
+    this.onTap,
+  });
 
-  //final dark = THelperFunctions.isDarkMode(context);
+  final String title;
+  final String price;
+  final String shop;
+  final String imageUrl;
+  final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: () {},
+      onTap: onTap,
       child: Container(
         width: 180,
         padding: const EdgeInsets.all(1),
         decoration: BoxDecoration(
-          //boxShadow: [TShadowStyle.verticalProductShadow],
           borderRadius: BorderRadius.circular(TSizes.productImageRadius),
-          //color: THelperFunctions.isDarkMode() ? TColors.darkerGrey : TColors.white,
           color: TColors.white,
         ),
         child: Column(
           children: [
+            // --- Ảnh sản phẩm ---
             TRoundedContainer(
               height: 180,
               padding: const EdgeInsets.all(TSizes.sm),
-              //backgroundColor: dark ? TColors.dark : TColors.light,
               backgroundColor: TColors.light,
               child: Stack(
                 children: [
                   TRoundedImage(
-                    imageUrl: TImages.productImage1,
+                    imageUrl: imageUrl.isNotEmpty
+                        ? imageUrl
+                        : TImages.productImage1, // fallback
                     applyImageRadius: true,
                   ),
 
+                  // Giảm giá (nếu cần, demo 25%)
                   Positioned(
                     top: 12,
                     child: TRoundedContainer(
@@ -54,13 +66,15 @@ class TProductCardVertical extends StatelessWidget {
                       ),
                       child: Text(
                         '25%',
-                        style: Theme.of(
-                          context,
-                        ).textTheme.labelLarge!.apply(color: TColors.black),
+                        style: Theme.of(context)
+                            .textTheme
+                            .labelLarge!
+                            .apply(color: TColors.black),
                       ),
                     ),
                   ),
 
+                  // Icon yêu thích
                   const Positioned(
                     top: 0,
                     right: 0,
@@ -72,19 +86,23 @@ class TProductCardVertical extends StatelessWidget {
                 ],
               ),
             ),
+
             const SizedBox(height: TSizes.spaceBtwItems / 2),
 
+            // --- Thông tin sản phẩm ---
             Padding(
               padding: const EdgeInsets.only(left: TSizes.sm),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const TProductTitleText(title: 'Red Shoes', smallSize: true),
+                  TProductTitleText(title: title, smallSize: true),
                   const SizedBox(height: TSizes.spaceBtwItems / 2),
+
+                  // Tên shop
                   Row(
                     children: [
                       Text(
-                        'shop',
+                        shop,
                         overflow: TextOverflow.ellipsis,
                         maxLines: 1,
                         style: Theme.of(context).textTheme.labelMedium,
@@ -98,26 +116,25 @@ class TProductCardVertical extends StatelessWidget {
                     ],
                   ),
 
+                  // Giá + nút thêm vào giỏ
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
-
                     children: [
-                      TProductPriceText(price: '500.000đ'),
+                      TProductPriceText(price: price),
                       Container(
                         decoration: const BoxDecoration(
                           color: TColors.dark,
                           borderRadius: BorderRadius.only(
                             topLeft: Radius.circular(TSizes.cardRadiusMd),
-                            bottomLeft: Radius.circular(
-                              TSizes.productImageRadius,
-                            ),
+                            bottomLeft:
+                                Radius.circular(TSizes.productImageRadius),
                           ),
                         ),
-                        child: SizedBox(
+                        child: const SizedBox(
                           width: TSizes.iconMd,
                           height: TSizes.iconMd,
                           child: Center(
-                            child: const Icon(
+                            child: Icon(
                               Iconsax.add,
                               color: TColors.white,
                             ),

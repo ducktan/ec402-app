@@ -8,6 +8,7 @@ import './features/shop/controllers/home_controller.dart';
 import './features/shop/screens/product_detail/product_detail_screen.dart';
 import 'package:ec402_app/features/shop/screens/product_review/product_review_screen.dart';
 
+
 void main() {
   runApp(const MyApp());
 }

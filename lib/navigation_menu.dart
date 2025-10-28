@@ -12,6 +12,7 @@ import 'package:ec402_app/features/shop/screens/brand/all_brand.dart';
 import 'package:ec402_app/features/shop/screens/cart/cart.dart';
 import 'package:ec402_app/features/shop/screens/wishlist/wishlist.dart';
 import 'package:ec402_app/features/personalization/screens/address/address.dart';
+import 'package:ec402_app/features/shop/screens/store/store.dart';
 
 class NavigationMenu extends StatelessWidget {
   const NavigationMenu({super.key});
@@ -51,7 +52,7 @@ class NavigationController extends GetxController {
 
   final screens = [
     const HomeScreen(),
-    const AllBrandsScreen(),
+    const StoreScreen(),
     // Container(color: Colors.orange),
     const WishlistScreen(), 
     const SettingsScreen(),

@@ -4,6 +4,7 @@ import 'package:ec402_app/utils/constants/colors.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart'; // 👈 thêm cái này
 import '../../../controllers/home_controller.dart';
+import '../../cart/cart.dart';
 
 class THomeAppBar extends StatelessWidget {
   const THomeAppBar({super.key});
@@ -34,7 +35,17 @@ class THomeAppBar extends StatelessWidget {
               ),
             ],
           )),
-      actions: [TCartCounterIcon(onPressed: () {}, iconColor: TColors.white)],
+      actions: [
+        TCartCounterIcon(
+          iconColor: TColors.white,
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const CartScreen()),
+            );
+          },
+        ),
+      ],
     );
   }
 }

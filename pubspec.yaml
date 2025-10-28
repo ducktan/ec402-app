@@ -48,6 +48,7 @@ dependencies:
   iconsax: ^0.0.8
   cupertino_icons: ^1.0.8
   provider: ^6.1.5+1
+  video_player: ^2.10.0
 
 dev_dependencies:
   flutter_test:
@@ -69,7 +70,7 @@ flutter:
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in
   # the material Icons class.
-  uses-material-design: true
+  
 
   # To add assets to your application, add an assets section, like this:
   # assets:
@@ -81,8 +82,11 @@ flutter:
   assets:
     - assets/logo/ 
     - assets/images/
-    - assets/icons/
+    - assets/images/banners/
+    - assets/images/products/
+    - assets/icons/categories/
     - assets/fonts/
+  uses-material-design: true
 
   # For details regarding adding assets from package dependencies, see
   # https://flutter.dev/to/asset-from-package

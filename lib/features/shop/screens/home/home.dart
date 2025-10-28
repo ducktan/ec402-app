@@ -15,6 +15,8 @@ import 'package:ec402_app/utils/constants/image_strings.dart';
 import 'package:ec402_app/utils/constants/sizes.dart';
 import 'package:flutter/material.dart';
 import 'package:ec402_app/features/shop/screens/search/search_screen.dart';
+import 'package:ec402_app/features/shop/screens/product_detail/product_detail_screen.dart';
+import 'package:get/get.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -74,7 +76,13 @@ class HomeScreen extends StatelessWidget {
 
                   TGirdLayout(
                     iTemCount: 4,
-                    itemBuilder: (_, int index) => const TProductCardVertical(),
+                    itemBuilder: (_, index) => TProductCardVertical(
+                      title: "Red Shoes $index",
+                      price: "500.000đ",
+                      shop: "Nike Official",
+                      imageUrl: TImages.productImage1,
+                      onTap: () => Get.to(() => const ProductDetailScreen()),
+                    ),
                   ),
                 ],
               ),
