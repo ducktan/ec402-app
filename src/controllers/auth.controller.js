@@ -102,15 +102,21 @@ exports.loginWithOtp = async (req, res) => {
 
 // 🔹 Xác minh OTP
 exports.verifyOtp = async (req, res) => {
+  console.log(req.body);
   try {
     const { phone, otp } = req.body;
 
-    const [user] = await db.query("SELECT * FROM users WHERE phone = ?", [phone]);
-    if (user.length === 0) return res.status(404).json({ message: "Không tìm thấy người dùng" });
+    // 1️⃣ Tìm user theo số điện thoại
+    const [userRows] = await db.query("SELECT * FROM users WHERE phone = ?", [phone]);
+    if (userRows.length === 0)
+      return res.status(404).json({ message: "Không tìm thấy người dùng" });
 
+    const user = userRows[0];
+
+    // 2️⃣ Kiểm tra OTP hợp lệ
     const [otpRecord] = await db.query(
       "SELECT * FROM otps WHERE user_id = ? AND otp_code = ? AND is_used = FALSE ORDER BY created_at DESC LIMIT 1",
-      [user[0].id, otp]
+      [user.id, otp]
     );
 
     if (otpRecord.length === 0)
@@ -120,17 +126,29 @@ exports.verifyOtp = async (req, res) => {
     if (now > otpRecord[0].expires_at)
       return res.status(400).json({ message: "OTP đã hết hạn" });
 
-    // đánh dấu OTP đã dùng
+    // 3️⃣ Đánh dấu OTP đã sử dụng
     await db.query("UPDATE otps SET is_used = TRUE WHERE id = ?", [otpRecord[0].id]);
 
-    // tạo JWT
+    // 4️⃣ Tạo JWT token
     const token = jwt.sign(
-      { userId: user[0].id },
-      process.env.JWT_SECRET || "secret",
+      { userId: user.id },
+      process.env.JWT_SECRET || "EC402_APP_KEY",
       { expiresIn: "7d" }
     );
 
-    res.status(200).json({ message: "Xác thực thành công", token });
+    // 5️⃣ Trả về token kèm thông tin user
+    res.status(200).json({
+      message: "Xác thực thành công",
+      token,
+      user: {
+        id: user.id,
+        name: user.name,
+        phone: user.phone,
+        email: user.email,
+        avatar: user.avatar || null,
+      },
+    });
+
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: "Lỗi server" });

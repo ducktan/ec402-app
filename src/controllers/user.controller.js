@@ -23,7 +23,7 @@ exports.updateUser = async (req, res) => {
 // GET /api/users/profile
 exports.getUserProfile = async (req, res) => {
   try {
-    const userId = req.user.id; // lấy từ token middleware
+    const userId = req.user.userId; // lấy từ token middleware
 
     const user = await User.findById(userId);
 
