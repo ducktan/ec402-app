@@ -17,6 +17,8 @@ import 'package:ec402_app/features/shop/screens/cart/cart.dart';
 import 'package:ec402_app/features/personalization/screens/order/order.dart';
 import 'package:ec402_app/features/personalization/screens/coupon/coupon.dart';
 import 'package:iconsax/iconsax.dart';
+import 'package:ec402_app/services/api_service.dart';
+import 'package:ec402_app/features/authentication/screens/welcome.dart';
 
 class SettingsScreen extends StatelessWidget {
   const SettingsScreen({super.key});
@@ -86,7 +88,20 @@ class SettingsScreen extends StatelessWidget {
                 const SizedBox(height: TSizes.spaceBtwSections),
                 SizedBox(
                   width: double.infinity,
-                  child: OutlinedButton(onPressed: (){}, child: const Text('Logout')),
+                  child: OutlinedButton(
+                    onPressed: () async {
+                      final success = await ApiService.logout();
+                      if (success && context.mounted) {
+                        // Xóa stack và chuyển về WelcomeScreen
+                        Navigator.pushAndRemoveUntil(
+                          context,
+                          MaterialPageRoute(builder: (context) => const WelcomeScreen()),
+                          (route) => false,
+                        );
+                      }
+                    },
+                    child: const Text('Logout'),
+                  ),
                 ),
                 const SizedBox(height: TSizes.spaceBtwSections * 2.5),
               ],

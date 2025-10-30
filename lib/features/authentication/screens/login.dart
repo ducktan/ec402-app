@@ -153,7 +153,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
                     // 👉 Điều hướng sang màn hình Navigation
                     Get.offAll(() => const NavigationMenu());
-                    HomeController.instance.setUser(res.user.name);
+                    HomeController.instance.setUser(res.user.name, res.user.email, "");
 
 
                   } else {

@@ -7,6 +7,7 @@ import 'package:get/get.dart'; // 👈 import GetX
 import './features/shop/controllers/home_controller.dart';
 import './features/shop/screens/product_detail/product_detail_screen.dart';
 import 'package:ec402_app/features/shop/screens/product_review/product_review_screen.dart';
+import 'package:ec402_app/features/authentication/screens/welcome.dart';
 
 
 void main() {
@@ -89,7 +90,7 @@ class MyApp extends StatelessWidget {
         ),
       ),
 
-      home: const NavigationMenu(),
+      home: const WelcomeScreen(),
     );
   }
 }

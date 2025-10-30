@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:get/get.dart'; // ✅ import GetX
+import 'package:get/get.dart';
+
 import '../../../utils/constants/sizes.dart';
 import 'login.dart';
 import 'signup.dart';
+import 'login_otp_screen.dart'; // ✅ import thêm màn hình OTP
 
 class WelcomeScreen extends StatelessWidget {
   const WelcomeScreen({super.key});
@@ -17,10 +19,11 @@ class WelcomeScreen extends StatelessWidget {
       body: SafeArea(
         child: Center(
           child: SingleChildScrollView(
-            padding: const EdgeInsets.all(24),
+            padding: const EdgeInsets.all(TSizes.defaultSpace),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
+                /// Logo
                 Image.asset(
                   "assets/logo/t-store-splash-logo-black.png",
                   height: 250,
@@ -28,15 +31,18 @@ class WelcomeScreen extends StatelessWidget {
 
                 const SizedBox(height: 24),
 
+                /// Tiêu đề
                 Text(
                   "Welcome to T STORE",
-                  style: theme.textTheme.headlineSmall!.copyWith(
+                  style: theme.textTheme.headlineSmall?.copyWith(
                     fontWeight: FontWeight.bold,
                   ),
                   textAlign: TextAlign.center,
                 ).animate().fade(duration: 700.ms).slideY(begin: 0.3, end: 0),
 
                 const SizedBox(height: 8),
+
+                /// Subtitle
                 Text(
                   "Shop smart, live better.",
                   style: theme.textTheme.bodyMedium,
@@ -45,7 +51,7 @@ class WelcomeScreen extends StatelessWidget {
 
                 const SizedBox(height: 32),
 
-                /// ✅ Nút Login (dùng GetX)
+                /// Nút Login Email
                 SizedBox(
                   width: double.infinity,
                   child: ElevatedButton.icon(
@@ -57,19 +63,19 @@ class WelcomeScreen extends StatelessWidget {
 
                 const SizedBox(height: 16),
 
-                /// Nút Login Phone
+                /// ✅ Nút Login Phone (chuyển sang OTP Screen)
                 SizedBox(
                   width: double.infinity,
                   child: OutlinedButton.icon(
                     icon: Icon(Icons.phone, color: theme.colorScheme.primary),
                     label: const Text("Login with Phone Number"),
-                    onPressed: () {},
+                    onPressed: () => Get.to(() => const LoginOtpScreen()),
                   ),
                 ).animate().fade(duration: 1000.ms).slideX(begin: 0.3, end: 0),
 
                 const SizedBox(height: 16),
 
-                /// Nút Google
+                /// Google Login
                 SizedBox(
                   width: double.infinity,
                   child: OutlinedButton.icon(
@@ -88,7 +94,7 @@ class WelcomeScreen extends StatelessWidget {
 
                 const SizedBox(height: 24),
 
-                /// ✅ Link Sign Up (dùng GetX)
+                /// Sign up link
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
