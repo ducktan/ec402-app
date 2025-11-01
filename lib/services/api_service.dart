@@ -5,6 +5,8 @@ import '../models/signup_model.dart';
 import '../utils/helpers/user_session.dart'; // 👈 import file UserSession
 import 'package:jwt_decoder/jwt_decoder.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:get_storage/get_storage.dart';
+import 'package:get/get.dart';
 
 class ApiService {
   static const String baseUrl = "http://192.168.23.1:5000/api"; // đổi theo IP backend
@@ -132,6 +134,7 @@ class ApiService {
 
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
+        print(data);
 
         // data gồm: { message, token, user }
         return {
@@ -176,4 +179,34 @@ class ApiService {
     }
   }
 
+
+
+  static Future<bool> updateUserProfile(Map<String, dynamic> data) async {
+    final token = await UserSession.getToken();
+    try {
+      print(token);
+      final url = Uri.parse('$baseUrl/users');
+      final response = await http.put(
+        url,
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ${token ?? ''}',
+        },
+        body: jsonEncode(data),
+      );
+
+      if (response.statusCode == 200) {
+        Get.snackbar("Success", "Profile updated successfully");
+        return true;
+      } else {
+        final body = jsonDecode(response.body);
+        Get.snackbar("Error", body['message'] ?? "Failed to update profile");
+        return false;
+      }
+    } catch (e) {
+      Get.snackbar("Error", "Failed to connect to server");
+      print("==> API updateUserProfile error: $e");
+      return false;
+    }
+  }
 }

@@ -23,18 +23,14 @@ class _VerifyOtpScreenState extends State<VerifyOtpScreen> {
     final result = await ApiService.verifyOTP(widget.phone, otpController.text);
 
     if (result != null) {
-      final token = result['token'];
 
-      // Gọi API lấy thông tin user
-      print(token);
-      final user = await ApiService.getUserProfile(token);
+      final user = result['user'];
+    
 
       if (user != null) {
         final homeCtrl = Get.put(HomeController());
         homeCtrl.setUser(user['name'], user['email'], user['avatar']); // 👈 thêm email
 
-        // Có thể lưu token vào GetStorage / SharedPrefs
-        // await LocalStorage.saveToken(token);
 
         Get.offAll(() => const NavigationMenu());
       } else {

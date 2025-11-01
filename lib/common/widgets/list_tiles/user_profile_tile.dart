@@ -16,12 +16,19 @@ class TUserProfileTile extends StatelessWidget {
 
     return Obx(() => ListTile(
           onTap: onPressed,
-          leading: const TCircularImage(
-            image: TImages.user,
+
+          // 🟢 Avatar động
+          leading: TCircularImage(
+            image: homeCtrl.avatarUrl.value.isNotEmpty
+                ? homeCtrl.avatarUrl.value
+                : TImages.user, // fallback ảnh mặc định
+            isNetworkImage: homeCtrl.avatarUrl.value.isNotEmpty,
             width: 50,
             height: 50,
             padding: 0,
           ),
+
+          // 🟢 Username
           title: Text(
             homeCtrl.username.value.isNotEmpty
                 ? homeCtrl.username.value
@@ -31,6 +38,8 @@ class TUserProfileTile extends StatelessWidget {
                 .headlineSmall!
                 .apply(color: TColors.white),
           ),
+
+          // 🟢 Email
           subtitle: Text(
             homeCtrl.email.value.isNotEmpty
                 ? homeCtrl.email.value
@@ -40,6 +49,7 @@ class TUserProfileTile extends StatelessWidget {
                 .bodyMedium!
                 .apply(color: TColors.white),
           ),
+
           trailing: IconButton(
             onPressed: onPressed,
             icon: const Icon(Iconsax.edit, color: TColors.white),
