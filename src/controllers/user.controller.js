@@ -5,28 +5,61 @@ const UserAddress = require("../models/userAddress.model");
 exports.updateUser = async (req, res) => {
   try {
     const userId = req.user.id; // lấy từ middleware auth
-    const { name, phone, avatar } = req.body;
+    const { name, phone, avatar, gender, dob } = req.body;
 
+    // Tìm user
     const user = await User.findById(userId);
     if (!user) return res.status(404).json({ message: "User not found" });
 
-    await User.updateUser(userId, { name, phone, avatar });
+    // Tạo object chứa các trường cần update (chỉ thêm khi có giá trị)
+    const updateData = {};
+    if (name) updateData.name = name;
+    if (phone) updateData.phone = phone;
+    if (avatar) updateData.avatar = avatar;
+    if (gender) updateData.gender = gender;
+    if (dob) updateData.dob = dob;
 
-    res.json({ message: "User updated successfully" });
+    // Nếu không có gì để update thì báo lại
+    if (Object.keys(updateData).length === 0) {
+      return res.status(400).json({ message: "No fields to update" });
+    }
+
+    // Thực hiện cập nhật
+    await User.updateUser(userId, updateData);
+
+    // Lấy lại user mới sau update
+    const updatedUser = await User.findById(userId);
+
+    res.status(200).json({
+      message: "User updated successfully",
+      user: {
+        id: updatedUser.id,
+        name: updatedUser.name,
+        email: updatedUser.email,
+        phone: updatedUser.phone,
+        avatar: updatedUser.avatar,
+        gender: updatedUser.gender,
+        dob: updatedUser.dob,
+        role: updatedUser.role,
+        created_at: updatedUser.created_at,
+        updated_at: updatedUser.updated_at,
+      },
+    });
   } catch (err) {
-    console.error(err);
+    console.error("--> updateUser error:", err);
     res.status(500).json({ message: "Server error" });
   }
 };
 
 
+
+
 // GET /api/users/profile
 exports.getUserProfile = async (req, res) => {
   try {
-    const userId = req.user.userId; // lấy từ token middleware
 
+    const userId = req.user.id; // lấy từ token middleware
     const user = await User.findById(userId);
-
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }

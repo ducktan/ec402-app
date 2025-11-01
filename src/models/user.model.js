@@ -1,28 +1,38 @@
 const pool = require("../config/db");
 
 const User = {
-  // Tạo user mới
-  async createUser({ role, name, email, passwordHash, phone, avatar }) {
+  // 🧩 Tạo user mới
+  async createUser({ role, name, email, passwordHash, phone, avatar, gender, dob }) {
     const [result] = await pool.query(
-      "INSERT INTO users (role, name, email, password_hash, phone, avatar) VALUES (?, ?, ?, ?, ?, ?)",
-      [role || "buyer", name, email, passwordHash, phone || null, avatar || null]
+      `INSERT INTO users (role, name, email, password_hash, phone, avatar, gender, dob)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+      [
+        role || "buyer",
+        name,
+        email,
+        passwordHash,
+        phone || null,
+        avatar || null,
+        gender || "other",
+        dob || null, // yyyy-mm-dd format
+      ]
     );
     return result.insertId;
   },
 
-  // Tìm user theo email
+  // 🔍 Tìm user theo email
   async findUserByEmail(email) {
     const [rows] = await pool.query("SELECT * FROM users WHERE email = ?", [email]);
-    return rows[0]; // chỉ trả về 1 user
+    return rows[0];
   },
 
-  // Tìm user theo id
+  // 🔍 Tìm user theo id
   async findById(id) {
     const [rows] = await pool.query("SELECT * FROM users WHERE id = ?", [id]);
     return rows[0];
   },
 
-  // Cập nhật user
+  // ✏️ Cập nhật user
   async updateUser(id, data) {
     const fields = [];
     const values = [];
@@ -38,6 +48,14 @@ const User = {
     if (data.avatar !== undefined) {
       fields.push("avatar = ?");
       values.push(data.avatar);
+    }
+    if (data.gender !== undefined) {
+      fields.push("gender = ?");
+      values.push(data.gender);
+    }
+    if (data.dob !== undefined) {
+      fields.push("dob = ?");
+      values.push(data.dob);
     }
 
     if (fields.length === 0) return; // không có gì để update
