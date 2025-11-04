@@ -44,7 +44,7 @@ CREATE TABLE categories (
 -- table products
 CREATE TABLE products (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    seller_id INT NOT NULL,
+    brand_id INT NOT NULL,
     category_id INT,
     name VARCHAR(200) NOT NULL,
     description TEXT,
@@ -54,9 +54,21 @@ CREATE TABLE products (
     review_count INT DEFAULT 0,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    FOREIGN KEY (seller_id) REFERENCES users(id),
+    FOREIGN KEY (brand_id) REFERENCES brands(id),
     FOREIGN KEY (category_id) REFERENCES categories(id)
 );
+
+-- thêm bảng brands để sửa cái không có seller - id
+CREATE TABLE brands (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(200) NOT NULL,
+    description TEXT,
+    logo_url VARCHAR(255),  -- link hình ảnh thương hiệu
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+
 
 -- table product_images (1 product - n images)
 CREATE TABLE product_images (
@@ -79,6 +91,7 @@ CREATE TABLE reviews (
 );
 
 -- table carts
+-- mỗi cart chỉ thuộc về 1 user, lưu thông tin các lần thêm vào giỏ hàng của user thay vì dùng session. 
 CREATE TABLE carts (
     id INT AUTO_INCREMENT PRIMARY KEY,
     user_id INT UNIQUE NOT NULL,
@@ -87,7 +100,7 @@ CREATE TABLE carts (
 );
 
 -- table cart_items (1 - n)
-
+-- chứa các item trong giỏ hàng. 
 CREATE TABLE cart_items (
     id INT AUTO_INCREMENT PRIMARY KEY,
     cart_id INT NOT NULL,

@@ -2,24 +2,27 @@ const pool = require("../config/db");
 
 class Product {
   // ====== CREATE PRODUCT ======
-  static async create({ seller_id, category_id, name, description, price, stock }) {
+  static async create({ brand_id, category_id, name, description, price, stock }) {
     const [result] = await pool.query(
-      `INSERT INTO products (seller_id, category_id, name, description, price, stock) 
+      `INSERT INTO products (brand_id, category_id, name, description, price, stock)
        VALUES (?, ?, ?, ?, ?, ?)`,
-      [seller_id, category_id, name, description, price, stock]
+      [brand_id, category_id, name, description, price, stock]
     );
-    return { id: result.insertId, seller_id, category_id, name, description, price, stock };
+
+    return {
+      id: result.insertId,
+      brand_id,
+      category_id,
+      name,
+      description,
+      price,
+      stock,
+    };
   }
 
   // ====== GET ALL PRODUCTS ======
-  static async findAll({ category_id }) {
-    let sql = `SELECT * FROM products`;
-    const params = [];
-    if (category_id) {
-      sql += ` WHERE category_id = ?`;
-      params.push(category_id);
-    }
-    const [rows] = await pool.query(sql, params);
+  static async findAll() {
+    const [rows] = await pool.query(`SELECT * FROM products`);
     return rows;
   }
 
@@ -29,7 +32,7 @@ class Product {
     return rows[0];
   }
 
-  // ====== UPDATE PRODUCT (chỉ cập nhật field có trong body) ======
+  // ====== UPDATE PRODUCT (động) ======
   static async updateProduct(id, fields) {
     const keys = Object.keys(fields);
     if (keys.length === 0) return null;
