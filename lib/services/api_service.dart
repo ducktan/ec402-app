@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 import 'package:http/http.dart' as http;
 import '../models/login_model.dart';
 import '../models/signup_model.dart';
@@ -7,6 +8,8 @@ import 'package:jwt_decoder/jwt_decoder.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:get/get.dart';
+import 'package:http_parser/http_parser.dart';
+
 
 class ApiService {
   static const String baseUrl = "http://192.168.23.1:5000/api"; // đổi theo IP backend
@@ -134,7 +137,15 @@ class ApiService {
 
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
-        print(data);
+    
+
+        await UserSession.saveUserSession(
+          token: data["token"],
+          userId: data['user']['id'],
+          name: data['user']['name'],
+          email: data['user']['email'],
+          role: data['user']['role'],
+        );
 
         // data gồm: { message, token, user }
         return {
@@ -142,14 +153,17 @@ class ApiService {
           "user": data["user"],
         };
       } else {
-        print("❌ Verify OTP failed: ${response.body}");
+        print("Verify OTP failed: ${response.body}");
         return null;
       }
     } catch (e) {
-      print("⚠️ Error verifying OTP: $e");
+      print("Error verifying OTP: $e");
       return null;
     }
   }
+
+
+  
 
   // ✅ Get user info using token
   static Future<Map<String, dynamic>?> getUserProfile(String token) async {
@@ -185,7 +199,7 @@ class ApiService {
     final token = await UserSession.getToken();
     try {
       print(token);
-      final url = Uri.parse('$baseUrl/users');
+      final url = Uri.parse('$baseUrl/users/upload-avatar');
       final response = await http.put(
         url,
         headers: {
@@ -209,4 +223,62 @@ class ApiService {
       return false;
     }
   }
+
+
+   static Future<Map<String, dynamic>?> uploadAvatar(File file, String token) async {
+    try {
+      final uri = Uri.parse('$baseUrl/users/upload-avatar');
+      print('----->>> Uploading file: ${file.path}');
+
+      // 🔍 Xác định kiểu ảnh dựa vào phần mở rộng
+      final ext = file.path.split('.').last.toLowerCase();
+      String mimeSubtype;
+      switch (ext) {
+        case 'png':
+          mimeSubtype = 'png';
+          break;
+        case 'jpg':
+        case 'jpeg':
+          mimeSubtype = 'jpeg';
+          break;
+        case 'gif':
+          mimeSubtype = 'gif';
+          break;
+        default:
+          mimeSubtype = 'jpeg';
+      }
+
+      // 🔧 Tạo request multipart
+      final request = http.MultipartRequest('POST', uri)
+        ..headers['Authorization'] = 'Bearer $token'
+        ..files.add(
+          await http.MultipartFile.fromPath(
+            'avatar',
+            file.path,
+            contentType: MediaType('image', mimeSubtype), // ✅ quan trọng
+          ),
+        );
+
+      final response = await request.send();
+      final respStr = await response.stream.bytesToString();
+
+      if (response.statusCode == 200) {
+        print('✅ Upload success: $respStr');
+        try {
+          return jsonDecode(respStr);
+        } catch (_) {
+          return {'avatar_url': respStr};
+        }
+      } else {
+        print('❌ Upload failed: ${response.statusCode}, $respStr');
+        return null;
+      }
+    } catch (e) {
+      print('⚠️ Error uploading avatar: $e');
+      return null;
+    }
+  }
+
+
+
 }

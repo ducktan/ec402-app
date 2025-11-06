@@ -17,6 +17,19 @@ class HomeController extends GetxController {
     email.value = mail;
     avatarUrl.value = avatar ?? ''; // nếu không có thì để rỗng
   }
+
+  // ✅ Thêm 2 hàm sau:
+  /// Cập nhật avatar realtime sau khi upload
+  void updateAvatar(String newUrl) {
+    avatarUrl.value = newUrl;
+  }
+
+  /// Xóa thông tin user khi logout
+  void clearUser() {
+    username.value = '';
+    email.value = '';
+    avatarUrl.value = '';
+  }
 }
 
 

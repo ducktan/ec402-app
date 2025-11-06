@@ -32,7 +32,7 @@ class _LoginOtpScreenState extends State<LoginOtpScreen> {
       Get.to(() => VerifyOtpScreen(phone: phone));
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('❌ Không thể gửi OTP, vui lòng thử lại')),
+        const SnackBar(content: Text('Không thể gửi OTP, vui lòng thử lại')),
       );
     }
   }
@@ -42,42 +42,99 @@ class _LoginOtpScreenState extends State<LoginOtpScreen> {
     final theme = Theme.of(context);
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Đăng nhập bằng OTP'),
-        centerTitle: true,
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(24),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            const SizedBox(height: 40),
-            Icon(Icons.phone_android, size: 100, color: theme.primaryColor),
-            const SizedBox(height: 32),
+      backgroundColor: theme.colorScheme.surface,
+      body: SafeArea(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              // === App Logo / Illustration ===
+              const SizedBox(height: 20),
+              Icon(Icons.lock_outline,
+                  size: 90, color: theme.colorScheme.primary),
+              const SizedBox(height: 16),
 
-            TextField(
-              controller: phoneController,
-              decoration: const InputDecoration(
-                labelText: 'Số điện thoại',
-                prefixIcon: Icon(Icons.phone),
-                border: OutlineInputBorder(),
-              ),
-              keyboardType: TextInputType.phone,
-            ),
-
-            const SizedBox(height: 24),
-
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton(
-                onPressed: isLoading ? null : sendOtp,
-                style: ElevatedButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(vertical: 14),
+              // === Title & Subtitle ===
+              Text(
+                'Đăng nhập bằng OTP',
+                style: theme.textTheme.headlineSmall?.copyWith(
+                  fontWeight: FontWeight.bold,
+                  color: theme.colorScheme.onSurface,
                 ),
-                child: Text(isLoading ? 'Đang gửi OTP...' : 'Gửi OTP'),
               ),
-            ),
-          ],
+              const SizedBox(height: 8),
+              Text(
+                'Nhập số điện thoại của bạn để nhận mã xác thực.',
+                textAlign: TextAlign.center,
+                style: theme.textTheme.bodyMedium?.copyWith(
+                  color: theme.colorScheme.onSurfaceVariant,
+                ),
+              ),
+              const SizedBox(height: 40),
+
+              // === Input Field Card ===
+              Container(
+                padding: const EdgeInsets.all(20),
+                decoration: BoxDecoration(
+                  color: theme.colorScheme.surfaceContainerHighest,
+                  borderRadius: BorderRadius.circular(16),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.05),
+                      blurRadius: 8,
+                      offset: const Offset(0, 3),
+                    ),
+                  ],
+                ),
+                child: Column(
+                  children: [
+                    TextField(
+                      controller: phoneController,
+                      decoration: InputDecoration(
+                        labelText: 'Số điện thoại',
+                        hintText: 'VD: 0912 345 678',
+                        prefixIcon: const Icon(Icons.phone_rounded),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
+                      keyboardType: TextInputType.phone,
+                    ),
+                    const SizedBox(height: 28),
+                    SizedBox(
+                      width: double.infinity,
+                      height: 50,
+                      child: ElevatedButton(
+                        onPressed: isLoading ? null : sendOtp,
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: theme.colorScheme.primary,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          elevation: 3,
+                        ),
+                        child: Text(
+                          isLoading ? 'Đang gửi OTP...' : 'Gửi mã xác nhận',
+                          style: theme.textTheme.titleMedium?.copyWith(
+                            color: Colors.white,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+
+              const SizedBox(height: 40),
+              // === Footer ===
+              TextButton(
+                onPressed: () => Get.back(),
+                child: const Text('← Quay lại trang đăng nhập'),
+              ),
+            ],
+          ),
         ),
       ),
     );

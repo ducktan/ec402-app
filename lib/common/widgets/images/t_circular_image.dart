@@ -23,23 +23,22 @@ class TCircularImage extends StatelessWidget{
   final Color? backgroundColor;
   final double width, height, padding;
 
+
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: width,
-      height: height,
-      padding: EdgeInsets.all(padding),
-      decoration: BoxDecoration(
-        color: backgroundColor ?? (THelperFunctions.isDarkMode(context) ? TColors.black : TColors.white),
-        borderRadius: BorderRadius.circular(100),
-      ),
-      child: Center(
-        child: Image(
-          fit: fit,
-          image: isNetworkImage ? NetworkImage(image) : AssetImage(image) as ImageProvider,
-          color: overlayColor,
-        ),
+    final imageWidget = isNetworkImage
+        ? Image.network(image, fit: BoxFit.cover)
+        : Image.asset(image, fit: BoxFit.cover);
+
+    return ClipOval(
+      child: Container(
+        width: width,
+        height: height,
+        color: backgroundColor ?? Colors.grey.shade200,
+        child: imageWidget,
       ),
     );
   }
+
+  
 }
