@@ -1,5 +1,7 @@
 const User = require("../models/user.model");
 const UserAddress = require("../models/userAddress.model");
+const path = require("path");
+const pool = require("../config/db");
 
 // Cập nhật thông tin user
 exports.updateUser = async (req, res) => {
@@ -138,3 +140,28 @@ exports.deleteAddress = async (req, res) => {
   }
 };
 
+
+
+
+exports.uploadAvatar = async (req, res) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({ message: "Không có file nào được tải lên" });
+    }
+
+    const userId = req.user.id; // lấy từ middleware auth
+    const fullUrl = `${req.protocol}://${req.get("host")}`; // vd: http://localhost:5000
+    const avatarUrl = `${fullUrl}/uploads/avatars/${req.file.filename}`;
+
+    // Cập nhật vào DB với full đường dẫn
+    await pool.query(`UPDATE users SET avatar = ? WHERE id = ?`, [avatarUrl, userId]);
+
+    return res.json({
+      message: "Upload thành công",
+      avatar_url: avatarUrl,
+    });
+  } catch (err) {
+    console.error("Upload error:", err);
+    res.status(500).json({ message: "Lỗi server khi upload avatar" });
+  }
+};

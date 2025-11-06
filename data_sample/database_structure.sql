@@ -111,20 +111,20 @@ CREATE TABLE cart_items (
 );
 
 -- table orders
-
+-- sửa orders table 
 CREATE TABLE orders (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    user_id INT NOT NULL,     -- buyer
-    seller_id INT NOT NULL,   -- seller
+    user_id INT NOT NULL,
+    brand_id INT NOT NULL,
     total_amount DECIMAL(12,2) NOT NULL,
-    payment_method ENUM('momo','vnpay','stripe','cod'), -- maybe change 
+    payment_method ENUM('momo','vnpay','stripe','cod'),
     payment_status ENUM('pending','paid','failed') DEFAULT 'pending',
     order_status ENUM('pending','confirmed','shipping','delivered','cancelled') DEFAULT 'pending',
-    shipping_address JSON,   -- MySQL 5.7+ hỗ trợ JSON
+    shipping_address JSON,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES users(id),
-    FOREIGN KEY (seller_id) REFERENCES users(id)
+    FOREIGN KEY (brand_id) REFERENCES brands(id)
 );
 
 -- table order_items (1 order - n items)

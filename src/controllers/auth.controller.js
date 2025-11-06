@@ -129,12 +129,8 @@ exports.verifyOtp = async (req, res) => {
     // 3️⃣ Đánh dấu OTP đã sử dụng
     await db.query("UPDATE otps SET is_used = TRUE WHERE id = ?", [otpRecord[0].id]);
 
-    // 4️⃣ Tạo JWT token
-    const token = jwt.sign(
-      { userId: user.id },
-      process.env.JWT_SECRET || "EC402_APP_KEY",
-      { expiresIn: "7d" }
-    );
+     // Tạo token (dùng utils/token.js)
+    const token = generateToken({ id: user.id, role: user.role });
 
     // 5️⃣ Trả về token kèm thông tin user
     res.status(200).json({
@@ -145,7 +141,8 @@ exports.verifyOtp = async (req, res) => {
         name: user.name,
         phone: user.phone,
         email: user.email,
-        avatar: user.avatar || null,
+        avatar: user.avatar,
+        role: user.role,
       },
     });
 

@@ -4,12 +4,14 @@ const userRoutes = require("./routes/user.routes");
 const productRoutes = require("./routes/product.routes");
 const CategoryRoutes = require("./routes/category.routes");
 const Product = require("./routes/product.routes");
+const path = require("path");
 
 
 
 const app = express();
 
 app.use(express.json());
+app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 // routes
 app.use("/api/auth", authRoutes);
