@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:ec402_app/utils/constants/colors.dart';
+import 'package:ec402_app/utils/constants/sizes.dart';
 
 class OrderSuccessScreen extends StatelessWidget {
   const OrderSuccessScreen({super.key});
@@ -6,42 +8,49 @@ class OrderSuccessScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: TColors.white,
       body: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 24),
+          padding: const EdgeInsets.symmetric(horizontal: TSizes.defaultSpace),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              /// 🖼 Hiển thị ảnh GIF (thay video)
+              /// 🎉 Animated GIF hoặc ảnh minh họa
               ClipRRect(
                 borderRadius: BorderRadius.circular(16),
                 child: Image.asset(
                   'assets/images/Order_complete.gif',
                   fit: BoxFit.cover,
-                  width: 240,
-                  height: 240,
+                  width: 220,
+                  height: 220,
                 ),
               ),
 
-              const SizedBox(height: 32),
+              const SizedBox(height: TSizes.spaceBtwItems * 2),
 
-              const Text(
+              /// 🏷 Title
+              Text(
                 'Order Success!',
-                style: TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.black87,
-                ),
+                style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                      fontWeight: FontWeight.bold,
+                      color: TColors.textPrimary,
+                    ),
               ),
               const SizedBox(height: 8),
 
-              const Text(
-                'Your item will be shipped soon!',
-                style: TextStyle(color: Colors.grey, fontSize: 14),
+              /// 📦 Subtitle
+              Text(
+                'Your order has been placed successfully.\nWe’ll deliver it soon!',
+                textAlign: TextAlign.center,
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                      color: TColors.textSecondary,
+                      height: 1.5,
+                    ),
               ),
-              const SizedBox(height: 40),
 
+              const SizedBox(height: TSizes.spaceBtwSections * 1.5),
+
+              /// 🔘 Continue Button
               SizedBox(
                 width: double.infinity,
                 height: 52,
@@ -50,16 +59,17 @@ class OrderSuccessScreen extends StatelessWidget {
                     Navigator.popUntil(context, (route) => route.isFirst);
                   },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF4C6EF5),
+                    backgroundColor: Theme.of(context).colorScheme.primary,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),
                     ),
+                    elevation: 2,
                   ),
                   child: const Text(
-                    'Continue',
+                    'Continue Shopping',
                     style: TextStyle(
                       fontWeight: FontWeight.bold,
-                      color: Colors.white,
+                      color: TColors.white,
                       fontSize: 16,
                     ),
                   ),

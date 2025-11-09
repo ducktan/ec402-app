@@ -4,13 +4,14 @@ import 'package:flutter/material.dart';
 import 'package:ec402_app/common/widgets/texts/section_heading.dart';
 import 'package:ec402_app/features/shop/screens/filter/filter_screen.dart';
 import 'package:ec402_app/utils/constants/sizes.dart';
+import 'package:ec402_app/common/widgets/appbar/appbar.dart';
 
 class SearchScreen extends StatelessWidget {
   const SearchScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    // --- DỮ LIỆU GIẢ LẬP ---
+    // --- Dữ liệu giả lập ---
     final brands = const [
       ('Acer', Icons.computer),
       ('IKEA', Icons.chair),
@@ -37,23 +38,18 @@ class SearchScreen extends StatelessWidget {
     ];
 
     return Scaffold(
-      appBar: AppBar(
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () => Navigator.pop(context),
-        ),
-        title: const Text('Search'),
-        centerTitle: true,
-        backgroundColor: Colors.white,
-        foregroundColor: Colors.black,
-        elevation: 0,
+      // ===== SỬ DỤNG TAppBar =====
+      appBar: const TAppBar(
+        showBackArrow: true,
+        title: Text('Search'),
       ),
+      
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(TSizes.defaultSpace),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // --- THANH TÌM KIẾM + NÚT FILTER ---
+            // ===== Thanh tìm kiếm + nút Filter =====
             Row(
               children: [
                 Expanded(
@@ -111,8 +107,7 @@ class SearchScreen extends StatelessWidget {
             ),
             const SizedBox(height: TSizes.spaceBtwSections),
 
-            // --- BRANDS SECTION (GRIDVIEW) ---
-            // --- SỬA 1: Đổi tiêu đề ---
+            // ===== Brands Section =====
             const TSectionHeading(title: 'Brands', showActionButton: false),
             const SizedBox(height: TSizes.spaceBtwItems),
             GridView.builder(
@@ -129,7 +124,6 @@ class SearchScreen extends StatelessWidget {
                 final (name, icon) = brands[index];
                 return GestureDetector(
                   onTap: () {
-                    // TODO: Thêm điều hướng đến trang chi tiết của brand 'name'
                     print('Tapped on Brand: $name');
                   },
                   child: Column(
@@ -149,7 +143,6 @@ class SearchScreen extends StatelessWidget {
                       Expanded(
                         child: Text(
                           name,
-                          // --- SỬA 2: Giảm kích thước chữ để không bị cắt ---
                           style: Theme.of(context).textTheme.labelSmall,
                           textAlign: TextAlign.center,
                           maxLines: 1,
@@ -163,7 +156,7 @@ class SearchScreen extends StatelessWidget {
             ),
             const SizedBox(height: TSizes.spaceBtwSections),
 
-            // --- CATEGORIES SECTION (LISTVIEW) ---
+            // ===== Categories Section =====
             const TSectionHeading(title: 'Categories', showActionButton: false),
             const SizedBox(height: TSizes.spaceBtwItems),
             ListView.builder(
@@ -176,7 +169,6 @@ class SearchScreen extends StatelessWidget {
                   leading: Icon(icon, color: Colors.black),
                   title: Text(name),
                   onTap: () {
-                    // TODO: Thêm điều hướng đến trang chi tiết của category 'name'
                     print('Tapped on Category: $name');
                   },
                 );

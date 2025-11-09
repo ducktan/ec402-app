@@ -18,7 +18,11 @@ class CategoryProductsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      // ==== AppBar bình thường ở trên ====
       appBar: AppBar(
+        backgroundColor: Colors.white,
+        iconTheme: const IconThemeData(color: TColors.black),
+        elevation: 0,
         title: Text(
           categoryName,
           style: const TextStyle(
@@ -26,38 +30,35 @@ class CategoryProductsScreen extends StatelessWidget {
             color: TColors.black,
           ),
         ),
-        backgroundColor: Colors.white,
-        elevation: 0,
-        iconTheme: const IconThemeData(color: TColors.black),
+        centerTitle: true,
       ),
       body: SingleChildScrollView(
         child: Column(
           children: [
-            // 🔸 Banner khuyến mãi full width
-            ClipRRect(
-              borderRadius: const BorderRadius.only(
-                bottomLeft: Radius.circular(16),
-                bottomRight: Radius.circular(16),
-              ),
-              child: Image.asset(
-                TImages.promoBanner1,
-                width: double.infinity,
-                height: 180,
-                fit: BoxFit.cover, // ✅ phủ full chiều ngang
+            // ==== Banner full width, cách xa AppBar ====
+            Padding(
+              padding: const EdgeInsets.only(top: TSizes.defaultSpace),
+              child: ClipRRect(
+                borderRadius: const BorderRadius.all(Radius.circular(16)),
+                child: Image.asset(
+                  TImages.promoBanner1,
+                  width: double.infinity,
+                  height: 180,
+                  fit: BoxFit.cover,
+                ),
               ),
             ),
 
             const SizedBox(height: TSizes.spaceBtwSections),
 
-            // 🔸 Tiêu đề
+            // ==== Section Heading "Products" ====
             const Padding(
               padding: EdgeInsets.symmetric(horizontal: TSizes.defaultSpace),
               child: TSectionHeading(title: 'Products', showActionButton: false),
             ),
-
             const SizedBox(height: TSizes.spaceBtwItems),
 
-            // 🔸 Danh sách sản phẩm
+            // ==== Grid sản phẩm ====
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: TSizes.defaultSpace),
               child: products.isNotEmpty
@@ -81,14 +82,17 @@ class CategoryProductsScreen extends StatelessWidget {
                         );
                       },
                     )
-                  : const Padding(
-                      padding: EdgeInsets.only(top: 60),
-                      child: Text(
-                        'No Data Found!',
-                        style: TextStyle(color: Colors.grey, fontSize: 16),
+                  : Padding(
+                      padding: const EdgeInsets.only(top: 60),
+                      child: Center(
+                        child: Text(
+                          'No Data Found!',
+                          style: TextStyle(color: Colors.grey.shade600, fontSize: 16),
+                        ),
                       ),
                     ),
             ),
+            const SizedBox(height: TSizes.spaceBtwSections),
           ],
         ),
       ),

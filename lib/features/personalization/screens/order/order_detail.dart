@@ -1,11 +1,8 @@
 import 'package:ec402_app/common/widgets/appbar/appbar.dart';
 import 'package:ec402_app/common/widgets/custom_shapes/containers/rounded_container.dart';
-import 'package:ec402_app/utils/constants/colors.dart';
 import 'package:ec402_app/utils/constants/sizes.dart';
 import 'package:ec402_app/utils/helpers/helper_functions.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
-import 'package:get/get_core/src/get_main.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:ec402_app/common/widgets/images/t_circular_image.dart';
 import 'package:ec402_app/utils/constants/image_strings.dart';
@@ -15,11 +12,13 @@ class OrderDetailScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
     final dark = THelperFunctions.isDarkMode(context);
 
     return Scaffold(
       appBar: TAppBar(
-        title: Text('Order Details', style: Theme.of(context).textTheme.headlineSmall),
+        title: Text('Order Details', style: theme.textTheme.headlineSmall),
         showBackArrow: true,
       ),
       body: SingleChildScrollView(
@@ -28,16 +27,13 @@ class OrderDetailScreen extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             /// -------- Order Summary --------
-            _SectionHeader(
-              icon: Iconsax.bag_2, // order icon
-              title: 'Order Summary',
-              context: context,
-            ),
+            _SectionHeader(icon: Iconsax.bag_2, title: 'Order Summary', context: context),
             const SizedBox(height: TSizes.spaceBtwItems / 2),
 
             TRoundedContainer(
               showBorder: true,
-              backgroundColor: dark ? TColors.dark : TColors.light,
+              backgroundColor: colorScheme.surface,
+              borderColor: colorScheme.outlineVariant,
               padding: const EdgeInsets.all(TSizes.md),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -48,19 +44,20 @@ class OrderDetailScreen extends StatelessWidget {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text('Order Status:', style: Theme.of(context).textTheme.bodyMedium),
+                      Text('Order Status:', style: theme.textTheme.bodyMedium),
                       Container(
                         decoration: BoxDecoration(
-                          // ignore: deprecated_member_use
-                          color: TColors.primary.withOpacity(0.1),
+                          color: colorScheme.primaryContainer.withOpacity(0.3),
                           borderRadius: BorderRadius.circular(20),
                         ),
-                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-                        child: Text('Pending',
-                            style: Theme.of(context)
-                                .textTheme
-                                .labelLarge!
-                                .apply(color: TColors.primary)),
+                        padding:
+                            const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                        child: Text(
+                          'Pending',
+                          style: theme.textTheme.labelLarge?.copyWith(
+                            color: colorScheme.primary,
+                          ),
+                        ),
                       ),
                     ],
                   ),
@@ -71,15 +68,13 @@ class OrderDetailScreen extends StatelessWidget {
             const SizedBox(height: TSizes.spaceBtwSections),
 
             /// -------- Items --------
-            _SectionHeader(
-              icon: Iconsax.shopping_cart, // items icon
-              title: 'Items',
-              context: context,
-            ),
+            _SectionHeader(icon: Iconsax.shopping_cart, title: 'Items', context: context),
             const SizedBox(height: TSizes.spaceBtwItems / 2),
+
             TRoundedContainer(
               showBorder: true,
-              backgroundColor: dark ? TColors.dark : TColors.light,
+              backgroundColor: colorScheme.surface,
+              borderColor: colorScheme.outlineVariant,
               padding: const EdgeInsets.all(TSizes.md),
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -98,26 +93,28 @@ class OrderDetailScreen extends StatelessWidget {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Expanded(
-                              child: Text('Green Nike sports shoe',
-                                  style: Theme.of(context).textTheme.titleMedium),
+                              child: Text(
+                                'Green Nike sports shoe',
+                                style: theme.textTheme.titleMedium,
+                              ),
                             ),
                             const SizedBox(width: 8),
-                            // Price at the top-right of the item row
-                            Text('\$122.6', style: Theme.of(context).textTheme.titleMedium),
+                            Text('\$122.6', style: theme.textTheme.titleMedium),
                           ],
                         ),
                         const SizedBox(height: 4),
                         Row(
                           children: [
                             Text('Unit Price: \$134.0',
-                                style: Theme.of(context).textTheme.labelMedium),
+                                style: theme.textTheme.labelMedium),
                             const SizedBox(width: 12),
                             Row(
                               mainAxisSize: MainAxisSize.min,
                               children: [
-                                Text('Quantity:', style: Theme.of(context).textTheme.labelMedium),
+                                Text('Quantity:',
+                                    style: theme.textTheme.labelMedium),
                                 const SizedBox(width: 4),
-                                Text('1', style: Theme.of(context).textTheme.labelMedium),
+                                Text('1', style: theme.textTheme.labelMedium),
                               ],
                             ),
                           ],
@@ -127,13 +124,16 @@ class OrderDetailScreen extends StatelessWidget {
                           alignment: Alignment.centerLeft,
                           child: ElevatedButton.icon(
                             onPressed: () {},
-                            icon: const Icon(Iconsax.star, size: 16, color: Colors.white),
-                            label: const Text('Review Product', style: TextStyle(color: Colors.white)),
+                            icon: const Icon(Iconsax.star, size: 16),
+                            label: const Text('Review Product'),
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: TColors.primary,
-                              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                              textStyle: Theme.of(context).textTheme.labelLarge,
+                              backgroundColor: colorScheme.primary,
+                              foregroundColor: colorScheme.onPrimary,
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 14, vertical: 8),
+                              shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(8)),
+                              textStyle: theme.textTheme.labelLarge,
                             ),
                           ),
                         ),
@@ -148,13 +148,11 @@ class OrderDetailScreen extends StatelessWidget {
 
             /// -------- Shipping Address --------
             _SectionHeader(
-              icon: Iconsax.location, // shipping icon
-              title: 'Shipping Address',
-              context: context,
-            ),
+                icon: Iconsax.location, title: 'Shipping Address', context: context),
             const SizedBox(height: TSizes.spaceBtwItems / 2),
             TRoundedContainer(
-              backgroundColor: dark ? TColors.dark : TColors.light,
+              backgroundColor: colorScheme.surface,
+              borderColor: colorScheme.outlineVariant,
               padding: const EdgeInsets.all(TSizes.md),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -169,29 +167,24 @@ class OrderDetailScreen extends StatelessWidget {
             const SizedBox(height: TSizes.spaceBtwSections),
 
             /// -------- Billing Address --------
-            _SectionHeader(
-              icon: Iconsax.home, // billing icon
-              title: 'Billing Address',
-              context: context,
-            ),
+            _SectionHeader(icon: Iconsax.home, title: 'Billing Address', context: context),
             TRoundedContainer(
-              backgroundColor: dark ? TColors.dark : TColors.light,
+              backgroundColor: colorScheme.surface,
+              borderColor: colorScheme.outlineVariant,
               padding: const EdgeInsets.all(TSizes.md),
               child: Text('Billing Address is Same as Shipping Address',
-                  style: Theme.of(context).textTheme.bodyMedium),
+                  style: theme.textTheme.bodyMedium),
             ),
 
             const SizedBox(height: TSizes.spaceBtwSections),
 
             /// -------- Payment Details --------
             _SectionHeader(
-              icon: Iconsax.wallet_2, // payment icon
-              title: 'Payment Details',
-              context: context,
-            ),
+                icon: Iconsax.wallet_2, title: 'Payment Details', context: context),
             const SizedBox(height: TSizes.spaceBtwItems / 2),
             TRoundedContainer(
-              backgroundColor: dark ? TColors.dark : TColors.light,
+              backgroundColor: colorScheme.surface,
+              borderColor: colorScheme.outlineVariant,
               padding: const EdgeInsets.all(TSizes.md),
               child: Column(
                 children: [
@@ -208,49 +201,51 @@ class OrderDetailScreen extends StatelessWidget {
             const SizedBox(height: TSizes.spaceBtwSections),
 
             /// -------- Delivery Status --------
-            _SectionHeader(
-              icon: Iconsax.truck, // delivery icon
-              title: 'Delivery Status',
-              context: context,
-            ),
+            _SectionHeader(icon: Iconsax.truck, title: 'Delivery Status', context: context),
             const SizedBox(height: TSizes.spaceBtwItems / 2),
             TRoundedContainer(
-              backgroundColor: dark ? TColors.dark : TColors.light,
+              backgroundColor: colorScheme.surface,
+              borderColor: colorScheme.outlineVariant,
               padding: const EdgeInsets.all(TSizes.md),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('[#6d291]', style: Theme.of(context).textTheme.labelMedium),
+                  Text('[#6d291]', style: theme.textTheme.labelMedium),
                   const SizedBox(height: TSizes.spaceBtwItems / 2),
                   _DeliveryStep(
-                    icon: Iconsax.timer, // placed
-                    title: 'Order Placed',
-                    status: 'Pending',
-                    active: true,
-                  ),
-                  const _DeliveryStep(icon: Iconsax.refresh, title: 'Processing', status: 'In Progress'),
-                  const _DeliveryStep(icon: Iconsax.truck, title: 'Shipped', status: 'On the Way'),
-                  const _DeliveryStep(icon: Iconsax.home, title: 'Delivered', status: 'Arrived'),
-                  const _DeliveryStep(icon: Iconsax.close_circle, title: 'Order Canceled', status: 'Canceled'),
-                  const _DeliveryStep(icon: Iconsax.arrow_circle_left, title: 'Returned', status: 'Returned'),
-                  const _DeliveryStep(icon: Iconsax.refresh_circle, title: 'Refunded', status: 'Refunded'),
+                      icon: Iconsax.timer,
+                      title: 'Order Placed',
+                      status: 'Pending',
+                      active: true),
+                  const _DeliveryStep(
+                      icon: Iconsax.refresh,
+                      title: 'Processing',
+                      status: 'In Progress'),
+                  const _DeliveryStep(
+                      icon: Iconsax.truck, title: 'Shipped', status: 'On the Way'),
+                  const _DeliveryStep(
+                      icon: Iconsax.home, title: 'Delivered', status: 'Arrived'),
                 ],
               ),
             ),
 
             const SizedBox(height: TSizes.spaceBtwSections),
 
-            // Cancel order button
             SizedBox(
               width: double.infinity,
               child: ElevatedButton(
                 onPressed: () {},
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: TColors.primary,
+                  backgroundColor: colorScheme.primary,
+                  foregroundColor: colorScheme.onPrimary,
                   padding: const EdgeInsets.symmetric(vertical: 16),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12)),
                 ),
-                child: Text('Cancel Order', style: Theme.of(context).textTheme.titleMedium!.apply(color: Colors.white)),
+                child: Text('Cancel Order',
+                    style: theme.textTheme.titleMedium?.copyWith(
+                      color: colorScheme.onPrimary,
+                    )),
               ),
             ),
           ],
@@ -259,22 +254,21 @@ class OrderDetailScreen extends StatelessWidget {
     );
   }
 
-  /// Helper widget để hiển thị 1 dòng thông tin đơn hàng
-  Widget _buildOrderRow(String label, String value, BuildContext context, {bool bold = false}) {
+  Widget _buildOrderRow(String label, String value, BuildContext context,
+      {bool bold = false}) {
+    final theme = Theme.of(context);
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(label, style: Theme.of(context).textTheme.bodyMedium),
+          Text(label, style: theme.textTheme.bodyMedium),
           Text(
             value,
             style: bold
-                ? Theme.of(context)
-                    .textTheme
-                    .titleMedium!
+                ? theme.textTheme.titleMedium!
                     .copyWith(fontWeight: FontWeight.bold)
-                : Theme.of(context).textTheme.bodyMedium,
+                : theme.textTheme.bodyMedium,
           ),
         ],
       ),
@@ -282,7 +276,6 @@ class OrderDetailScreen extends StatelessWidget {
   }
 }
 
-/// ------- Widget hiển thị địa chỉ -------
 class _AddressRow extends StatelessWidget {
   final String label;
   final String value;
@@ -290,21 +283,21 @@ class _AddressRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 3),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(label, style: Theme.of(context).textTheme.bodyMedium),
+          Text(label, style: theme.textTheme.bodyMedium),
           const SizedBox(width: 6),
-          Expanded(child: Text(value, style: Theme.of(context).textTheme.bodyMedium)),
+          Expanded(child: Text(value, style: theme.textTheme.bodyMedium)),
         ],
       ),
     );
   }
 }
 
-/// ------- Widget hiển thị tiến trình giao hàng -------
 class _DeliveryStep extends StatelessWidget {
   final IconData icon;
   final String title;
@@ -312,7 +305,7 @@ class _DeliveryStep extends StatelessWidget {
   final bool active;
 
   const _DeliveryStep({
-    this.icon = Iconsax.clock, // default
+    required this.icon,
     required this.title,
     required this.status,
     this.active = false,
@@ -320,7 +313,10 @@ class _DeliveryStep extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final color = active ? TColors.primary : Colors.grey.shade400;
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final color = active ? colorScheme.primary : colorScheme.outline;
+
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 10),
       child: Row(
@@ -332,32 +328,29 @@ class _DeliveryStep extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  title,
-                  style: Theme.of(context)
-                      .textTheme
-                      .bodyMedium!
-                      .copyWith(fontWeight: FontWeight.bold, color: color),
-                ),
+                Text(title,
+                    style: theme.textTheme.bodyMedium!.copyWith(
+                        fontWeight: FontWeight.bold, color: color)),
                 const SizedBox(height: 4),
-                Text(status, style: Theme.of(context).textTheme.labelMedium!.apply(color: color)),
+                Text(status,
+                    style: theme.textTheme.labelMedium?.copyWith(color: color)),
               ],
             ),
           ),
-          // right-side indicator when active
           if (active)
             Container(
               width: 24,
               height: 24,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                border: Border.all(color: TColors.primary, width: 2),
+                border: Border.all(color: colorScheme.primary, width: 2),
               ),
               child: Center(
                 child: Container(
                   width: 10,
                   height: 10,
-                  decoration: const BoxDecoration(shape: BoxShape.circle, color: TColors.primary),
+                  decoration: BoxDecoration(
+                      shape: BoxShape.circle, color: colorScheme.primary),
                 ),
               ),
             ),
@@ -367,7 +360,6 @@ class _DeliveryStep extends StatelessWidget {
   }
 }
 
-/// Small section header with circular icon and title
 class _SectionHeader extends StatelessWidget {
   final IconData icon;
   final String title;
@@ -377,21 +369,21 @@ class _SectionHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext _) {
-    final textStyle = Theme.of(context).textTheme.titleMedium;
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
     return Row(
       children: [
         Container(
           width: 36,
           height: 36,
           decoration: BoxDecoration(
-            // ignore: deprecated_member_use
-            color: THelperFunctions.isDarkMode(context) ? TColors.dark.withOpacity(0.2) : TColors.primary.withOpacity(0.12),
+            color: colorScheme.primaryContainer.withOpacity(0.2),
             borderRadius: BorderRadius.circular(12),
           ),
-          child: Icon(icon, color: TColors.primary, size: 18),
+          child: Icon(icon, color: colorScheme.primary, size: 18),
         ),
         const SizedBox(width: 12),
-        Text(title, style: textStyle),
+        Text(title, style: theme.textTheme.titleMedium),
       ],
     );
   }

@@ -1,6 +1,5 @@
 import 'package:ec402_app/common/widgets/custom_shapes/containers/rounded_container.dart';
 import 'package:ec402_app/features/personalization/screens/order/order_detail.dart';
-import 'package:ec402_app/utils/constants/colors.dart';
 import 'package:ec402_app/utils/constants/sizes.dart';
 import 'package:ec402_app/utils/helpers/helper_functions.dart';
 import 'package:flutter/material.dart';
@@ -13,118 +12,107 @@ class TOrderListItems extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final dark = THelperFunctions.isDarkMode(context);
+    final colorScheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
+
     return ListView.separated(
       shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
       itemCount: 10,
       separatorBuilder: (_, __) => const SizedBox(height: TSizes.spaceBtwItems),
       itemBuilder: (_, index) => TRoundedContainer(
         showBorder: true,
         padding: const EdgeInsets.all(TSizes.md),
-        backgroundColor: dark ? TColors.dark : TColors.light,
+        backgroundColor: colorScheme.surface,
+        borderColor: colorScheme.outlineVariant.withOpacity(0.3),
         child: Column(
-          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-          /// -- Row 1
-          Row(
-            children: [
-              /// 1 - Icon
-              Icon(Iconsax.ship),
-              SizedBox(width: TSizes.spaceBtwItems / 2),
-
-              /// 2 - Status & Date
-              Expanded(
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Processing',
-                      style: Theme.of(context).textTheme.bodyLarge!.apply(
-                        color: TColors.primary,
-                        fontWeightDelta: 1,
+            /// Row 1: Trạng thái + Ngày
+            Row(
+              children: [
+                Icon(Iconsax.ship, color: colorScheme.primary),
+                const SizedBox(width: TSizes.spaceBtwItems / 2),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Processing',
+                        style: textTheme.bodyLarge?.copyWith(
+                          color: colorScheme.primary,
+                          fontWeight: FontWeight.w600,
+                        ),
                       ),
-                    ),
-                    Text(
-                      '12 Jan, 2024',
-                      style: Theme.of(
-                        context,
-                      ).textTheme.bodyMedium?.copyWith(fontSize: 16, fontWeight: FontWeight.bold),
-                    ),
-                  ],
+                      Text(
+                        '12 Jan, 2024',
+                        style: textTheme.bodyMedium?.copyWith(
+                          color: colorScheme.onSurfaceVariant,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
-              ),
+                IconButton(
+                  onPressed: () => Get.to(() => const OrderDetailScreen()),
+                  icon: Icon(Iconsax.arrow_right_34,
+                      size: TSizes.iconSm, color: colorScheme.onSurface),
+                ),
+              ],
+            ),
+            const SizedBox(height: TSizes.spaceBtwItems),
 
-              /// 3 - Icon
-              IconButton(
-                onPressed: () { Get.to(() => const OrderDetailScreen()); },
-                icon: const Icon(Iconsax.arrow_right_34, size: TSizes.iconSm),
-              ),
-            ],
-          ),
-          const SizedBox(height: TSizes.spaceBtwItems),
-          /// -- Row 2
-          Row(
-            children: [
-              Expanded(
-                child: Row(
-                  children: [
-                    /// 1 - Icon
-                    Icon(Iconsax.tag),
-                    SizedBox(width: TSizes.spaceBtwItems / 2),
-
-                    /// 2 - Status & Date
-                    Expanded(
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
+            /// Row 2: Mã đơn + Ngày giao
+            Row(
+              children: [
+                /// Mã đơn
+                Expanded(
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Icon(Iconsax.tag, color: colorScheme.primary),
+                      const SizedBox(width: TSizes.spaceBtwItems / 2),
+                      Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(
-                            'Order',
-                            style: Theme.of(context).textTheme.labelMedium,
-                          ),
-                          Text(
-                            '#123456',
-                            style: Theme.of(context).textTheme.titleMedium,
-                          ),
+                          Text('Order',
+                              style: textTheme.labelMedium?.copyWith(
+                                  color: colorScheme.onSurfaceVariant)),
+                          Text('#123456',
+                              style: textTheme.titleMedium?.copyWith(
+                                  color: colorScheme.onSurface)),
                         ],
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
-              ),
 
-              Expanded(
-                child: Row(
-                  children: [
-                    /// 1 - Icon
-                    Icon(Iconsax.calendar),
-                    SizedBox(width: TSizes.spaceBtwItems / 2),
-
-                    /// 2 - Status & Date
-                    Expanded(
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
+                /// Ngày giao
+                Expanded(
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Icon(Iconsax.calendar, color: colorScheme.primary),
+                      const SizedBox(width: TSizes.spaceBtwItems / 2),
+                      Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(
-                            'Shipping Date',
-                            style: Theme.of(context).textTheme.labelMedium,
-                          ),
-                          Text(
-                            '03 Feb, 2024',
-                            style: Theme.of(context).textTheme.titleMedium,
-                          ),
+                          Text('Shipping Date',
+                              style: textTheme.labelMedium?.copyWith(
+                                  color: colorScheme.onSurfaceVariant)),
+                          Text('03 Feb, 2024',
+                              style: textTheme.titleMedium?.copyWith(
+                                  color: colorScheme.onSurface)),
                         ],
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
-              ),
-            ],
-          ),
-        ],
+              ],
+            ),
+          ],
+        ),
       ),
-    ),
     );
   }
 }

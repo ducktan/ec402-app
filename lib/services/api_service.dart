@@ -197,9 +197,11 @@ class ApiService {
 
   static Future<bool> updateUserProfile(Map<String, dynamic> data) async {
     final token = await UserSession.getToken();
+    print(token);
+
     try {
       print(token);
-      final url = Uri.parse('$baseUrl/users/upload-avatar');
+      final url = Uri.parse('$baseUrl/users');
       final response = await http.put(
         url,
         headers: {
@@ -208,6 +210,8 @@ class ApiService {
         },
         body: jsonEncode(data),
       );
+        print("==> Response status: ${response.statusCode}");
+        print("==> Response body: ${response.body}");
 
       if (response.statusCode == 200) {
         Get.snackbar("Success", "Profile updated successfully");
@@ -223,6 +227,8 @@ class ApiService {
       return false;
     }
   }
+
+  
 
 
    static Future<Map<String, dynamic>?> uploadAvatar(File file, String token) async {
@@ -280,5 +286,57 @@ class ApiService {
   }
 
 
+// Address APIs can be added here similarly
+/// Lấy danh sách địa chỉ
+  static Future<List<dynamic>?> getAddresses(String token) async {
+    try {
+      final url = Uri.parse('$baseUrl/users/addresses');
+      final response = await http.get(
+        url,
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        final body = jsonDecode(response.body);
+        // giả sử API trả về list trong key "data" hoặc trả thẳng list
+        if (body is List) return body;
+        if (body['data'] != null && body['data'] is List) {
+          return body['data'];
+        }
+      } else {
+        print("getAddresses failed: ${response.body}");
+      }
+    } catch (e) {
+      print("Error getAddresses: $e");
+    }
+    return null;
+  }
+
+  /// Tạo địa chỉ mới
+  static Future<bool> createAddress(Map<String, dynamic> data, String token) async {
+    try {
+      final url = Uri.parse('$baseUrl/users/addresses');
+      final response = await http.post(
+        url,
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token',
+        },
+        body: jsonEncode(data),
+      );
+
+      if (response.statusCode == 201 || response.statusCode == 200) {
+        return true;
+      } else {
+        print("createAddress failed: ${response.body}");
+      }
+    } catch (e) {
+      print("Error createAddress: $e");
+    }
+    return false;
+  }
 
 }

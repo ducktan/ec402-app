@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:iconsax/iconsax.dart';
 import '../../controllers/profile_controller.dart';
+import 'package:intl/intl.dart';
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
@@ -19,7 +20,6 @@ class ProfileScreen extends StatelessWidget {
         showBackArrow: true,
         title: Text('Profile'),
       ),
-
       body: Obx(() {
         if (controller.isLoading.value) {
           return const Center(child: CircularProgressIndicator());
@@ -33,7 +33,14 @@ class ProfileScreen extends StatelessWidget {
         // --- Controllers cho các TextField ---
         final nameCtrl = TextEditingController(text: user['name'] ?? '');
         final phoneCtrl = TextEditingController(text: user['phone'] ?? '');
-        final dobCtrl = TextEditingController(text: user['dob'] ?? '');
+
+        // --- DOB formatted ---
+        final dobRaw = user['dob'] ?? '';
+        final dobDate = DateTime.tryParse(dobRaw);
+        final dobCtrl = TextEditingController(
+          text: dobDate != null ? DateFormat('yyyy-MM-dd').format(dobDate) : '',
+        );
+
         String selectedGender = user['gender'] ?? 'other';
 
         return SingleChildScrollView(
@@ -58,7 +65,6 @@ class ProfileScreen extends StatelessWidget {
                   ],
                 ),
               ),
-
               const Divider(height: 32),
 
               // --- Name ---
@@ -109,14 +115,15 @@ class ProfileScreen extends StatelessWidget {
                   suffixIcon: IconButton(
                     icon: const Icon(Iconsax.calendar),
                     onPressed: () async {
+                      final initialDate = dobDate ?? DateTime(2000);
                       final picked = await showDatePicker(
                         context: context,
-                        initialDate: DateTime.tryParse(user['dob'] ?? '') ?? DateTime(2000),
+                        initialDate: initialDate,
                         firstDate: DateTime(1950),
                         lastDate: DateTime.now(),
                       );
                       if (picked != null) {
-                        dobCtrl.text = picked.toIso8601String().split('T')[0];
+                        dobCtrl.text = DateFormat('yyyy-MM-dd').format(picked);
                       }
                     },
                   ),
