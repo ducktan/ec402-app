@@ -109,6 +109,8 @@ CREATE TABLE cart_items (
     FOREIGN KEY (cart_id) REFERENCES carts(id) ON DELETE CASCADE,
     FOREIGN KEY (product_id) REFERENCES products(id)
 );
+ALTER TABLE cart_items
+ADD COLUMN is_selected BOOLEAN DEFAULT 0;
 
 -- table orders
 -- sửa orders table 
