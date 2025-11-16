@@ -23,28 +23,51 @@ class TAppBar extends StatelessWidget implements PreferredSizeWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: EdgeInsets.symmetric(horizontal: TSizes.md),
+      padding: const EdgeInsets.symmetric(horizontal: TSizes.md),
       child: AppBar(
-        backgroundColor: Colors.transparent,
-        surfaceTintColor: Colors.transparent,
+        backgroundColor: const Color.fromARGB(0, 255, 255, 255), // nền trắng sáng
+        surfaceTintColor: Colors.white,
         elevation: 0,
         scrolledUnderElevation: 0,
         automaticallyImplyLeading: false,
+
+        // ==== Back button / leading ====
         leading: showBackArrow
             ? IconButton(
                 onPressed: () => Get.back(),
-                icon: const Icon(Iconsax.arrow_left),
+                icon: const Icon(
+                  Iconsax.arrow_left,
+                  color: Colors.black, // fix màu đen
+                  size: 24,
+                ),
               )
             : leadingIcon != null
-            ? IconButton(onPressed: leadingOnPressed, icon: Icon(leadingIcon))
-            : null,
-        title: title,
+                ? IconButton(
+                    onPressed: leadingOnPressed,
+                    icon: Icon(
+                      leadingIcon,
+                      color: Colors.black,
+                      size: 24,
+                    ),
+                  )
+                : null,
+
+        // ==== Title ====
+        title: DefaultTextStyle(
+          style: const TextStyle(
+            color: Colors.black, // fix chữ đen
+            fontSize: 20,
+            fontWeight: FontWeight.w600,
+          ),
+          child: title ?? const SizedBox(),
+        ),
+
+        centerTitle: false,
         actions: actions,
       ),
     );
   }
 
   @override
-  // T000: implement preferredSize
   Size get preferredSize => Size.fromHeight(TDeviceUtils.getAppBarHeight());
 }

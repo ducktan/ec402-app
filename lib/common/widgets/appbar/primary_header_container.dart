@@ -21,26 +21,37 @@ class TPrimaryHeaderContainer extends StatelessWidget {
         child: Stack(
           clipBehavior: Clip.none,
           children: [
-            /// Background color
-            Container(color: TColors.primary),
+            /// Background gradient
+            Container(
+              decoration: const BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [
+                    Color(0xFFFF6B00), // cam đậm
+                    Color(0xFFFF8C1A), // cam nhạt
+                  ],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                ),
+              ),
+            ),
 
-            /// Decorative circles
+            /// Decorative circles (nhẹ hơn, opacity 0.1)
             Positioned(
               top: -150,
               right: -250,
               child: TCircularContainer(
-                backgroundColor: TColors.textWhite.withValues(alpha: 0.1),
+                backgroundColor: Colors.white.withOpacity(0.1),
               ),
             ),
             Positioned(
               top: 100,
               right: -300,
               child: TCircularContainer(
-                backgroundColor: TColors.textWhite.withValues(alpha: 0.1),
+                backgroundColor: Colors.white.withOpacity(0.1),
               ),
             ),
 
-            /// 🔹 Đảm bảo nội dung nằm trên cùng và nhận gesture
+            /// Nội dung child
             Positioned.fill(
               child: child,
             ),

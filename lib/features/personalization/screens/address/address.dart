@@ -1,42 +1,95 @@
+// user_address_screen.dart
 import 'package:ec402_app/common/widgets/appbar/appbar.dart';
 import 'package:ec402_app/features/personalization/screens/address/add_new_address.dart';
 import 'package:ec402_app/features/personalization/screens/address/widgets/single_address.dart';
-import 'package:ec402_app/utils/constants/colors.dart';
 import 'package:ec402_app/utils/constants/sizes.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import '../../controllers/address_controller.dart';
 import 'package:iconsax/iconsax.dart';
 
 class UserAddressScreen extends StatelessWidget {
-  const UserAddressScreen({Key? key}) : super(key: key);
+  const UserAddressScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final addressCtrl = Get.put(AddressController());
+    final theme = Theme.of(context);
+
     return Scaffold(
       floatingActionButton: FloatingActionButton(
-        backgroundColor: TColors.primary,
+        backgroundColor: theme.colorScheme.primary,
         onPressed: () => Get.to(() => const AddNewAddressScreen()),
-        child: const Icon(Iconsax.add, color: TColors.white),
+        child: const Icon(Iconsax.add, color: Colors.white),
       ),
       appBar: TAppBar(
         showBackArrow: true,
-        title: Text(
-          'Addresses',
-          style: Theme.of(context).textTheme.headlineSmall,
-        ),
+        title: Text('Addresses', style: theme.textTheme.headlineSmall),
       ),
-      body: const SingleChildScrollView(
-        child: Padding(
-          // <-- SỬA LỖI PADDING Ở ĐÂY
-          padding: EdgeInsets.all(TSizes.defaultSpace),
+      body: Obx(() {
+        if (addressCtrl.isLoading.value) {
+          return const Center(child: CircularProgressIndicator());
+        }
+
+        final addresses = addressCtrl.addresses;
+
+        if (addresses.isEmpty) {
+          return Center(
+            child: Text(
+              "No addresses found",
+              style: theme.textTheme.bodyMedium,
+            ),
+          );
+        }
+
+        return SingleChildScrollView(
+          padding: const EdgeInsets.all(TSizes.defaultSpace),
           child: Column(
-            children: [
-              TSingleAddress(selectedAddress: true),
-              TSingleAddress(selectedAddress: false),
-            ],
+            children: List.generate(addresses.length, (index) {
+              final isSelected =
+                  addressCtrl.selectedAddressIndex.value == index;
+
+              return GestureDetector(
+                onTap: () => addressCtrl.selectAddress(index), // ✅ chọn địa chỉ
+                child: TSingleAddress(
+                  selectedAddress: isSelected,
+                  address: addresses[index],
+                  onEdit: () {
+                    Get.to(
+                      () => const AddNewAddressScreen(),
+                      arguments: addresses[index],
+                    );
+                  },
+                  onDelete: () async {
+                    final confirm = await Get.dialog(
+                      AlertDialog(
+                        title: const Text("Delete Address"),
+                        content: const Text(
+                          "Are you sure you want to delete this address?",
+                        ),
+                        actions: [
+                          TextButton(
+                            onPressed: () => Get.back(result: false),
+                            child: const Text("Cancel"),
+                          ),
+                          TextButton(
+                            onPressed: () => Get.back(result: true),
+                            child: const Text("Delete"),
+                          ),
+                        ],
+                      ),
+                    );
+
+                    if (confirm == true) {
+                      await addressCtrl.deleteAddress(addresses[index]['id']);
+                    }
+                  },
+                ),
+              );
+            }),
           ),
-        ),
-      ),
+        );
+      }),
     );
   }
 }

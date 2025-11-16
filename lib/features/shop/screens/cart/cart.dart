@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:ec402_app/common/widgets/appbar/appbar.dart';
+import 'package:ec402_app/features/shop/screens/checkout/checkout.dart';
 
 class CartScreen extends StatefulWidget {
   const CartScreen({super.key});
@@ -19,68 +21,51 @@ class _CartScreenState extends State<CartScreen> {
       'image': 'assets/images/product1.png',
     },
     {
-      'brand': 'ZARA',
-      'name': 'Blue T-shirt for all ages',
-      'price': 35.0,
-      'quantity': 1,
-      'image': 'assets/images/product1.png',
-    },
-    {
-      'brand': 'Nike',
-      'name': 'Nike Track suit red',
-      'price': 500.0,
-      'quantity': 1,
-      'image': 'assets/images/product1.png',
-    },
-    {
-      'brand': 'Nike',
-      'name': 'Nike Air Max Red & Black',
-      'price': 600.0,
-      'quantity': 1,
-      'image': 'assets/images/product1.png',
-    },
-    {
       'brand': 'Apple',
-      'name': 'Iphone 14 pro 512gb',
+      'name': 'iPhone 14 Pro 512GB',
       'price': 1998.0,
-      'quantity': 2,
+      'quantity': 1,
       'image': 'assets/images/product1.png',
     },
   ];
 
   void _incrementQuantity(int index) {
     setState(() {
-      cartItems[index]['quantity'] = (cartItems[index]['quantity'] as int) + 1;
+      cartItems[index]['quantity']++;
     });
   }
 
   void _decrementQuantity(int index) {
     setState(() {
       final current = cartItems[index]['quantity'] as int;
-      cartItems[index]['quantity'] = current > 1 ? current - 1 : 1;
+      if (current > 1) cartItems[index]['quantity'] = current - 1;
     });
   }
 
   double get _totalPrice => cartItems.fold<double>(
-    0,
-    (sum, item) => sum + (item['price'] as double) * (item['quantity'] as int),
-  );
+        0,
+        (sum, item) =>
+            sum + (item['price'] as double) * (item['quantity'] as int),
+      );
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+
     final devicePixelRatio = MediaQuery.of(context).devicePixelRatio;
     final targetCacheSize = (56 * devicePixelRatio).round();
 
     return Scaffold(
-      backgroundColor: Colors.grey[50],
-      appBar: AppBar(
-        title: const Text(
-          'Cart',
-          style: TextStyle(fontWeight: FontWeight.bold),
-        ),
-        centerTitle: true,
-        elevation: 0,
+      backgroundColor: colorScheme.background,
+
+      // ===== AppBar =====
+      appBar: const TAppBar(
+        title: Text("Cart"),
+        showBackArrow: true,
       ),
+
+      // ===== Body =====
       body: ListView.separated(
         padding: const EdgeInsets.all(16),
         itemCount: cartItems.length,
@@ -89,9 +74,9 @@ class _CartScreenState extends State<CartScreen> {
           final item = cartItems[index];
           return Card(
             elevation: 1,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12),
-            ),
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            color: colorScheme.surface,
             child: Padding(
               padding: const EdgeInsets.all(12),
               child: Row(
@@ -101,7 +86,7 @@ class _CartScreenState extends State<CartScreen> {
                   ClipRRect(
                     borderRadius: BorderRadius.circular(10),
                     child: Image.asset(
-                      item['image']?.toString() ?? 'assets/images/product1.png',
+                      item['image'] ?? 'assets/images/product1.png',
                       width: 60,
                       height: 60,
                       fit: BoxFit.cover,
@@ -117,33 +102,17 @@ class _CartScreenState extends State<CartScreen> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Row(
-                          children: [
-                            Text(
-                              item['brand']?.toString() ?? '',
-                              style: TextStyle(
-                                color: Colors.grey[700],
-                                fontSize: 12,
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
-                            const SizedBox(width: 4),
-                            const Icon(
-                              Icons.verified,
-                              color: Colors.blue,
-                              size: 14,
-                            ),
-                          ],
-                        ),
+                        Text(item['brand'] ?? '',
+                            style: theme.textTheme.labelSmall
+                                ?.copyWith(color: colorScheme.onBackground)),
                         const SizedBox(height: 2),
                         Text(
-                          item['name'].toString(),
+                          item['name'],
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
-                          style: const TextStyle(
-                            fontWeight: FontWeight.w600,
-                            fontSize: 14,
-                          ),
+                          style: theme.textTheme.bodyMedium?.copyWith(
+                              fontWeight: FontWeight.w600,
+                              color: colorScheme.onBackground),
                         ),
                         if (item['color'] != null || item['size'] != null)
                           Padding(
@@ -152,10 +121,8 @@ class _CartScreenState extends State<CartScreen> {
                               '${item['color'] != null ? 'Color ${item['color']}' : ''}'
                               '${item['color'] != null && item['size'] != null ? '   ' : ''}'
                               '${item['size'] != null ? 'Size ${item['size']}' : ''}',
-                              style: TextStyle(
-                                color: Colors.grey[600],
-                                fontSize: 12,
-                              ),
+                              style: theme.textTheme.labelSmall
+                                  ?.copyWith(color: colorScheme.onBackground),
                             ),
                           ),
                         const SizedBox(height: 10),
@@ -164,37 +131,27 @@ class _CartScreenState extends State<CartScreen> {
                         Row(
                           children: [
                             IconButton(
-                              icon: const Icon(
-                                Icons.remove,
-                                size: 18,
-                                color: Colors.grey,
-                              ),
+                              icon: Icon(Icons.remove,
+                                  size: 18, color: colorScheme.onBackground),
                               onPressed: () => _decrementQuantity(index),
                               visualDensity: VisualDensity.compact,
                             ),
-                            Text(
-                              '${item['quantity']}',
-                              style: const TextStyle(
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
+                            Text('${item['quantity']}',
+                                style: theme.textTheme.bodyMedium?.copyWith(
+                                    fontWeight: FontWeight.w600,
+                                    color: colorScheme.onBackground)),
                             IconButton(
-                              icon: const Icon(
-                                Icons.add,
-                                size: 18,
-                                color: Colors.blue,
-                              ),
+                              icon: Icon(Icons.add,
+                                  size: 18, color: colorScheme.primary),
                               onPressed: () => _incrementQuantity(index),
                               visualDensity: VisualDensity.compact,
                             ),
                             const Spacer(),
-                            Text(
-                              '\$${item['price']}',
-                              style: const TextStyle(
-                                fontWeight: FontWeight.bold,
-                                fontSize: 16,
-                              ),
-                            ),
+                            Text('\$${item['price']}',
+                                style: theme.textTheme.bodyMedium?.copyWith(
+                                    fontWeight: FontWeight.bold,
+                                    color: colorScheme.onBackground,
+                                    fontSize: 16)),
                           ],
                         ),
                       ],
@@ -207,14 +164,14 @@ class _CartScreenState extends State<CartScreen> {
         },
       ),
 
-      // 🧾 Checkout Button
+      // ===== Checkout Button =====
       bottomNavigationBar: Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: colorScheme.surface,
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withValues(alpha: 0.05),
+              color: Colors.black.withOpacity(0.05),
               blurRadius: 6,
               offset: const Offset(0, -1),
             ),
@@ -224,19 +181,31 @@ class _CartScreenState extends State<CartScreen> {
           width: double.infinity,
           height: 50,
           child: ElevatedButton(
-            onPressed: () {},
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => CheckoutScreen(
+                    cartItem: {
+                      'title': cartItems.first['name'],
+                      'price': _totalPrice,
+                      'image': cartItems.first['image'],
+                      'variant':
+                          cartItems.first['color'] ?? cartItems.first['size'] ?? '',
+                    },
+                  ),
+                ),
+              );
+            },
             style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.blue,
+              backgroundColor: colorScheme.primary,
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
+                  borderRadius: BorderRadius.circular(12)),
             ),
             child: Text(
-              'Checkout ${_totalPrice.toStringAsFixed(1)}',
-              style: const TextStyle(
-                fontWeight: FontWeight.bold,
-                color: Colors.white,
-              ),
+              'Checkout \$${_totalPrice.toStringAsFixed(2)}',
+              style: theme.textTheme.bodyMedium?.copyWith(
+                  fontWeight: FontWeight.bold, color: colorScheme.onPrimary),
             ),
           ),
         ),

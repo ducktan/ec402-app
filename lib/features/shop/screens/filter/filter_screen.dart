@@ -1,5 +1,3 @@
-// path: lib/features/shop/screens/filter/filter_screen.dart
-
 import 'package:flutter/material.dart';
 import 'package:ec402_app/utils/constants/sizes.dart';
 import 'package:ec402_app/features/shop/screens/filter/widgets/sort_by_dropdown.dart';
@@ -34,9 +32,12 @@ class _TFilterScreenState extends State<TFilterScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context); // lấy theme hiện tại
+
     return Container(
       padding: const EdgeInsets.all(TSizes.defaultSpace),
       height: MediaQuery.of(context).size.height * 0.85,
+      color: theme.scaffoldBackgroundColor, // dùng màu nền theo theme
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -44,9 +45,12 @@ class _TFilterScreenState extends State<TFilterScreen> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text('Filter', style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
+              Text(
+                'Filter',
+                style: theme.textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold),
+              ),
               IconButton(
-                icon: const Icon(Icons.close),
+                icon: Icon(Icons.close, color: theme.colorScheme.onBackground),
                 onPressed: () => Navigator.pop(context),
               ),
             ],
@@ -60,21 +64,21 @@ class _TFilterScreenState extends State<TFilterScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   // --- SORT BY ---
-                  const Text('Sort by', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600)),
+                  Text('Sort by', style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600)),
                   const SizedBox(height: TSizes.spaceBtwItems),
                   const TSortByDropdown(),
 
                   const SizedBox(height: TSizes.spaceBtwSections),
-                  const Divider(),
+                  Divider(color: theme.dividerColor),
                   const SizedBox(height: TSizes.spaceBtwSections),
 
                   // --- PRICE RANGE ---
-                  const Text('Price Range', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600)),
+                  Text('Price Range', style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600)),
                   const SizedBox(height: TSizes.spaceBtwItems),
 
                   Row(
                     children: [
-                      // --- MIN ---
+                      // MIN
                       Expanded(
                         child: TextFormField(
                           keyboardType: TextInputType.number,
@@ -90,7 +94,7 @@ class _TFilterScreenState extends State<TFilterScreen> {
                         ),
                       ),
                       const SizedBox(width: 16),
-                      // --- MAX ---
+                      // MAX
                       Expanded(
                         child: TextFormField(
                           keyboardType: TextInputType.number,
@@ -109,18 +113,18 @@ class _TFilterScreenState extends State<TFilterScreen> {
                   ),
 
                   const SizedBox(height: TSizes.spaceBtwSections),
-                  const Divider(),
+                  Divider(color: theme.dividerColor),
                   const SizedBox(height: TSizes.spaceBtwSections),
 
                   // --- CATEGORY ---
-                  const Text('Category', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600)),
+                  Text('Category', style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600)),
                   const SizedBox(height: TSizes.spaceBtwItems),
 
                   ListView.separated(
                     shrinkWrap: true,
                     physics: const NeverScrollableScrollPhysics(),
                     itemCount: _categories.length,
-                    separatorBuilder: (_, __) => const Divider(height: 1),
+                    separatorBuilder: (_, __) => Divider(height: 1, color: theme.dividerColor),
                     itemBuilder: (_, index) {
                       final categoryName = _categories.keys.elementAt(index);
                       final subCategories = _categories[categoryName]!;
@@ -143,7 +147,6 @@ class _TFilterScreenState extends State<TFilterScreen> {
             width: double.infinity,
             child: ElevatedButton(
               onPressed: () {
-                // TODO: Xử lý logic apply filter
                 Navigator.pop(context, {
                   'category': _selectedSubCategory,
                   'priceMin': _priceMin,
@@ -152,8 +155,8 @@ class _TFilterScreenState extends State<TFilterScreen> {
               },
               style: ElevatedButton.styleFrom(
                 padding: const EdgeInsets.symmetric(vertical: 16),
-                backgroundColor: const Color(0xFF6C4EFF),
-                foregroundColor: Colors.white,
+                backgroundColor: theme.colorScheme.primary, // dùng primary của theme
+                foregroundColor: theme.colorScheme.onPrimary,
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
               ),
               child: const Text('Apply Filter'),

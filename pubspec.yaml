@@ -31,6 +31,10 @@ dependencies:
   flutter_animate: ^4.5.0   # hoặc version mới nhất
   flutter:
     sdk: flutter
+  flutter_svg: ^2.1.6
+  image_picker: ^1.1.1
+  shared_preferences: ^2.3.2
+  jwt_decoder: ^2.0.1
   lottie: ^3.1.0
   get: ^4.6.6
   # Unility Packages
@@ -48,10 +52,17 @@ dependencies:
   iconsax: ^0.0.8
   cupertino_icons: ^1.0.8
   provider: ^6.1.5+1
+  video_player: ^2.10.0
+  get_storage: ^2.1.1
+  dio: ^5.9.0
 
 dev_dependencies:
-  flutter_test:
-    sdk: flutter
+  flutter_launcher_icons: ^0.14.4
+
+flutter_icons:
+  android: true
+  ios: true
+  image_path: "assets/logo/logo-app.png"
 
   # The "flutter_lints" package below contains a set of recommended lints to
   # encourage good coding practices. The lint set provided by the package is
@@ -69,7 +80,7 @@ flutter:
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in
   # the material Icons class.
-  uses-material-design: true
+  
 
   # To add assets to your application, add an assets section, like this:
   # assets:
@@ -81,8 +92,12 @@ flutter:
   assets:
     - assets/logo/ 
     - assets/images/
-    - assets/icons/
+    - assets/images/banners/
+    - assets/images/products/
+    - assets/icons/categories/
     - assets/fonts/
+    - assets/data/vn_provinces.json
+  uses-material-design: true
 
   # For details regarding adding assets from package dependencies, see
   # https://flutter.dev/to/asset-from-package

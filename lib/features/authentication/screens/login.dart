@@ -91,7 +91,8 @@ class _LoginScreenState extends State<LoginScreen> {
                 labelText: "Password",
                 suffixIcon: IconButton(
                   icon: Icon(
-                      obscurePass ? Icons.visibility_off : Icons.visibility),
+                    obscurePass ? Icons.visibility_off : Icons.visibility,
+                  ),
                   onPressed: () {
                     setState(() => obscurePass = !obscurePass);
                   },
@@ -108,8 +109,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   children: [
                     Checkbox(
                       value: rememberMe,
-                      onChanged: (v) =>
-                          setState(() => rememberMe = v ?? false),
+                      onChanged: (v) => setState(() => rememberMe = v ?? false),
                     ),
                     const Text("Remember Me"),
                   ],
@@ -132,35 +132,34 @@ class _LoginScreenState extends State<LoginScreen> {
 
                   if (email.isEmpty || password.isEmpty) {
                     ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text("Please fill all fields"),
-                      ),
+                      const SnackBar(content: Text("Please fill all fields")),
                     );
                     return;
                   }
 
-                  final res = await ApiService.login(email, password); // ✅ gọi ApiService
+                  final res = await ApiService.login(
+                    email,
+                    password,
+                  ); // ✅ gọi ApiService
 
                   if (res != null) {
-                    print("Token: ${res.token}");
-                    print("User: ${res.user.name} - ${res.user.email}");
+                    final user = await ApiService.getUserProfile(res.token);
+                    if (user != null) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text("Welcome ${user['name']}!")),
+                      );
 
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text("Welcome ${res.user.name}!"),
-                      ),
-                    );
-
-                    // 👉 Điều hướng sang màn hình Navigation
-                    Get.offAll(() => const NavigationMenu());
-                    HomeController.instance.setUser(res.user.name);
-
-
+                      // 👉 Điều hướng sang màn hình Navigation
+                      Get.offAll(() => const NavigationMenu());
+                      HomeController.instance.setUser(
+                        user['name'],
+                        user['email'],
+                        user['avatar'],
+                      );
+                    }
                   } else {
                     ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text("Login failed"),
-                      ),
+                      const SnackBar(content: Text("Login failed")),
                     );
                   }
                 },
@@ -177,7 +176,8 @@ class _LoginScreenState extends State<LoginScreen> {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                        builder: (context) => const SignupScreen()),
+                      builder: (context) => const SignupScreen(),
+                    ),
                   );
                 },
                 child: const Text("Create Account"),

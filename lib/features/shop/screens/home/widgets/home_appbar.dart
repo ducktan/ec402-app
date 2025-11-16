@@ -2,8 +2,11 @@ import 'package:ec402_app/common/widgets/appbar/appbar.dart';
 import 'package:ec402_app/common/widgets/products.card/cart_menu_icon.dart';
 import 'package:ec402_app/utils/constants/colors.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart'; // 👈 thêm cái này
+import 'package:get/get.dart';
 import '../../../controllers/home_controller.dart';
+import '../../cart/cart.dart';
+import 'package:ec402_app/features/personalization/screens/notification/notification.dart'; // 👈 import NotificationScreen
+import 'package:iconsax/iconsax.dart'; // 👈 import iconsax package
 
 class THomeAppBar extends StatelessWidget {
   const THomeAppBar({super.key});
@@ -11,30 +14,51 @@ class THomeAppBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final controller = HomeController.instance; // 👈 khai báo controller
+    final theme = Theme.of(context);
 
     return TAppBar(
-      title: Obx(() => Column(   // 👈 dùng Obx để reactive
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                "Good morning ☀️",
-                style: Theme.of(context)
-                    .textTheme
-                    .labelMedium!
-                    .apply(color: TColors.grey),
-              ),
-              Text(
-                controller.username.value.isNotEmpty
-                    ? controller.username.value
-                    : 'Guest',
-                style: Theme.of(context)
-                    .textTheme
-                    .headlineSmall!
-                    .apply(color: TColors.white),
-              ),
-            ],
-          )),
-      actions: [TCartCounterIcon(onPressed: () {}, iconColor: TColors.white)],
+      title: Obx(
+        () => Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              "Good morning ☀️",
+              style: theme.textTheme.labelMedium,
+            ),
+            Text(
+              controller.username.value.isNotEmpty
+                  ? controller.username.value
+                  : 'Guest',
+              style: theme.textTheme.headlineSmall,
+            ),
+          ],
+        ),
+      ),
+      actions: [
+        // 👈 Icon thông báo
+        IconButton(
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => const NotificationScreen()),
+            );
+          },
+          icon: Icon(
+            Iconsax.notification,
+            color: theme.iconTheme.color,
+          ),
+        ),
+        // 👈 Icon giỏ hàng
+        TCartCounterIcon(
+          iconColor: theme.iconTheme.color ?? TColors.white,
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const CartScreen()),
+            );
+          },
+        ),
+      ],
     );
   }
 }
