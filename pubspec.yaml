@@ -96,6 +96,7 @@ flutter:
     - assets/images/products/
     - assets/icons/categories/
     - assets/fonts/
+    - assets/data/vn_provinces.json
   uses-material-design: true
 
   # For details regarding adding assets from package dependencies, see

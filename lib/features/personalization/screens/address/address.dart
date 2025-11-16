@@ -1,3 +1,4 @@
+// user_address_screen.dart
 import 'package:ec402_app/common/widgets/appbar/appbar.dart';
 import 'package:ec402_app/features/personalization/screens/address/add_new_address.dart';
 import 'package:ec402_app/features/personalization/screens/address/widgets/single_address.dart';
@@ -23,10 +24,7 @@ class UserAddressScreen extends StatelessWidget {
       ),
       appBar: TAppBar(
         showBackArrow: true,
-        title: Text(
-          'Addresses',
-          style: theme.textTheme.headlineSmall,
-        ),
+        title: Text('Addresses', style: theme.textTheme.headlineSmall),
       ),
       body: Obx(() {
         if (addressCtrl.isLoading.value) {
@@ -47,13 +45,48 @@ class UserAddressScreen extends StatelessWidget {
         return SingleChildScrollView(
           padding: const EdgeInsets.all(TSizes.defaultSpace),
           child: Column(
-            children: List.generate(
-              addresses.length,
-              (index) => TSingleAddress(
-                selectedAddress: index == 0, // highlight địa chỉ đầu tiên
-                address: addresses[index],
-              ),
-            ),
+            children: List.generate(addresses.length, (index) {
+              final isSelected =
+                  addressCtrl.selectedAddressIndex.value == index;
+
+              return GestureDetector(
+                onTap: () => addressCtrl.selectAddress(index), // ✅ chọn địa chỉ
+                child: TSingleAddress(
+                  selectedAddress: isSelected,
+                  address: addresses[index],
+                  onEdit: () {
+                    Get.to(
+                      () => const AddNewAddressScreen(),
+                      arguments: addresses[index],
+                    );
+                  },
+                  onDelete: () async {
+                    final confirm = await Get.dialog(
+                      AlertDialog(
+                        title: const Text("Delete Address"),
+                        content: const Text(
+                          "Are you sure you want to delete this address?",
+                        ),
+                        actions: [
+                          TextButton(
+                            onPressed: () => Get.back(result: false),
+                            child: const Text("Cancel"),
+                          ),
+                          TextButton(
+                            onPressed: () => Get.back(result: true),
+                            child: const Text("Delete"),
+                          ),
+                        ],
+                      ),
+                    );
+
+                    if (confirm == true) {
+                      await addressCtrl.deleteAddress(addresses[index]['id']);
+                    }
+                  },
+                ),
+              );
+            }),
           ),
         );
       }),
