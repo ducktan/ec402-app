@@ -32,6 +32,16 @@ class Product {
     return rows[0];
   }
 
+  // ====== GET PRODUCT IMAGES BY PRODUCT ID ======
+  static async findImgByProductId(productId) {
+    const [rows] = await pool.query(
+      `SELECT * FROM product_images WHERE product_id = ?`,
+      [productId]
+    );
+    return rows;
+  }
+
+
   // ====== UPDATE PRODUCT (động) ======
   static async updateProduct(id, fields) {
     const keys = Object.keys(fields);

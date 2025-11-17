@@ -10,4 +10,7 @@ router.get("/:id", ProductController.getProductById);
 router.put("/:id", authMiddleware, authorizeRole(["admin"]), authMiddleware, ProductController.updateProduct);
 router.delete("/:id", authMiddleware, authorizeRole(["admin"]), authMiddleware, ProductController.deleteProduct);
 
+router.get("/:id/images", ProductController.getImagesByProductId);
+
+
 module.exports = router;

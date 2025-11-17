@@ -56,6 +56,22 @@ exports.getProductById = async (req, res) => {
   }
 };
 
+  exports.getImagesByProductId = async (req, res) => {
+    try {
+      const { id } = req.params;
+      const images = await Product.findImgByProductId(id);
+
+      res.status(200).json({
+        success: true,
+        productId: id,
+        images,
+      });
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ message: "Server error" });
+    }
+  };
+
 // ====== UPDATE PRODUCT ======
 exports.updateProduct = async (req, res) => {
   try {
