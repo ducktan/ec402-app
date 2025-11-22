@@ -1,29 +1,77 @@
 import React, { useState, useEffect } from "react";
+import axios from "axios";
 import UserTable from "../components/UserTable";
 import UserModal from "../components/UserModal";
+import { toast } from "react-toastify";
+
+// Tạo instance axios với baseURL và headers mặc định
+const api = axios.create({
+  baseURL: "http://localhost:5000/api",
+  withCredentials: true, // Cho phép gửi cookie với request
+});
 
 const UsersPage = () => {
   const [users, setUsers] = useState([]);
   const [filterRole, setFilterRole] = useState("all");
   const [editingUser, setEditingUser] = useState(null);
 
-  // Giả lập fetch từ API
+  // Lấy danh sách người dùng từ API
+  const fetchUsers = async () => {
+    try {
+      const response = await api.get("/users/all");
+      setUsers(response.data);
+    } catch (error) {
+      console.error("Lỗi khi lấy danh sách người dùng:", error);
+      const errorMessage = error.response?.data?.message || "Có lỗi xảy ra khi tải dữ liệu người dùng";
+      toast.error(errorMessage);
+    }
+  };
+
   useEffect(() => {
-    setUsers([
-      { id: 1, role: "admin", name: "Nguyễn Văn A", email: "a@gmail.com", phone: "0900000001" },
-      { id: 2, role: "buyer", name: "Trần Thị B", email: "b@gmail.com", phone: "0900000002" },
-      { id: 3, role: "seller", name: "Lê Văn C", email: "c@gmail.com", phone: "0900000003" },
-    ]);
+    fetchUsers();
   }, []);
 
-  const handleAddUser = (user) =>
-    setUsers([...users, { ...user, id: Date.now() }]);
+  const handleAddUser = async (user) => {
+    try {
+      const response = await api.post("/users", user);
+      toast.success("Thêm người dùng thành công");
+      fetchUsers(); // Làm mới danh sách sau khi thêm
+      return true;
+    } catch (error) {
+      console.error("Lỗi khi thêm người dùng:", error);
+      const errorMessage = error.response?.data?.message || "Có lỗi xảy ra khi thêm người dùng";
+      toast.error(errorMessage);
+      return false;
+    }
+  };
 
-  const handleEditUser = (updated) =>
-    setUsers(users.map((u) => (u.id === updated.id ? updated : u)));
+  const handleEditUser = async (updated) => {
+    try {
+      await api.put(`/users/${updated.id}`, updated);
+      toast.success("Cập nhật thông tin thành công");
+      fetchUsers(); // Làm mới danh sách sau khi cập nhật
+      return true;
+    } catch (error) {
+      console.error("Lỗi khi cập nhật người dùng:", error);
+      const errorMessage = error.response?.data?.message || "Có lỗi xảy ra khi cập nhật thông tin";
+      toast.error(errorMessage);
+      return false;
+    }
+  };
 
-  const handleDeleteUser = (id) =>
-    setUsers(users.filter((u) => u.id !== id));
+  const handleDeleteUser = async (id) => {
+    if (!window.confirm("Bạn có chắc chắn muốn xóa người dùng này?")) return;
+    
+    try {
+      await api.delete(`/users/${id}`);
+      toast.success("Xóa người dùng thành công");
+      fetchUsers(); // Làm mới danh sách sau khi xóa
+    } catch (error) {
+      console.error("Lỗi khi xóa người dùng:", error);
+      const errorMessage = error.response?.data?.message || "Có lỗi xảy ra khi xóa người dùng";
+      toast.error(errorMessage);
+    }
+  };
 
   const filteredUsers =
     filterRole === "all" ? users : users.filter((u) => u.role === filterRole);
