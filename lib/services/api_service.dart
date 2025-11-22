@@ -10,9 +10,9 @@ import 'package:get_storage/get_storage.dart';
 import 'package:get/get.dart';
 import 'package:http_parser/http_parser.dart';
 
-
 class ApiService {
-  static const String baseUrl = "http://192.168.23.1:5000/api"; // đổi theo IP backend
+  static const String baseUrl =
+      "http://192.168.23.1:5000/api"; // đổi theo IP backend
 
   // =========================================================
   // 🟢 LOGIN
@@ -42,7 +42,6 @@ class ApiService {
           role: loginResponse.user.role,
         );
 
-
         return loginResponse;
       } else {
         print("❌ Login failed: ${response.statusCode}, body: ${response.body}");
@@ -50,6 +49,28 @@ class ApiService {
       }
     } catch (e) {
       print("⚠️ Login error: $e");
+      return null;
+    }
+  }
+
+  // Dang nhap voi gg
+  static Future<Map<String, dynamic>?> loginWithGoogle(String idToken) async {
+    final url = Uri.parse("$baseUrl/auth/login-google");
+    try {
+      final res = await http.post(
+        url,
+        headers: {"Content-Type": "application/json"},
+        body: jsonEncode({"idToken": idToken}),
+      );
+
+      if (res.statusCode == 200) {
+        return jsonDecode(res.body);
+      } else {
+        print("Google login failed: ${res.body}");
+        return null;
+      }
+    } catch (e) {
+      print("Error loginWithGoogle: $e");
       return null;
     }
   }
@@ -96,8 +117,7 @@ class ApiService {
     }
   }
 
-
-    // =========================================================
+  // =========================================================
   // 🟡 LOGIN OTP - GỬI OTP (Gen OTP)
   // =========================================================
   static Future<bool> loginOTP(String phone) async {
@@ -125,7 +145,10 @@ class ApiService {
   }
 
   // ------------------ VERIFY OTP ------------------
-  static Future<Map<String, dynamic>?> verifyOTP(String phone, String otp) async {
+  static Future<Map<String, dynamic>?> verifyOTP(
+    String phone,
+    String otp,
+  ) async {
     final url = Uri.parse("$baseUrl/auth/verify-otp");
 
     try {
@@ -137,7 +160,6 @@ class ApiService {
 
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
-    
 
         await UserSession.saveUserSession(
           token: data["token"],
@@ -148,10 +170,7 @@ class ApiService {
         );
 
         // data gồm: { message, token, user }
-        return {
-          "token": data["token"],
-          "user": data["user"],
-        };
+        return {"token": data["token"], "user": data["user"]};
       } else {
         print("Verify OTP failed: ${response.body}");
         return null;
@@ -161,9 +180,6 @@ class ApiService {
       return null;
     }
   }
-
-
-  
 
   // ✅ Get user info using token
   static Future<Map<String, dynamic>?> getUserProfile(String token) async {
@@ -193,8 +209,6 @@ class ApiService {
     }
   }
 
-
-
   static Future<bool> updateUserProfile(Map<String, dynamic> data) async {
     final token = await UserSession.getToken();
     print(token);
@@ -210,8 +224,8 @@ class ApiService {
         },
         body: jsonEncode(data),
       );
-        print("==> Response status: ${response.statusCode}");
-        print("==> Response body: ${response.body}");
+      print("==> Response status: ${response.statusCode}");
+      print("==> Response body: ${response.body}");
 
       if (response.statusCode == 200) {
         Get.snackbar("Success", "Profile updated successfully");
@@ -228,10 +242,10 @@ class ApiService {
     }
   }
 
-  
-
-
-   static Future<Map<String, dynamic>?> uploadAvatar(File file, String token) async {
+  static Future<Map<String, dynamic>?> uploadAvatar(
+    File file,
+    String token,
+  ) async {
     try {
       final uri = Uri.parse('$baseUrl/users/upload-avatar');
       print('----->>> Uploading file: ${file.path}');
@@ -285,9 +299,8 @@ class ApiService {
     }
   }
 
-
-// Address APIs can be added here similarly
-/// Lấy danh sách địa chỉ
+  // Address APIs can be added here similarly
+  /// Lấy danh sách địa chỉ
   static Future<List<dynamic>?> getAddresses(String token) async {
     try {
       final url = Uri.parse('$baseUrl/users/addresses');
@@ -316,7 +329,10 @@ class ApiService {
   }
 
   /// Tạo địa chỉ mới
-  static Future<bool> createAddress(Map<String, dynamic> data, String token) async {
+  static Future<bool> createAddress(
+    Map<String, dynamic> data,
+    String token,
+  ) async {
     try {
       final url = Uri.parse('$baseUrl/users/addresses');
       final response = await http.post(
@@ -339,8 +355,5 @@ class ApiService {
     return false;
   }
 
-  // 
-
-
-
+  //
 }

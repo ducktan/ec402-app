@@ -4,10 +4,11 @@ import 'package:iconsax/iconsax.dart';
 import 'signup.dart';
 import 'welcome.dart';
 import '../../../models/login_model.dart';
-import '../../../services/api_service.dart'; // ✅ import ApiService
-import '../../../navigation_menu.dart'; // ✅ import NavigationScreen
+import '../../../services/api_service.dart';
+import '../../../navigation_menu.dart';
 import 'package:get/get.dart';
 import '../../shop/controllers/home_controller.dart';
+import '../../authentication/controllers/google_auth_controller.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -23,9 +24,11 @@ class _LoginScreenState extends State<LoginScreen> {
   // --- TextEditingController cho email & password
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
-
+  final googleCtrl = Get.put(GoogleAuthController());
   @override
   Widget build(BuildContext context) {
+    // ✅ Khởi tạo Google Controller
+    final googleCtrl = Get.put(GoogleAuthController());
     final dark = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(
@@ -122,7 +125,7 @@ class _LoginScreenState extends State<LoginScreen> {
             ),
             const SizedBox(height: 24),
 
-            /// --- Login Button
+            /// --- Login Button (Local)
             SizedBox(
               width: double.infinity,
               child: ElevatedButton(
@@ -137,10 +140,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     return;
                   }
 
-                  final res = await ApiService.login(
-                    email,
-                    password,
-                  ); // ✅ gọi ApiService
+                  final res = await ApiService.login(email, password);
 
                   if (res != null) {
                     final user = await ApiService.getUserProfile(res.token);
@@ -149,13 +149,13 @@ class _LoginScreenState extends State<LoginScreen> {
                         SnackBar(content: Text("Welcome ${user['name']}!")),
                       );
 
-                      // 👉 Điều hướng sang màn hình Navigation
-                      Get.offAll(() => const NavigationMenu());
                       HomeController.instance.setUser(
                         user['name'],
                         user['email'],
                         user['avatar'],
                       );
+                      // 👉 Điều hướng
+                      Get.offAll(() => const NavigationMenu());
                     }
                   } else {
                     ScaffoldMessenger.of(context).showSnackBar(
@@ -183,6 +183,70 @@ class _LoginScreenState extends State<LoginScreen> {
                 child: const Text("Create Account"),
               ),
             ),
+
+            const SizedBox(height: 24),
+
+            /// =============================================
+            /// ✅ SECTION: SOCIAL LOGIN (GOOGLE)
+            /// =============================================
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Flexible(
+                  child: Divider(
+                    color: dark ? Colors.grey[700] : Colors.grey,
+                    thickness: 0.5,
+                    indent: 60,
+                    endIndent: 5,
+                  ),
+                ),
+                Text(
+                  "Or sign in with",
+                  style: Theme.of(context).textTheme.labelMedium,
+                ),
+                Flexible(
+                  child: Divider(
+                    color: dark ? Colors.grey[700] : Colors.grey,
+                    thickness: 0.5,
+                    indent: 5,
+                    endIndent: 60,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 16),
+
+            // Nút Google
+            SizedBox(
+              width: double.infinity,
+              child: OutlinedButton(
+                onPressed: () => googleCtrl.loginWithGoogle(),
+                style: OutlinedButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(vertical: 12),
+                  side: BorderSide(color: Colors.grey.withOpacity(0.5)),
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    // ⚠️ Đảm bảo bạn đã có file logo google trong thư mục assets
+                    // Nếu chưa có, hãy tải icon google về và đặt tại: assets/logo/google-icon.png
+                    const Image(
+                      image: AssetImage('assets/logo/google-icon.png'),
+                      height: 24,
+                      width: 24,
+                    ),
+                    const SizedBox(width: 12),
+                    Text(
+                      "Continue with Google",
+                      style: TextStyle(
+                        color: dark ? Colors.white : Colors.black,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            const SizedBox(height: 24),
           ],
         ),
       ),
