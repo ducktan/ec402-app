@@ -4,70 +4,97 @@ const { hashPassword, comparePassword, generateToken } = require("../utils/token
 const db = require("../config/db");
 const jwt = require("jsonwebtoken");
 const { generateOTP, sendOTP } = require("../utils/token");
+const { OAuth2Client } = require('google-auth-library');
+const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
+const bcrypt = require('bcryptjs');
 
-// Đăng ký
+// Đăng ký (Register)
 exports.register = async (req, res) => {
   try {
-    const { name, email, password, phone } = req.body;
+    // 1. Lấy dữ liệu từ Postman gửi lên
+    const { name, email, password, phone, role } = req.body;
 
-    // Check email đã tồn tại chưa
-    const existingUser = await User.findUserByEmail(email);
-    if (existingUser) {
-      return res.status(400).json({ message: "Email already exists" });
+    // 2. Kiểm tra xem đã điền đủ thông tin chưa
+    if (!name || !email || !password) {
+      return res.status(400).json({ message: 'Vui lòng nhập tên, email và mật khẩu!' });
     }
 
-    // Hash password
-    const passwordHash = await hashPassword(password);
+    // 3. Kiểm tra email đã tồn tại chưa
+    const [existingUser] = await db.query('SELECT * FROM users WHERE email = ?', [email]);
+    if (existingUser.length > 0) {
+      return res.status(400).json({ message: 'Email này đã được sử dụng!' });
+    }
 
-    // Lưu user vào DB
-    const userId = await User.createUser({
-      role: "buyer",
-      name,
-      email,
-      passwordHash,
-      phone,
+    // 4. Mã hóa mật khẩu (Quan trọng: DB của bạn lưu password_hash)
+    const salt = await bcrypt.genSalt(10);
+    const passwordHash = await bcrypt.hash(password, salt);
+
+    // 5. Chèn vào Database
+    // Lưu ý: Nếu không gửi role, mặc định sẽ là 'buyer' (cần sửa DB như hướng dẫn trước hoặc truyền role từ body)
+    const insertQuery = `
+            INSERT INTO users (name, email, password_hash, phone, role) 
+            VALUES (?, ?, ?, ?, ?)
+        `;
+
+    // Nếu role rỗng, gán mặc định là 'buyer' để tránh lỗi DB
+    const userRole = role || 'buyer';
+
+    await db.query(insertQuery, [name, email, passwordHash, phone, userRole]);
+
+    return res.status(201).json({ message: 'Đăng ký thành công!' });
+
+  } catch (error) {
+    // 🔴 In lỗi chi tiết ra Terminal để debug
+    console.error("Lỗi Đăng Ký:", error);
+    return res.status(500).json({
+      message: 'Lỗi Server',
+      error: error.message // Trả về lỗi chi tiết cho Postman xem luôn
     });
-
-    res.status(201).json({ message: "User registered successfully", userId });
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ message: "Server error" });
   }
 };
 
-// Đăng nhập
+// Đăng nhập (Login)
 exports.login = async (req, res) => {
   try {
     const { email, password } = req.body;
 
-    // Tìm user theo email
-    const user = await User.findUserByEmail(email);
-    if (!user) {
-      return res.status(400).json({ message: "Invalid email or password" });
+    // 1. Tìm user theo email
+    const [users] = await db.query('SELECT * FROM users WHERE email = ?', [email]);
+    if (users.length === 0) {
+      return res.status(404).json({ message: 'Email không tồn tại!' });
     }
 
-    // Kiểm tra password
-    const isMatch = await comparePassword(password, user.password_hash);
+    const user = users[0];
+
+    // 2. So sánh mật khẩu
+    // Lưu ý: DB của bạn cột tên là password_hash
+    const isMatch = await bcrypt.compare(password, user.password_hash);
     if (!isMatch) {
-      return res.status(400).json({ message: "Invalid email or password" });
+      return res.status(400).json({ message: 'Sai mật khẩu!' });
     }
 
-    // Tạo token (dùng utils/token.js)
-    const token = generateToken({ id: user.id, role: user.role });
+    // 3. Tạo Token
+    const token = jwt.sign(
+      { id: user.id, role: user.role, email: user.email },
+      process.env.JWT_SECRET || 'EC402_APP_KEY',
+      { expiresIn: '7d' }
+    );
 
-    res.json({
-      message: "Login successful",
+    return res.json({
+      message: 'Đăng nhập thành công',
       token,
       user: {
         id: user.id,
         name: user.name,
         email: user.email,
         role: user.role,
-      },
+        avatar: user.avatar
+      }
     });
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ message: "Server error" });
+
+  } catch (error) {
+    console.error("Lỗi Đăng Nhập:", error);
+    return res.status(500).json({ message: 'Lỗi Server', error: error.message });
   }
 };
 
@@ -129,7 +156,7 @@ exports.verifyOtp = async (req, res) => {
     // 3️⃣ Đánh dấu OTP đã sử dụng
     await db.query("UPDATE otps SET is_used = TRUE WHERE id = ?", [otpRecord[0].id]);
 
-     // Tạo token (dùng utils/token.js)
+    // Tạo token (dùng utils/token.js)
     const token = generateToken({ id: user.id, role: user.role });
 
     // 5️⃣ Trả về token kèm thông tin user
@@ -170,5 +197,50 @@ exports.logout = async (req, res) => {
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: "Server error" });
+  }
+};
+
+exports.loginWithGoogle = async (req, res) => {
+  try {
+    const { idToken } = req.body;
+    const ticket = await client.verifyIdToken({
+      idToken,
+      audience: process.env.GOOGLE_CLIENT_ID,
+    });
+
+    const payload = ticket.getPayload();
+    const { email, name, picture, sub } = payload;
+
+    // check user
+    let user = await User.findOne({ email });
+    if (!user) {
+      user = await User.create({
+        name,
+        email,
+        googleId: sub,
+        avatar: picture,
+        password: null, // no password needed
+      });
+    }
+
+    // create JWT
+    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
+      expiresIn: '7d',
+    });
+
+    return res.json({
+      message: 'Google login success',
+      token,
+      user: {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+        avatar: user.avatar,
+        role: user.role || 'user',
+      },
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(400).json({ message: 'Invalid Google token' });
   }
 };

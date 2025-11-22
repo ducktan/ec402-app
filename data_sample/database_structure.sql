@@ -1,8 +1,9 @@
-create database ec402;
---
-use ec402;
---
---  create table users
+-- 1. Tạo Database
+CREATE DATABASE IF NOT EXISTS ec402;
+USE ec402;
+
+-- 2. Bảng Users
+-- (Đã sửa lỗi: Bỏ 'AFTER', sắp xếp lại thứ tự dòng để gender/dob nằm sau phone)
 CREATE TABLE users (
     id INT AUTO_INCREMENT PRIMARY KEY,
     role ENUM('buyer','seller','admin') NOT NULL,
@@ -10,14 +11,14 @@ CREATE TABLE users (
     email VARCHAR(100) UNIQUE NOT NULL,
     password_hash VARCHAR(255) NOT NULL,
     phone VARCHAR(20),
+    gender ENUM('male', 'female', 'other') DEFAULT 'other',
+    dob DATE,
     avatar VARCHAR(255),
-    gender ENUM('male', 'female', 'other') DEFAULT 'other'after phone,
-    dob DATE after gender,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
 
--- table user_addresses (1 - n)
+-- 3. Bảng User Addresses
 CREATE TABLE user_addresses (
     id INT AUTO_INCREMENT PRIMARY KEY,
     user_id INT NOT NULL,
@@ -31,7 +32,7 @@ CREATE TABLE user_addresses (
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
--- table categories
+-- 4. Bảng Categories
 CREATE TABLE categories (
     id INT AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(100) NOT NULL,
@@ -41,7 +42,17 @@ CREATE TABLE categories (
     FOREIGN KEY (parent_id) REFERENCES categories(id) ON DELETE SET NULL
 );
 
--- table products
+-- 5. Bảng Brands
+CREATE TABLE brands (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(200) NOT NULL,
+    description TEXT,
+    logo_url VARCHAR(255),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+-- 6. Bảng Products
 CREATE TABLE products (
     id INT AUTO_INCREMENT PRIMARY KEY,
     brand_id INT NOT NULL,
@@ -58,19 +69,7 @@ CREATE TABLE products (
     FOREIGN KEY (category_id) REFERENCES categories(id)
 );
 
--- thêm bảng brands để sửa cái không có seller - id
-CREATE TABLE brands (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    name VARCHAR(200) NOT NULL,
-    description TEXT,
-    logo_url VARCHAR(255),  -- link hình ảnh thương hiệu
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-);
-
-
-
--- table product_images (1 product - n images)
+-- 7. Bảng Product Images
 CREATE TABLE product_images (
     id INT AUTO_INCREMENT PRIMARY KEY,
     product_id INT NOT NULL,
@@ -78,7 +77,7 @@ CREATE TABLE product_images (
     FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE
 );
 
--- table reviews (1 user - n reviews)
+-- 8. Bảng Reviews
 CREATE TABLE reviews (
     id INT AUTO_INCREMENT PRIMARY KEY,
     product_id INT NOT NULL,
@@ -90,8 +89,7 @@ CREATE TABLE reviews (
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
--- table carts
--- mỗi cart chỉ thuộc về 1 user, lưu thông tin các lần thêm vào giỏ hàng của user thay vì dùng session. 
+-- 9. Bảng Carts
 CREATE TABLE carts (
     id INT AUTO_INCREMENT PRIMARY KEY,
     user_id INT UNIQUE NOT NULL,
@@ -99,8 +97,7 @@ CREATE TABLE carts (
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
--- table cart_items (1 - n)
--- chứa các item trong giỏ hàng. 
+-- 10. Bảng Cart Items
 CREATE TABLE cart_items (
     id INT AUTO_INCREMENT PRIMARY KEY,
     cart_id INT NOT NULL,
@@ -110,8 +107,7 @@ CREATE TABLE cart_items (
     FOREIGN KEY (product_id) REFERENCES products(id)
 );
 
--- table orders
--- sửa orders table 
+-- 11. Bảng Orders
 CREATE TABLE orders (
     id INT AUTO_INCREMENT PRIMARY KEY,
     user_id INT NOT NULL,
@@ -127,7 +123,7 @@ CREATE TABLE orders (
     FOREIGN KEY (brand_id) REFERENCES brands(id)
 );
 
--- table order_items (1 order - n items)
+-- 12. Bảng Order Items
 CREATE TABLE order_items (
     id INT AUTO_INCREMENT PRIMARY KEY,
     order_id INT NOT NULL,
@@ -138,7 +134,8 @@ CREATE TABLE order_items (
     FOREIGN KEY (order_id) REFERENCES orders(id) ON DELETE CASCADE,
     FOREIGN KEY (product_id) REFERENCES products(id)
 );
--- table transactions
+
+-- 13. Bảng Transactions
 CREATE TABLE transactions (
     id INT AUTO_INCREMENT PRIMARY KEY,
     order_id INT NOT NULL,
@@ -152,7 +149,7 @@ CREATE TABLE transactions (
     FOREIGN KEY (user_id) REFERENCES users(id)
 );
 
--- table OTP for login with phone number
+-- 14. Bảng OTPs
 CREATE TABLE otps (
   id INT AUTO_INCREMENT PRIMARY KEY,
   user_id INT NOT NULL,
@@ -163,7 +160,7 @@ CREATE TABLE otps (
   FOREIGN KEY (user_id) REFERENCES users(id)
 );
 
--- table blacklist_token 
+-- 15. Bảng Token Blacklist
 CREATE TABLE token_blacklist (
   id INT AUTO_INCREMENT PRIMARY KEY,
   token TEXT NOT NULL,
@@ -171,21 +168,30 @@ CREATE TABLE token_blacklist (
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- Wishlist
+-- 16. Bảng Wishlist
 CREATE TABLE wishlist (
     id INT AUTO_INCREMENT PRIMARY KEY,
     user_id INT NOT NULL,
     product_id INT NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-
-    CONSTRAINT fk_wishlist_user 
-        FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
-
-    CONSTRAINT fk_wishlist_product 
-        FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE,
-
+    CONSTRAINT fk_wishlist_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    CONSTRAINT fk_wishlist_product FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE,
     UNIQUE KEY unique_wishlist (user_id, product_id)
 );
 
-
-
+-- 17. Bảng Vouchers (Mới thêm)
+CREATE TABLE vouchers (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    code VARCHAR(50) UNIQUE NOT NULL COMMENT 'Mã giảm giá, VD: SALE50',
+    discount_type ENUM('percentage', 'fixed') NOT NULL COMMENT 'Loại giảm: theo % hoặc số tiền cố định',
+    discount_value DECIMAL(12,2) NOT NULL COMMENT 'Giá trị giảm',
+    min_order_value DECIMAL(12,2) DEFAULT 0 COMMENT 'Đơn tối thiểu để dùng được',
+    max_discount_amount DECIMAL(12,2) NULL COMMENT 'Giảm tối đa bao nhiêu (nếu là %)',
+    start_date DATETIME NOT NULL,
+    end_date DATETIME NOT NULL,
+    usage_limit INT DEFAULT 0 COMMENT 'Giới hạn số lần dùng chung, 0 là không giới hạn',
+    used_count INT DEFAULT 0 COMMENT 'Số lần đã dùng',
+    status ENUM('active', 'inactive') DEFAULT 'active',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
