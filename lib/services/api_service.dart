@@ -406,4 +406,38 @@ class ApiService {
     }
     return [];
   }
+  // Gửi đánh giá lên Server
+  static Future<bool> createReview(int productId, int rating, String comment) async {
+    // Lấy token từ UserSession (giả sử bạn đã lưu token ở đó)
+    final token = await UserSession.getToken(); 
+    if (token == null) return false;
+
+    try {
+      final response = await http.post(
+        Uri.parse("$baseUrl/reviews"),
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": "Bearer $token",
+        },
+        body: jsonEncode({
+          "product_id": productId,
+          "rating": rating,
+          "comment": comment,
+        }),
+      );
+
+      if (response.statusCode == 201) {
+        return true;
+      } else {
+        // In lỗi từ server trả về (ví dụ: chưa mua hàng)
+        final json = jsonDecode(response.body);
+        print("Lỗi tạo review: ${json['message']}");
+        Get.snackbar("Lỗi", json['message']); // Hiển thị thông báo cho user
+        return false;
+      }
+    } catch (e) {
+      print("Error createReview: $e");
+      return false;
+    }
+  }
 }
