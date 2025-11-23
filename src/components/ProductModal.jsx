@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 
-const ProductModal = ({ editingProduct, onAdd, onEdit }) => {
+const ProductModal = ({ editingProduct, onAdd, onEdit, categories }) => {
   const [form, setForm] = useState({
     name: "",
     category_id: "",
@@ -21,15 +21,29 @@ const ProductModal = ({ editingProduct, onAdd, onEdit }) => {
       });
   }, [editingProduct]);
 
-  const handleSubmit = () => {
-    if (editingProduct) onEdit(form);
-    else onAdd(form);
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    // Convert price to number and stock to integer
+    const productData = {
+      ...form,
+      price: parseFloat(form.price) || 0,
+      stock: parseInt(form.stock) || 0,
+      // Ensure category_id is a number
+      category_id: form.category_id ? parseInt(form.category_id) : null,
+    };
+    
+    if (editingProduct) onEdit(productData);
+    else onAdd(productData);
+    
+    // Close the modal
+    const modal = window.bootstrap.Modal.getInstance(document.getElementById("productModal"));
+    modal.hide();
   };
 
   return (
     <div className="modal fade" id="productModal" tabIndex="-1">
       <div className="modal-dialog modal-lg">
-        <div className="modal-content">
+        <form onSubmit={handleSubmit} className="modal-content">
           <div className="modal-header">
             <h5 className="modal-title">
               {editingProduct ? "Chỉnh sửa sản phẩm" : "Thêm sản phẩm"}
@@ -62,8 +76,11 @@ const ProductModal = ({ editingProduct, onAdd, onEdit }) => {
                   }
                 >
                   <option value="">Chọn danh mục</option>
-                  <option value="1">Điện thoại</option>
-                  <option value="2">Laptop</option>
+                  {categories.map(category => (
+                    <option key={category.id} value={category.id}>
+                      {category.name}
+                    </option>
+                  ))}
                 </select>
               </div>
 
@@ -112,9 +129,9 @@ const ProductModal = ({ editingProduct, onAdd, onEdit }) => {
 
               {form.images.length > 0 && (
                 <div className="col-12 d-flex flex-wrap gap-2">
-                  {form.images.map((url, i) => (
+                  {form.images.map((url) => (
                     <img
-                      key={i}
+                      key={url}
                       src={url}
                       alt="preview"
                       width="70"
@@ -128,18 +145,14 @@ const ProductModal = ({ editingProduct, onAdd, onEdit }) => {
           </div>
 
           <div className="modal-footer">
-            <button className="btn btn-secondary" data-bs-dismiss="modal">
+            <button type="button" className="btn btn-secondary" data-bs-dismiss="modal">
               Hủy
             </button>
-            <button
-              className="btn btn-success"
-              data-bs-dismiss="modal"
-              onClick={handleSubmit}
-            >
+            <button type="submit" className="btn btn-success">
               Lưu
             </button>
           </div>
-        </div>
+        </form>
       </div>
     </div>
   );

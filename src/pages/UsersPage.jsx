@@ -1,29 +1,27 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
 import UserTable from "../components/UserTable";
 import UserModal from "../components/UserModal";
 import { toast } from "react-toastify";
-
-// Tạo instance axios với baseURL và headers mặc định
-const api = axios.create({
-  baseURL: "http://localhost:5000/api",
-  withCredentials: true, // Cho phép gửi cookie với request
-});
+import { userService } from "../services/userService";
 
 const UsersPage = () => {
   const [users, setUsers] = useState([]);
   const [filterRole, setFilterRole] = useState("all");
   const [editingUser, setEditingUser] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState(null);
 
-  // Lấy danh sách người dùng từ API
   const fetchUsers = async () => {
     try {
-      const response = await api.get("/users/all");
-      setUsers(response.data);
-    } catch (error) {
-      console.error("Lỗi khi lấy danh sách người dùng:", error);
-      const errorMessage = error.response?.data?.message || "Có lỗi xảy ra khi tải dữ liệu người dùng";
-      toast.error(errorMessage);
+      setIsLoading(true);
+      setError(null);
+      const data = await userService.getAll();
+      setUsers(data);
+    } catch (err) {
+      console.error("Lỗi khi tải người dùng:", err);
+      setError("Không thể tải danh sách người dùng. Vui lòng thử lại sau.");
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -33,29 +31,36 @@ const UsersPage = () => {
 
   const handleAddUser = async (user) => {
     try {
-      const response = await api.post("/users", user);
-      toast.success("Thêm người dùng thành công");
-      fetchUsers(); // Làm mới danh sách sau khi thêm
-      return true;
+      const response = await userService.create(user);
+      // The server should return the created user with the generated ID
+      if (response && response.data) {
+        setUsers([...users, response.data]);
+        return { success: true };
+      } else {
+        // If the response format is different, refetch the users list to ensure we have the latest data
+        await fetchUsers();
+        return { success: true };
+      }
     } catch (error) {
       console.error("Lỗi khi thêm người dùng:", error);
-      const errorMessage = error.response?.data?.message || "Có lỗi xảy ra khi thêm người dùng";
-      toast.error(errorMessage);
-      return false;
+      return { 
+        success: false, 
+        message: error.response?.data?.message || "Có lỗi xảy ra khi thêm người dùng" 
+      };
     }
   };
 
   const handleEditUser = async (updated) => {
     try {
-      await api.put(`/users/${updated.id}`, updated);
-      toast.success("Cập nhật thông tin thành công");
-      fetchUsers(); // Làm mới danh sách sau khi cập nhật
-      return true;
+      const updatedUser = await userService.update(updated.id, updated);
+      setUsers(users.map((u) => (u.id === updated.id ? updatedUser : u)));
+      return { success: true };
     } catch (error) {
       console.error("Lỗi khi cập nhật người dùng:", error);
-      const errorMessage = error.response?.data?.message || "Có lỗi xảy ra khi cập nhật thông tin";
-      toast.error(errorMessage);
-      return false;
+      return { 
+        success: false, 
+        message: error.response?.data?.message || "Có lỗi xảy ra khi cập nhật thông tin" 
+      };
     }
   };
 
@@ -63,9 +68,8 @@ const UsersPage = () => {
     if (!window.confirm("Bạn có chắc chắn muốn xóa người dùng này?")) return;
     
     try {
-      await api.delete(`/users/${id}`);
-      toast.success("Xóa người dùng thành công");
-      fetchUsers(); // Làm mới danh sách sau khi xóa
+      await userService.delete(id);
+      setUsers(users.filter((u) => u.id !== id));
     } catch (error) {
       console.error("Lỗi khi xóa người dùng:", error);
       const errorMessage = error.response?.data?.message || "Có lỗi xảy ra khi xóa người dùng";
@@ -76,48 +80,67 @@ const UsersPage = () => {
   const filteredUsers =
     filterRole === "all" ? users : users.filter((u) => u.role === filterRole);
 
+  if (isLoading) {
+    return (
+      <div className="d-flex justify-content-center align-items-center" style={{ height: '300px' }}>
+        <div className="spinner-border text-primary" role="status">
+          <span className="visually-hidden">Loading...</span>
+        </div>
+        <span className="ms-2">Đang tải danh sách người dùng...</span>
+      </div>
+    );
+  }
+
   return (
-    <div>
+    <>
+      <div className="d-flex justify-content-between align-items-center mb-3">
+        <h3>Quản lý người dùng</h3>
+        <button
+          className="btn btn-primary"
+          data-bs-toggle="modal"
+          data-bs-target="#userModal"
+          onClick={() => setEditingUser(null)}
+          disabled={isLoading}
+        >
+          <i className="fa fa-plus me-2"></i>Thêm người dùng
+        </button>
+      </div>
 
-      <div className="container py-4">
-        <div className="d-flex justify-content-between align-items-center mb-3">
-          <h3>Quản lý người dùng</h3>
-          <button
-            className="btn btn-primary"
-            data-bs-toggle="modal"
-            data-bs-target="#userModal"
-            onClick={() => setEditingUser(null)}
-          >
-            <i className="fa fa-plus me-2"></i>Thêm người dùng
-          </button>
+      {error && (
+        <div className="alert alert-danger" role="alert">
+          {error}
         </div>
+      )}
 
-        <div className="mb-3">
-          <select
-            className="form-select w-auto"
-            value={filterRole}
-            onChange={(e) => setFilterRole(e.target.value)}
-          >
-            <option value="all">Tất cả vai trò</option>
-            <option value="buyer">Người mua</option>
-            <option value="seller">Người bán</option>
-            <option value="admin">Quản trị</option>
-          </select>
-        </div>
+      <div className="mb-3">
+        <select
+          className="form-select w-auto"
+          value={filterRole}
+          onChange={(e) => setFilterRole(e.target.value)}
+        >
+          <option value="all">Tất cả vai trò</option>
+          <option value="buyer">Người mua</option>
+          <option value="seller">Người bán</option>
+          <option value="admin">Quản trị</option>
+        </select>
+      </div>
 
+      {!isLoading && users.length === 0 ? (
+        <div className="alert alert-info">Không có người dùng nào.</div>
+      ) : (
         <UserTable
           users={filteredUsers}
           onEdit={setEditingUser}
           onDelete={handleDeleteUser}
         />
-      </div>
+      )}
 
       <UserModal
         editingUser={editingUser}
         onAdd={handleAddUser}
         onEdit={handleEditUser}
       />
-    </div>
+    </>
   );
 };
 
