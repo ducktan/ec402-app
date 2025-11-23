@@ -10,7 +10,10 @@ import 'package:ec402_app/features/shop/screens/product_detail/widget/product_re
 import 'package:ec402_app/features/shop/screens/product_detail/widget/product_seller_info.dart';
 import 'package:ec402_app/features/shop/screens/product_detail/widget/related_products_section.dart';
 
+
 class ProductDetailScreen extends StatelessWidget {
+  final int productId = 1; // Giả sử ID sản phẩm là 1
+
   const ProductDetailScreen({super.key});
 
   @override
@@ -20,42 +23,33 @@ class ProductDetailScreen extends StatelessWidget {
 
     return Scaffold(
       backgroundColor: colorScheme.background,
-
-      // ===== AppBar =====
       appBar: TAppBar(
         showBackArrow: true,
         title: const Text("Product Detail"),
         actions: [
-          IconButton(
-            icon: Icon(Iconsax.heart, color: colorScheme.onBackground),
-            onPressed: () {},
-          ),
-          IconButton(
-            icon: Icon(Iconsax.share, color: colorScheme.onBackground),
-            onPressed: () {},
-          ),
+          IconButton(icon: Icon(Iconsax.heart, color: colorScheme.onBackground), onPressed: () {}),
+          IconButton(icon: Icon(Iconsax.share, color: colorScheme.onBackground), onPressed: () {}),
         ],
       ),
-
-      // ===== Body =====
       body: SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
-          children: const [
-            ProductImageSlider(),
-            ProductInfoSection(),
-            ProductDescription(),
-            ProductSellerInfo(
+          // ❌ LỖI CŨ: children: const [ ... ]
+          // ✅ SỬA LẠI: Bỏ từ khóa 'const' ở đây vì bên trong có productId là biến
+          children: [ 
+            const ProductImageSlider(),
+            const ProductInfoSection(),
+            const ProductDescription(),
+            const ProductSellerInfo(
               sellerName: "Nike Official Store",
               sellerAvatar: "https://picsum.photos/200",
             ),
-            ProductReviewsPreview(),
-            RelatedProductsSection(),
+            // Widget này nhận biến productId nên danh sách cha không được là const
+            ProductReviewsPreview(productId: productId), 
+            const RelatedProductsSection(),
           ],
         ),
       ),
-
-      // ===== Bottom Bar =====
       bottomNavigationBar: const ProductBottomBar(),
     );
   }

@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 
 class AddressAPI {
-  static const String baseUrl = "http://192.168.23.1:5000/api";
+  static const String baseUrl = "http://186.186.1.185:5000/api";
 
   /// 🔹 Lấy danh sách địa chỉ
   static Future<List<dynamic>?> getAddresses(String token) async {
@@ -35,7 +35,9 @@ class AddressAPI {
 
   /// 🔹 Tạo địa chỉ mới
   static Future<bool> createAddress(
-      Map<String, dynamic> data, String token) async {
+    Map<String, dynamic> data,
+    String token,
+  ) async {
     try {
       final url = Uri.parse('$baseUrl/users/addresses');
       final response = await http.post(
@@ -61,7 +63,10 @@ class AddressAPI {
 
   /// 🔹 Cập nhật địa chỉ
   static Future<bool> updateAddress(
-      int id, Map<String, dynamic> data, String token) async {
+    int id,
+    Map<String, dynamic> data,
+    String token,
+  ) async {
     try {
       final url = Uri.parse('$baseUrl/users/addresses/$id');
       final response = await http.put(
@@ -108,4 +113,5 @@ class AddressAPI {
     }
     return false;
   }
+  
 }

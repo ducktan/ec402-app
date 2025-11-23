@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:ec402_app/utils/constants/sizes.dart';
-import 'package:ec402_app/features/shop/screens/filter/widgets/sort_by_dropdown.dart';
-import 'package:ec402_app/features/shop/screens/filter/widgets/category_filter_item.dart';
+// Import Controller để lấy danh sách danh mục thật
+import '../../controllers/search_controller.dart';
 
 class TFilterScreen extends StatefulWidget {
   const TFilterScreen({super.key});
@@ -11,33 +12,54 @@ class TFilterScreen extends StatefulWidget {
 }
 
 class _TFilterScreenState extends State<TFilterScreen> {
-  final Map<String, List<String>> _categories = {
-    'Sports': ['Sports Equipments', 'Sport Shoes', 'Track suits'],
-    'Jewelery': ['Rings', 'Necklaces', 'Bracelets'],
-    'Electronics': ['Smartphones', 'Laptops', 'Headphones'],
-    'Clothes': ['T-Shirts', 'Jeans', 'Jackets'],
-    'Animals': ['Dog Food', 'Cat Toys', 'Fish Tanks'],
-    'Furniture': ['Chairs', 'Tables', 'Sofas'],
-  };
+  final controller = SearchPageController.instance;
 
-  String? _selectedSubCategory;
-  String? _priceMin;
-  String? _priceMax;
+  String _selectedSort = 'Name';
+  int? _selectedCategoryId;
+  final TextEditingController _minPriceCtrl = TextEditingController();
+  final TextEditingController _maxPriceCtrl = TextEditingController();
 
-  void _handleSubCategorySelection(String? selectedValue) {
-    setState(() {
-      _selectedSubCategory = selectedValue;
-    });
+  // Danh sách các lựa chọn sắp xếp hợp lệ
+  final List<String> _sortOptions = [
+    'Name', 'Lowest Price', 'Highest Price', 'Popular', 'Newest', 'Suitable'
+  ];
+
+  @override
+  void initState() {
+    super.initState();
+    
+    // ✅ SỬA LỖI CRASH: Kiểm tra xem giá trị trong controller có hợp lệ không
+    // Nếu controller đang lưu 'name_asc' (cũ) mà dropdown không có, thì ép về 'Name'
+    String currentSort = controller.selectedSort.value;
+    if (_sortOptions.contains(currentSort)) {
+      _selectedSort = currentSort;
+    } else {
+      _selectedSort = 'Name'; 
+    }
+
+    _selectedCategoryId = controller.selectedCategoryId.value;
+    if (controller.minPrice.text.isNotEmpty) {
+      _minPriceCtrl.text = controller.minPrice.text;
+    }
+    if (controller.maxPrice.text.isNotEmpty) {
+      _maxPriceCtrl.text = controller.maxPrice.text;
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context); // lấy theme hiện tại
+    final theme = Theme.of(context);
 
     return Container(
       padding: const EdgeInsets.all(TSizes.defaultSpace),
       height: MediaQuery.of(context).size.height * 0.85,
-      color: theme.scaffoldBackgroundColor, // dùng màu nền theo theme
+      decoration: BoxDecoration(
+        color: theme.scaffoldBackgroundColor,
+        borderRadius: const BorderRadius.only(
+          topLeft: Radius.circular(20),
+          topRight: Radius.circular(20),
+        ),
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -57,56 +79,66 @@ class _TFilterScreenState extends State<TFilterScreen> {
           ),
           const SizedBox(height: TSizes.spaceBtwSections),
 
-          // --- BODY (SCROLLABLE) ---
+          // --- BODY ---
           Expanded(
             child: SingleChildScrollView(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // --- SORT BY ---
+                  // --- 1. SORT BY ---
                   Text('Sort by', style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600)),
                   const SizedBox(height: TSizes.spaceBtwItems),
-                  const TSortByDropdown(),
+                  
+                  DropdownButtonFormField<String>(
+                    value: _selectedSort,
+                    decoration: InputDecoration(
+                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                    ),
+                    items: _sortOptions.map((String value) {
+                      return DropdownMenuItem<String>(
+                        value: value,
+                        child: Text(value),
+                      );
+                    }).toList(),
+                    onChanged: (val) {
+                      setState(() => _selectedSort = val!);
+                    },
+                  ),
 
                   const SizedBox(height: TSizes.spaceBtwSections),
                   Divider(color: theme.dividerColor),
                   const SizedBox(height: TSizes.spaceBtwSections),
 
-                  // --- PRICE RANGE ---
+                  // --- 2. PRICE RANGE ---
                   Text('Price Range', style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600)),
                   const SizedBox(height: TSizes.spaceBtwItems),
 
                   Row(
                     children: [
-                      // MIN
                       Expanded(
                         child: TextFormField(
+                          controller: _minPriceCtrl,
                           keyboardType: TextInputType.number,
                           decoration: InputDecoration(
                             labelText: 'Min',
                             prefixText: '₫ ',
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(12),
-                            ),
+                            border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
                             contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                           ),
-                          onChanged: (value) => _priceMin = value,
                         ),
                       ),
                       const SizedBox(width: 16),
-                      // MAX
                       Expanded(
                         child: TextFormField(
+                          controller: _maxPriceCtrl,
                           keyboardType: TextInputType.number,
                           decoration: InputDecoration(
                             labelText: 'Max',
                             prefixText: '₫ ',
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(12),
-                            ),
+                            border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
                             contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                           ),
-                          onChanged: (value) => _priceMax = value,
                         ),
                       ),
                     ],
@@ -116,51 +148,83 @@ class _TFilterScreenState extends State<TFilterScreen> {
                   Divider(color: theme.dividerColor),
                   const SizedBox(height: TSizes.spaceBtwSections),
 
-                  // --- CATEGORY ---
+                  // --- 3. CATEGORY ---
                   Text('Category', style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600)),
                   const SizedBox(height: TSizes.spaceBtwItems),
 
-                  ListView.separated(
-                    shrinkWrap: true,
-                    physics: const NeverScrollableScrollPhysics(),
-                    itemCount: _categories.length,
-                    separatorBuilder: (_, __) => Divider(height: 1, color: theme.dividerColor),
-                    itemBuilder: (_, index) {
-                      final categoryName = _categories.keys.elementAt(index);
-                      final subCategories = _categories[categoryName]!;
-                      return TCategoryFilterItem(
-                        categoryName: categoryName,
-                        subCategories: subCategories,
-                        selectedSubCategory: _selectedSubCategory,
-                        onSubCategorySelected: _handleSubCategorySelection,
-                      );
-                    },
-                  ),
+                  Obx(() {
+                    if (controller.categories.isEmpty) {
+                      return const Text("No categories available");
+                    }
+                    
+                    return Column(
+                      children: controller.categories.map((cat) {
+                        return RadioListTile<int>(
+                          title: Text(cat['name'] ?? ''),
+                          value: cat['id'],
+                          groupValue: _selectedCategoryId,
+                          activeColor: theme.primaryColor,
+                          contentPadding: EdgeInsets.zero,
+                          onChanged: (val) {
+                            setState(() => _selectedCategoryId = val);
+                          },
+                        );
+                      }).toList(),
+                    );
+                  }),
                 ],
               ),
             ),
           ),
 
-          // --- APPLY BUTTON ---
+          // --- FOOTER BUTTONS ---
           const SizedBox(height: TSizes.spaceBtwItems),
-          SizedBox(
-            width: double.infinity,
-            child: ElevatedButton(
-              onPressed: () {
-                Navigator.pop(context, {
-                  'category': _selectedSubCategory,
-                  'priceMin': _priceMin,
-                  'priceMax': _priceMax,
-                });
-              },
-              style: ElevatedButton.styleFrom(
-                padding: const EdgeInsets.symmetric(vertical: 16),
-                backgroundColor: theme.colorScheme.primary, // dùng primary của theme
-                foregroundColor: theme.colorScheme.onPrimary,
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          Row(
+            children: [
+              // RESET
+              Expanded(
+                child: OutlinedButton(
+                  onPressed: () {
+                    setState(() {
+                      _selectedSort = 'Name';
+                      _selectedCategoryId = null;
+                      _minPriceCtrl.clear();
+                      _maxPriceCtrl.clear();
+                    });
+                  },
+                  style: OutlinedButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(vertical: 16),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                  ),
+                  child: const Text("Reset"),
+                ),
               ),
-              child: const Text('Apply Filter'),
-            ),
+              const SizedBox(width: 16),
+              
+              // APPLY
+              Expanded(
+                flex: 2,
+                child: ElevatedButton(
+                  onPressed: () {
+                    controller.selectedSort.value = _selectedSort;
+                    controller.selectedCategoryId.value = _selectedCategoryId;
+                    controller.minPrice.text = _minPriceCtrl.text;
+                    controller.maxPrice.text = _maxPriceCtrl.text;
+
+                    controller.search(query: controller.searchTextController.text);
+                    
+                    Navigator.pop(context);
+                  },
+                  style: ElevatedButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(vertical: 16),
+                    backgroundColor: theme.colorScheme.primary,
+                    foregroundColor: theme.colorScheme.onPrimary,
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                  ),
+                  child: const Text('Apply Filter'),
+                ),
+              ),
+            ],
           ),
         ],
       ),

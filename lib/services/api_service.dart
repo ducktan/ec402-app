@@ -10,9 +10,9 @@ import 'package:get_storage/get_storage.dart';
 import 'package:get/get.dart';
 import 'package:http_parser/http_parser.dart';
 
-
 class ApiService {
-  static const String baseUrl = "http://192.168.23.1:5000/api"; // đổi theo IP backend
+  static const String baseUrl =
+      "http://186.186.1.185:5000/api"; // đổi theo IP backend
 
   // =========================================================
   // 🟢 LOGIN
@@ -41,7 +41,6 @@ class ApiService {
           email: loginResponse.user.email,
           role: loginResponse.user.role,
         );
-
 
         return loginResponse;
       } else {
@@ -96,8 +95,7 @@ class ApiService {
     }
   }
 
-
-    // =========================================================
+  // =========================================================
   // 🟡 LOGIN OTP - GỬI OTP (Gen OTP)
   // =========================================================
   static Future<bool> loginOTP(String phone) async {
@@ -125,7 +123,10 @@ class ApiService {
   }
 
   // ------------------ VERIFY OTP ------------------
-  static Future<Map<String, dynamic>?> verifyOTP(String phone, String otp) async {
+  static Future<Map<String, dynamic>?> verifyOTP(
+    String phone,
+    String otp,
+  ) async {
     final url = Uri.parse("$baseUrl/auth/verify-otp");
 
     try {
@@ -137,7 +138,6 @@ class ApiService {
 
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
-    
 
         await UserSession.saveUserSession(
           token: data["token"],
@@ -148,10 +148,7 @@ class ApiService {
         );
 
         // data gồm: { message, token, user }
-        return {
-          "token": data["token"],
-          "user": data["user"],
-        };
+        return {"token": data["token"], "user": data["user"]};
       } else {
         print("Verify OTP failed: ${response.body}");
         return null;
@@ -161,9 +158,6 @@ class ApiService {
       return null;
     }
   }
-
-
-  
 
   // ✅ Get user info using token
   static Future<Map<String, dynamic>?> getUserProfile(String token) async {
@@ -193,8 +187,6 @@ class ApiService {
     }
   }
 
-
-
   static Future<bool> updateUserProfile(Map<String, dynamic> data) async {
     final token = await UserSession.getToken();
     print(token);
@@ -210,8 +202,8 @@ class ApiService {
         },
         body: jsonEncode(data),
       );
-        print("==> Response status: ${response.statusCode}");
-        print("==> Response body: ${response.body}");
+      print("==> Response status: ${response.statusCode}");
+      print("==> Response body: ${response.body}");
 
       if (response.statusCode == 200) {
         Get.snackbar("Success", "Profile updated successfully");
@@ -228,10 +220,10 @@ class ApiService {
     }
   }
 
-  
-
-
-   static Future<Map<String, dynamic>?> uploadAvatar(File file, String token) async {
+  static Future<Map<String, dynamic>?> uploadAvatar(
+    File file,
+    String token,
+  ) async {
     try {
       final uri = Uri.parse('$baseUrl/users/upload-avatar');
       print('----->>> Uploading file: ${file.path}');
@@ -285,9 +277,8 @@ class ApiService {
     }
   }
 
-
-// Address APIs can be added here similarly
-/// Lấy danh sách địa chỉ
+  // Address APIs can be added here similarly
+  /// Lấy danh sách địa chỉ
   static Future<List<dynamic>?> getAddresses(String token) async {
     try {
       final url = Uri.parse('$baseUrl/users/addresses');
@@ -316,7 +307,10 @@ class ApiService {
   }
 
   /// Tạo địa chỉ mới
-  static Future<bool> createAddress(Map<String, dynamic> data, String token) async {
+  static Future<bool> createAddress(
+    Map<String, dynamic> data,
+    String token,
+  ) async {
     try {
       final url = Uri.parse('$baseUrl/users/addresses');
       final response = await http.post(
@@ -339,8 +333,77 @@ class ApiService {
     return false;
   }
 
-  // 
+  // 1. Lấy danh sách Brands
+  static Future<List<dynamic>> getBrands() async {
+    try {
+      // Gọi tới: /api/shop/brands
+      final response = await http.get(Uri.parse("$baseUrl/shop/brands"));
+      if (response.statusCode == 200) {
+        final json = jsonDecode(response.body);
+        return json['data'];
+      }
+    } catch (e) {
+      print("Error getBrands: $e");
+    }
+    return [];
+  }
 
+  // 2. Lấy danh sách Categories
+  static Future<List<dynamic>> getCategories() async {
+    try {
+      // Gọi tới: /api/shop/categories
+      final response = await http.get(Uri.parse("$baseUrl/shop/categories"));
+      if (response.statusCode == 200) {
+        final json = jsonDecode(response.body);
+        return json['data'];
+      }
+    } catch (e) {
+      print("Error getCategories: $e");
+    }
+    return [];
+  }
 
+  // 3. Tìm kiếm sản phẩm
+  static Future<List<dynamic>> searchProducts({
+    String? query,
+    double? minPrice,
+    double? maxPrice,
+    int? categoryId,
+    String? sort,
+  }) async {
+    try {
+      // Xây dựng URL với query params
+      String url = "$baseUrl/shop/search?q=1"; // q=1 làm mồi để nối & phía sau
 
+      if (query != null && query.isNotEmpty) url += "&query=$query";
+      if (minPrice != null) url += "&minPrice=$minPrice";
+      if (maxPrice != null) url += "&maxPrice=$maxPrice";
+      if (categoryId != null) url += "&categoryId=$categoryId";
+      if (sort != null) url += "&sort=$sort";
+
+      print("🔵 API URL: $url");
+
+      final response = await http.get(Uri.parse(url));
+      if (response.statusCode == 200) {
+        final json = jsonDecode(response.body);
+        return json['data'];
+      }
+    } catch (e) {
+      print("Error searchProducts: $e");
+    }
+    return [];
+  }
+
+  static Future<List<dynamic>> getProductReviews(int productId) async {
+    try {
+      final response = await http.get(Uri.parse("$baseUrl/reviews/$productId"));
+      if (response.statusCode == 200) {
+        final json = jsonDecode(response.body);
+        return json['data'];
+      }
+    } catch (e) {
+      print("Error getProductReviews: $e");
+    }
+    return [];
+  }
 }
