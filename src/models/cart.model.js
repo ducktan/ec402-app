@@ -9,18 +9,45 @@ class Cart {
   }
 
   static async getCartWithItems(userId) {
-    const [carts] = await pool.query("SELECT * FROM carts WHERE user_id = ?", [userId]);
-    if (carts.length === 0) return { cart: null, items: [] };
+    const [carts] = await pool.query("SELECT * FROM carts WHERE user_id = ?", [
+      userId,
+    ]);
+    if (carts.length === 0) {
+      return { cart: null, items: [] };
+    }
     const cart = carts[0];
-    const [items] = await pool.query(
-      `SELECT ci.id, ci.product_id, ci.quantity, p.name, p.price, p.stock, p.brand_id, p.category_id
-       FROM cart_items ci
-       JOIN products p ON p.id = ci.product_id
-       WHERE ci.cart_id = ?`,
+    const [rows] = await pool.query(
+      `SELECT 
+              ci.id, 
+             ci.quantity, 
+             ci.product_id,
+             p.name,
+             p.price,
+             b.name as brand,
+             (SELECT image_url FROM product_images WHERE product_id = p.id LIMIT 1) as thumbnail
+           FROM cart_items ci
+           JOIN products p ON p.id = ci.product_id
+           LEFT JOIN brands b ON b.id = p.brand_id
+           WHERE ci.cart_id = ?`,
       [cart.id]
     );
+
+    // Restructure the data to match frontend expectations
+    const items = rows.map((item) => ({
+      id: item.id,
+      quantity: item.quantity,
+      product: {
+        id: item.product_id,
+        title: item.name,
+        price: item.price,
+        brand: item.brand,
+        thumbnail: item.thumbnail,
+      },
+    }));
+
     return { cart, items };
   }
+
 
   static async addItem(userId, productId, quantity) {
     const cart = await this.getOrCreateCart(userId);
