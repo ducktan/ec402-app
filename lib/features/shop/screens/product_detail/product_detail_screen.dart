@@ -11,12 +11,16 @@ import 'package:ec402_app/features/shop/screens/product_detail/widget/product_se
 import 'package:ec402_app/features/shop/screens/product_detail/widget/related_products_section.dart';
 
 class ProductDetailScreen extends StatelessWidget {
-  const ProductDetailScreen({super.key});
+  const ProductDetailScreen({super.key, required this.product});
+
+  final Map<String, dynamic> product;
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
+    // A placeholder for the product ID. In a real app, this would come from the product object.
+    final productId = product['id'] ?? 1;
 
     return Scaffold(
       backgroundColor: colorScheme.background,
@@ -56,7 +60,7 @@ class ProductDetailScreen extends StatelessWidget {
       ),
 
       // ===== Bottom Bar =====
-      bottomNavigationBar: const ProductBottomBar(),
+      bottomNavigationBar: ProductBottomBar(productId: productId),
     );
   }
 }

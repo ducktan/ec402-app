@@ -113,7 +113,6 @@ class _StoreScreenState extends State<StoreScreen> {
           Padding(
             padding: const EdgeInsets.only(right: 15),
             child: TCartCounterIcon(
-              onPressed: () => Get.to(() => const CartScreen()),
               iconColor: TColors.black,
             ),
           ),

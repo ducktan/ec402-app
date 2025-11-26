@@ -31,6 +31,3 @@ class HomeController extends GetxController {
     avatarUrl.value = '';
   }
 }
-
-
-

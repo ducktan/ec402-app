@@ -51,12 +51,6 @@ class THomeAppBar extends StatelessWidget {
         // 👈 Icon giỏ hàng
         TCartCounterIcon(
           iconColor: theme.iconTheme.color ?? TColors.white,
-          onPressed: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => const CartScreen()),
-            );
-          },
         ),
       ],
     );

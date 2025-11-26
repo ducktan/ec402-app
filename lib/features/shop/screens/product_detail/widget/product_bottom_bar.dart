@@ -1,11 +1,16 @@
+import 'package:ec402_app/features/shop/controllers/cart_controller.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:iconsax/iconsax.dart';
 
 class ProductBottomBar extends StatelessWidget {
-  const ProductBottomBar({super.key});
+  const ProductBottomBar({super.key, required this.productId});
+
+  final int productId;
 
   @override
   Widget build(BuildContext context) {
+    final controller = Get.put(CartController());
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
       decoration: BoxDecoration(
@@ -27,7 +32,7 @@ class ProductBottomBar extends StatelessWidget {
           const SizedBox(width: 10),
           Expanded(
             child: ElevatedButton.icon(
-              onPressed: () {},
+              onPressed: () => controller.addToCart(productId: productId),
               icon: const Icon(Iconsax.shopping_cart, size: 18),
               label: const Text("Thêm vào giỏ hàng"),
               style: ElevatedButton.styleFrom(

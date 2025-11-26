@@ -81,7 +81,9 @@ class HomeScreen extends StatelessWidget {
                       price: "500.000đ",
                       shop: "Nike Official",
                       imageUrl: TImages.productImage1,
-                      onTap: () => Get.to(() => const ProductDetailScreen()),
+                      onTap: () => Get.to(() => ProductDetailScreen(
+                        product: { 'id': index + 1, 'title': 'Red Shoes $index' },
+                      )),
                     ),
                   ),
                 ],

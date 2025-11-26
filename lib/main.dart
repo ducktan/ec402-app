@@ -2,6 +2,7 @@ import 'package:ec402_app/features/authentication/screens/signup.dart';
 import 'package:ec402_app/features/authentication/screens/login.dart';
 import 'package:ec402_app/features/personalization/screens/profile/profile.dart';
 import 'package:ec402_app/features/personalization/screens/settings/settings.dart';
+import 'package:ec402_app/features/shop/controllers/cart_controller.dart';
 import 'package:ec402_app/features/shop/screens/home/home.dart';
 import 'package:ec402_app/navigation_menu.dart';
 import 'package:ec402_app/features/authentication/screens/welcome.dart';
@@ -22,6 +23,7 @@ class InitialBindings extends Bindings {
   @override
   void dependencies() {
     Get.put(HomeController()); // đăng ký HomeController ở startup
+    Get.put(CartController()); // đăng ký CartController ở startup
   }
 }
 
@@ -103,7 +105,7 @@ theme: ThemeData(
 
   // ===== AppBar =====
   appBarTheme: const AppBarTheme(
-    backgroundColor: Color(0xFFFF6B00),
+    backgroundColor: const Color(0xFFFF6B00),
     foregroundColor: Color.fromARGB(0, 255, 255, 255),
     elevation: 0,
     centerTitle: true,
