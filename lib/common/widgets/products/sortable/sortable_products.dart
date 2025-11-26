@@ -40,7 +40,7 @@ class TSortableProducts extends StatelessWidget {
             price: "500.000đ",
             shop: "Nike Official",
             imageUrl: "https://picsum.photos/id/${index + 10}/200/200",
-            onTap: () => Get.to(() => const ProductDetailScreen()),
+            // onTap: () => Get.to(() => const ProductDetailScreen()),
           ),
         ),
       ],

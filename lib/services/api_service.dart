@@ -342,5 +342,115 @@ class ApiService {
   // 
 
 
+  // Duc check 
+  // 1. Lấy danh sách Brands
+  static Future<List<dynamic>> getBrands() async {
+    try {
+      // Gọi tới: /api/shop/brands
+      final response = await http.get(Uri.parse("$baseUrl/brands"));
+      if (response.statusCode == 200) {
+        final json = jsonDecode(response.body);
+        return json['data'];
+      }
+    } catch (e) {
+      print("Error getBrands: $e");
+    }
+    return [];
+  }
+
+  // 2. Lấy danh sách Categories
+  static Future<List<dynamic>> getCategories() async {
+    try {
+      // Gọi tới: /api/shop/categories
+      final response = await http.get(Uri.parse("$baseUrl/categories"));
+      if (response.statusCode == 200) {
+        final json = jsonDecode(response.body);
+        return json['data'];
+      }
+    } catch (e) {
+      print("Error getCategories: $e");
+    }
+    return [];
+  }
+
+  // 3. Tìm kiếm sản phẩm
+  static Future<List<dynamic>> searchProducts({
+    String? query,
+    double? minPrice,
+    double? maxPrice,
+    int? categoryId,
+    String? sort,
+  }) async {
+    try {
+      // Xây dựng URL với query params
+      String url = "$baseUrl/products/search?q=1"; // q=1 làm mồi để nối & phía sau
+
+      if (query != null && query.isNotEmpty) url += "&query=$query";
+      if (minPrice != null) url += "&minPrice=$minPrice";
+      if (maxPrice != null) url += "&maxPrice=$maxPrice";
+      if (categoryId != null) url += "&categoryId=$categoryId";
+      if (sort != null) url += "&sort=$sort";
+
+      print("🔵 API URL: $url");
+
+      final response = await http.get(Uri.parse(url));
+      if (response.statusCode == 200) {
+        final json = jsonDecode(response.body);
+        return json['data'];
+      }
+    } catch (e) {
+      print("Error searchProducts: $e");
+    }
+    return [];
+  }
+
+  static Future<List<dynamic>> getProductReviews(int productId) async {
+    try {
+      final response = await http.get(Uri.parse("$baseUrl/reviews/$productId"));
+      if (response.statusCode == 200) {
+        final json = jsonDecode(response.body);
+        return json['data'];
+      }
+    } catch (e) {
+      print("Error getProductReviews: $e");
+    }
+    return [];
+  }
+  // Gửi đánh giá lên Server
+  static Future<bool> createReview(int productId, int rating, String comment) async {
+    // Lấy token từ UserSession (giả sử bạn đã lưu token ở đó)
+    final token = await UserSession.getToken(); 
+    if (token == null) return false;
+
+    try {
+      final response = await http.post(
+        Uri.parse("$baseUrl/reviews"),
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": "Bearer $token",
+        },
+        body: jsonEncode({
+          "product_id": productId,
+          "rating": rating,
+          "comment": comment,
+        }),
+      );
+
+      if (response.statusCode == 201) {
+        return true;
+      } else {
+        // In lỗi từ server trả về (ví dụ: chưa mua hàng)
+        final json = jsonDecode(response.body);
+        print("Lỗi tạo review: ${json['message']}");
+        Get.snackbar("Lỗi", json['message']); // Hiển thị thông báo cho user
+        return false;
+      }
+    } catch (e) {
+      print("Error createReview: $e");
+      return false;
+    }
+  }
+
+
 
 }

@@ -2,7 +2,18 @@ import 'package:flutter/material.dart';
 import 'package:iconsax/iconsax.dart';
 
 class ProductInfoSection extends StatelessWidget {
-  const ProductInfoSection({super.key});
+  final String name;
+  final String price;
+  final double rating;
+  final int stock;
+
+  const ProductInfoSection({
+    super.key,
+    required this.name,
+    required this.price,
+    required this.rating,
+    required this.stock,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -13,21 +24,21 @@ class ProductInfoSection extends StatelessWidget {
         children: [
           // ⭐ Rating
           Row(
-            children: const [
+            children: [
               Icon(Iconsax.star5, color: Colors.amber, size: 20),
-              SizedBox(width: 4),
+              const SizedBox(width: 4),
               Text(
-                '4.8 (215)',
-                style: TextStyle(fontWeight: FontWeight.w500),
+                "$rating (${stock} reviews)",
+                style: const TextStyle(fontWeight: FontWeight.w500),
               ),
             ],
           ),
           const SizedBox(height: 8),
 
           // 🏷️ Tên sản phẩm
-          const Text(
-            'Green Nike Sports Shoes',
-            style: TextStyle(
+          Text(
+            name,
+            style: const TextStyle(
               fontSize: 20,
               fontWeight: FontWeight.bold,
             ),
@@ -35,9 +46,9 @@ class ProductInfoSection extends StatelessWidget {
           const SizedBox(height: 4),
 
           // 💰 Giá sản phẩm
-          const Text(
-            '\$112.6',
-            style: TextStyle(
+          Text(
+            "$price VNĐ",
+            style: const TextStyle(
               fontSize: 18,
               color: Colors.black87,
               fontWeight: FontWeight.w600,
@@ -47,12 +58,12 @@ class ProductInfoSection extends StatelessWidget {
 
           // 📦 Tình trạng kho
           Row(
-            children: const [
-              Icon(Iconsax.box, size: 18, color: Colors.green),
-              SizedBox(width: 6),
+            children: [
+              Icon(Iconsax.box, size: 18, color: stock > 0 ? Colors.green : Colors.red),
+              const SizedBox(width: 6),
               Text(
-                'In Stock',
-                style: TextStyle(color: Colors.green),
+                stock > 0 ? 'In Stock' : 'Out of Stock',
+                style: TextStyle(color: stock > 0 ? Colors.green : Colors.red),
               ),
             ],
           ),

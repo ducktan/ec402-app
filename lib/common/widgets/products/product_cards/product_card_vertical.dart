@@ -28,47 +28,59 @@ class TProductCardVertical extends StatelessWidget {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
 
+    // Kiểm tra imageUrl
+    Widget buildImage() {
+      if (imageUrl.isEmpty) {
+        // Không có ảnh
+        return const Icon(Icons.image_not_supported, size: 80);
+      } else if (imageUrl.startsWith('http')) {
+        // URL mạng
+        return Image.network(
+          imageUrl,
+          fit: BoxFit.cover,
+          width: double.infinity,
+          height: double.infinity,
+          errorBuilder: (context, error, stackTrace) {
+            return const Icon(Icons.broken_image, size: 80);
+          },
+        );
+      } else {
+        // Asset local
+        return Image.asset(
+          imageUrl,
+          fit: BoxFit.cover,
+          width: double.infinity,
+          height: double.infinity,
+          errorBuilder: (context, error, stackTrace) {
+            return const Icon(Icons.broken_image, size: 80);
+          },
+        );
+      }
+    }
+
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        width: 180,
         padding: const EdgeInsets.all(1),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(TSizes.productImageRadius),
-          color: colorScheme.surface, // theo theme
+          color: colorScheme.surface,
         ),
         child: Column(
+          mainAxisSize: MainAxisSize.min,
           children: [
             // --- Ảnh sản phẩm ---
             TRoundedContainer(
               height: 180,
               padding: const EdgeInsets.all(TSizes.sm),
-              backgroundColor: colorScheme.surfaceVariant, // theme-aware
+              backgroundColor: colorScheme.surfaceVariant,
               child: Stack(
                 children: [
-                  TRoundedImage(
-                    imageUrl: imageUrl.isNotEmpty ? imageUrl : '',
-                    applyImageRadius: true,
+                  ClipRRect(
+                    borderRadius:
+                        BorderRadius.circular(TSizes.productImageRadius),
+                    child: buildImage(),
                   ),
-
-                  // Giảm giá (nếu cần, demo 25%)
-                  Positioned(
-                    top: 12,
-                    child: TRoundedContainer(
-                      radius: TSizes.sm,
-                      backgroundColor: colorScheme.secondary.withOpacity(0.8),
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: TSizes.sm,
-                        vertical: TSizes.xs,
-                      ),
-                      child: Text(
-                        '25%',
-                        style: theme.textTheme.labelLarge!
-                            .copyWith(color: colorScheme.onSecondary),
-                      ),
-                    ),
-                  ),
-
                   // Icon yêu thích
                   Positioned(
                     top: 0,
@@ -88,7 +100,8 @@ class TProductCardVertical extends StatelessWidget {
 
             // --- Thông tin sản phẩm ---
             Padding(
-              padding: const EdgeInsets.only(left: TSizes.sm),
+              padding: const EdgeInsets.only(
+                  left: TSizes.sm, right: TSizes.sm),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -98,7 +111,7 @@ class TProductCardVertical extends StatelessWidget {
                   // Tên shop
                   Row(
                     children: [
-                      Flexible(
+                      Expanded(
                         child: Text(
                           shop,
                           overflow: TextOverflow.ellipsis,
@@ -116,27 +129,29 @@ class TProductCardVertical extends StatelessWidget {
                     ],
                   ),
 
+                  const SizedBox(height: TSizes.xs),
+
                   // Giá + nút thêm vào giỏ
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      TProductPriceText(price: price),
+                      Expanded(
+                        child: TProductPriceText(price: price, maxLines: 1),
+                      ),
                       Container(
                         decoration: BoxDecoration(
                           color: colorScheme.primary,
                           borderRadius: const BorderRadius.only(
                             topLeft: Radius.circular(TSizes.cardRadiusMd),
-                            bottomLeft: Radius.circular(TSizes.productImageRadius),
+                            bottomLeft:
+                                Radius.circular(TSizes.productImageRadius),
                           ),
                         ),
                         child: const SizedBox(
                           width: TSizes.iconMd,
                           height: TSizes.iconMd,
                           child: Center(
-                            child: Icon(
-                              Iconsax.add,
-                              color: Colors.white,
-                            ),
+                            child: Icon(Iconsax.add, color: Colors.white),
                           ),
                         ),
                       ),

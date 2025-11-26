@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:iconsax/iconsax.dart';
+import 'package:ec402_app/features/shop/screens/brand/brand_product.dart';
 
 class ProductSellerInfo extends StatelessWidget {
   final String sellerName;
@@ -39,7 +40,19 @@ class ProductSellerInfo extends StatelessWidget {
             ),
           ),
           OutlinedButton.icon(
-            onPressed: () {},
+            onPressed: () {
+              // Navigate to BrandProducts page
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => BrandProducts(
+                    brandName: sellerName,              // từ product.brand
+                    icon: sellerAvatar,                 // logo brand
+                    productCount: "0",                  // tạm thời, sau có thể load từ API
+                  ),
+                ),
+              );
+            },
             icon: const Icon(Iconsax.shop, size: 18),
             label: const Text("Xem shop"),
           )

@@ -3,6 +3,7 @@ import 'package:ec402_app/features/authentication/screens/login.dart';
 import 'package:ec402_app/features/personalization/screens/profile/profile.dart';
 import 'package:ec402_app/features/personalization/screens/settings/settings.dart';
 import 'package:ec402_app/features/shop/screens/home/home.dart';
+import 'package:ec402_app/features/shop/screens/store/store.dart';
 import 'package:ec402_app/navigation_menu.dart';
 import 'package:ec402_app/features/authentication/screens/welcome.dart';
 import 'package:flutter/material.dart';
@@ -12,6 +13,8 @@ import './features/shop/screens/product_detail/product_detail_screen.dart';
 import 'package:ec402_app/features/shop/screens/product_review/product_review_screen.dart';
 import 'package:ec402_app/features/authentication/screens/welcome.dart';
 import 'package:ec402_app/features/personalization/screens/notification/notification.dart';
+import 'package:ec402_app/features/shop/screens/product_review/all_reviews_screen.dart';
+import 'package:ec402_app/features/shop/screens/product_review/create_review_screen.dart';
 
 
 void main() {
@@ -125,7 +128,12 @@ theme: ThemeData(
 
 
 
-      home: const WelcomeScreen(),
+      // home: HomeScreen(),
+      home: CreateReviewScreen(
+        productId: 27,
+        productName: "iPhone 14 Pro",
+        productImage: "https://i.pinimg.com/736x/12/9c/ec/129cecf395cde8f7d3da697749d6fbe4.jpg",
+      )
     );
   }
 }

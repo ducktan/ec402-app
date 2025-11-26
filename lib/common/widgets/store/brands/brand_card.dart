@@ -58,7 +58,7 @@ class TBrandCard extends StatelessWidget {
                     brandTextSize: TextSizes.large,
                   ),
                   Text(
-                    '$productCount products',
+                    '$productCount',
                     overflow: TextOverflow.ellipsis,
                     style: Theme.of(context).textTheme.bodyMedium,
                   ),

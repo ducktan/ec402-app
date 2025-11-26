@@ -1,25 +1,23 @@
 import 'package:flutter/material.dart';
-import 'package:ec402_app/utils/constants/image_strings.dart';
 
 class ProductImageSlider extends StatefulWidget {
-  const ProductImageSlider({super.key});
+  final List<String> images;
+  const ProductImageSlider({super.key, required this.images});
 
   @override
   State<ProductImageSlider> createState() => _ProductImageSliderState();
 }
 
 class _ProductImageSliderState extends State<ProductImageSlider> {
-  final List<String> images = [
-    TImages.productImage1,
-    TImages.productImage1,
-    TImages.productImage1,
-  ];
-
   int currentIndex = 0;
   final PageController _pageController = PageController();
 
   @override
   Widget build(BuildContext context) {
+    final images = widget.images.isNotEmpty
+        ? widget.images
+        : ["https://via.placeholder.com/300"]; // fallback nếu rỗng
+
     return Column(
       children: [
         SizedBox(
@@ -31,13 +29,14 @@ class _ProductImageSliderState extends State<ProductImageSlider> {
               setState(() => currentIndex = index);
             },
             itemBuilder: (context, index) {
+              final img = images[index];
               return AnimatedContainer(
                 duration: const Duration(milliseconds: 300),
                 margin: const EdgeInsets.symmetric(horizontal: 10),
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(16),
                   image: DecorationImage(
-                    image: AssetImage(images[index]),
+                    image: NetworkImage(img),
                     fit: BoxFit.contain,
                   ),
                 ),
@@ -46,8 +45,6 @@ class _ProductImageSliderState extends State<ProductImageSlider> {
           ),
         ),
         const SizedBox(height: 8),
-
-        // Indicator chấm tròn
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: List.generate(images.length, (index) {

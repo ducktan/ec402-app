@@ -17,12 +17,16 @@ import 'package:flutter/material.dart';
 import 'package:ec402_app/features/shop/screens/search/search_screen.dart';
 import 'package:ec402_app/features/shop/screens/product_detail/product_detail_screen.dart';
 import 'package:get/get.dart';
+import '../../controllers/product_controller.dart';
 
 class HomeScreen extends StatelessWidget {
-  const HomeScreen({super.key});
+  HomeScreen({super.key});
+  final ProductController productController = Get.put(ProductController());
 
   @override
   Widget build(BuildContext context) {
+    // Load data ngay khi screen mở
+    productController.loadProducts();
     return Scaffold(
       body: SingleChildScrollView(
         child: Column(
@@ -74,16 +78,30 @@ class HomeScreen extends StatelessWidget {
                   ),
                   const SizedBox(height: TSizes.spaceBtwItems),
 
-                  TGirdLayout(
-                    iTemCount: 4,
-                    itemBuilder: (_, index) => TProductCardVertical(
-                      title: "Red Shoes $index",
-                      price: "500.000đ",
-                      shop: "Nike Official",
-                      imageUrl: TImages.productImage1,
-                      onTap: () => Get.to(() => const ProductDetailScreen()),
-                    ),
-                  ),
+                  Obx(() {
+                    if (productController.isLoading.value) {
+                      return const Center(child: CircularProgressIndicator());
+                    }
+
+                    final products = productController.products;
+
+                    return TGirdLayout(
+                      iTemCount: products.length,
+                      childAspectRatio: 0.55,
+                      itemBuilder: (_, index) {
+                        final product = products[index];
+                        return TProductCardVertical(
+                          title: product['name'] ?? 'Unknown',
+                          price: "${product['price']} VNĐ",
+                          shop: "Brand ${product['brand_id'] ?? ''}",
+                          imageUrl:
+                              product['image_url'] ??
+                              "https://via.placeholder.com/150", // fallback nếu null
+                          onTap: () => Get.to(() => ProductDetailScreen(product: product)),
+                        );
+                      },
+                    );
+                  }),
                 ],
               ),
             ),

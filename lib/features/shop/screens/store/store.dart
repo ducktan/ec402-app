@@ -10,6 +10,7 @@ import 'package:flutter/material.dart';
 import 'package:ec402_app/utils/constants/sizes.dart';
 import 'package:get/get.dart';
 import 'package:ec402_app/common/widgets/store/category/category_section.dart';
+import '../../controllers/brand_controller.dart';
 
 class StoreScreen extends StatefulWidget {
   const StoreScreen({super.key});
@@ -19,23 +20,15 @@ class StoreScreen extends StatefulWidget {
 }
 
 class _StoreScreenState extends State<StoreScreen> {
-  static const List<Map<String, dynamic>> _brands = [
-    {'name': 'Acer', 'products': '15 products', 'icon': TImages.shoeIcon},
-    {'name': 'IKEA', 'products': '25 products', 'icon': TImages.shoeIcon},
-    {'name': 'Kenwood', 'products': '8 products', 'icon': TImages.shoeIcon},
-    {'name': 'Samsung', 'products': '30 products', 'icon': TImages.shoeIcon},
-  ];
+  final brandCtrl = Get.put(BrandController());
 
   final List<String> _categories = [
     'Sports',
     'Jewelery',
     'Electronics',
     'Clothes',
-    'Animals',
-    'Demo',
-    'Flat',
-    'Furniture',
   ];
+
   int _selectedCategoryIndex = 0;
 
   final Map<String, List<Map<String, dynamic>>> _categoryProducts = {
@@ -119,9 +112,11 @@ class _StoreScreenState extends State<StoreScreen> {
           ),
         ],
       ),
+
       body: CustomScrollView(
         slivers: [
-          // SEARCH + TITLE
+
+          // 🔍 SEARCH BAR
           SliverPadding(
             padding: const EdgeInsets.all(TSizes.defaultSpace),
             sliver: SliverList(
@@ -132,11 +127,11 @@ class _StoreScreenState extends State<StoreScreen> {
                     prefixIcon: const Icon(Icons.search),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
-                      borderSide: const BorderSide(color: Colors.grey),
                     ),
                   ),
                 ),
                 const SizedBox(height: TSizes.spaceBtwSections),
+
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -161,83 +156,94 @@ class _StoreScreenState extends State<StoreScreen> {
             ),
           ),
 
-          // GRID BRANDS
+          // ⭐ BRAND GRID - DỮ LIỆU TỪ BRAND CONTROLLER
           SliverPadding(
-            padding: const EdgeInsets.symmetric(
-              horizontal: TSizes.defaultSpace,
-            ),
-            sliver: SliverGrid(
-              delegate: SliverChildBuilderDelegate((context, index) {
-                final brand = _brands[index];
-                return TBrandCard(
-                  showBorder: true,
-                  brandName: brand['name']!,
-                  productCount: brand['products']!,
-                  icon: brand['icon'],
-                  onTap: () => Get.to(
-                    () => BrandProducts(
-                      brandName: brand['name']!,
-                      icon: brand['icon'],
-                      productCount: brand['products']!,
-                    ),
-                  ),
+            padding: const EdgeInsets.symmetric(horizontal: TSizes.defaultSpace),
+            sliver: Obx(() {
+              if (brandCtrl.isLoading.value) {
+                return const SliverToBoxAdapter(
+                  child: Center(child: CircularProgressIndicator()),
                 );
-              }, childCount: _brands.length),
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 2,
-                mainAxisExtent: 80,
-                crossAxisSpacing: TSizes.spaceBtwItems,
-                mainAxisSpacing: TSizes.spaceBtwItems,
-              ),
-            ),
-          ),
-          const SliverToBoxAdapter(
-            child: SizedBox(height: TSizes.spaceBtwSections),
+              }
+
+              if (brandCtrl.brands.isEmpty) {
+                return const SliverToBoxAdapter(
+                  child: Center(child: Text("No brands available")),
+                );
+              }
+
+              return SliverGrid(
+                delegate: SliverChildBuilderDelegate(
+                  (context, index) {
+                    final brand = brandCtrl.brands[index];
+
+                    return TBrandCard(
+                      showBorder: true,
+                      brandName: brand['name'],
+                      productCount: "", // API chưa có count
+                      icon: brand['logo_url'] ?? TImages.clothIcon,
+                      onTap: () async {
+                        await brandCtrl.fetchProducts(brand['id']);
+
+                        Get.to(() => BrandProducts(
+                              brandName: brand['name'],
+                              icon: brand['logo_url'] ?? TImages.clothIcon,
+                              productCount:
+                                  brandCtrl.productCount.value.toString(),
+                            ));
+                      },
+                    );
+                  },
+                  childCount: brandCtrl.brands.length,
+                ),
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 2,
+                  mainAxisExtent: 80,
+                  crossAxisSpacing: TSizes.spaceBtwItems,
+                  mainAxisSpacing: TSizes.spaceBtwItems,
+                ),
+              );
+            }),
           ),
 
           const SliverToBoxAdapter(
             child: SizedBox(height: TSizes.spaceBtwSections),
           ),
 
-          // ✅ CATEGORY SELECTOR
+          // 🔥 CATEGORY SELECTOR
           CategorySection(
             categories: _categories,
             selectedIndex: _selectedCategoryIndex,
-            onSelect: (index) {
-              setState(() => _selectedCategoryIndex = index);
-              print('Tapped on Category: ${_categories[index]}');
-            },
+            onSelect: (index) => setState(() => _selectedCategoryIndex = index),
           ),
 
-          // ✅ PRODUCT GRID THEO CATEGORY
+          // 🛍 PRODUCT GRID - STATIC DEMO
           SliverPadding(
             padding: const EdgeInsets.all(TSizes.defaultSpace),
             sliver: SliverGrid(
               delegate: SliverChildBuilderDelegate(
                 (context, index) {
-                  final categoryName = _categories[_selectedCategoryIndex];
-                  final products = _categoryProducts[categoryName] ?? [];
+                  final category = _categories[_selectedCategoryIndex];
+                  final products = _categoryProducts[category] ?? [];
 
                   if (index >= products.length) return const SizedBox();
-                  final product = products[index];
+
+                  final p = products[index];
 
                   return TProductCardVertical(
-                    title: product['title']!,
-                    price: product['price']!,
-                    shop: product['shop'],
-                    imageUrl: product['image']!,
+                    title: p['title'],
+                    price: p['price'],
+                    shop: p['shop'],
+                    imageUrl: p['image'],
                   );
                 },
-                childCount:
-                    _categoryProducts[_categories[_selectedCategoryIndex]]
-                        ?.length ??
-                    0,
+                childCount: _categoryProducts[_categories[_selectedCategoryIndex]]?.length ?? 0,
               ),
               gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                 crossAxisCount: 2,
                 mainAxisSpacing: TSizes.spaceBtwItems,
                 crossAxisSpacing: TSizes.spaceBtwItems,
-                mainAxisExtent: 280, // chiều cao mỗi card
+                mainAxisExtent: 280,
               ),
             ),
           ),

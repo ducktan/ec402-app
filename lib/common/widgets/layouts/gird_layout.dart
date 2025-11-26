@@ -5,12 +5,15 @@ class TGirdLayout extends StatelessWidget {
   const TGirdLayout({
     super.key,
     required this.iTemCount,
-    this.mainAxisExtent = 288,
+    this.mainAxisExtent,
+    this.childAspectRatio,
     required this.itemBuilder,
   });
+
   final int iTemCount;
   final double? mainAxisExtent;
-  final Widget? Function(BuildContext, int) itemBuilder;
+  final double? childAspectRatio;
+  final Widget Function(BuildContext, int) itemBuilder;
 
   @override
   Widget build(BuildContext context) {
@@ -24,6 +27,7 @@ class TGirdLayout extends StatelessWidget {
         mainAxisSpacing: TSizes.spaceBtwItems,
         crossAxisSpacing: TSizes.spaceBtwItems,
         mainAxisExtent: mainAxisExtent,
+        childAspectRatio: childAspectRatio ?? 0.65,
       ),
       itemBuilder: itemBuilder,
     );

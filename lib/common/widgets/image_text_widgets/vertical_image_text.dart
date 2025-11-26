@@ -1,61 +1,52 @@
 import 'package:ec402_app/utils/constants/colors.dart';
 import 'package:ec402_app/utils/constants/sizes.dart';
 import 'package:flutter/material.dart';
+import 'package:iconsax/iconsax.dart';
 
 class TVerticalImageText extends StatelessWidget {
+  final String? image;
+  final IconData? iconData;
+  final String title;
+  final VoidCallback? onTap;
+
   const TVerticalImageText({
     super.key,
-    required this.image,
+    this.image,
+    this.iconData,
     required this.title,
-    this.textColor = TColors.white,
-    this.backgroundColor = TColors.white,
     this.onTap,
   });
 
-  final String image, title;
-  final Color textColor;
-  final Color? backgroundColor;
-  final void Function()? onTap;
-
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
+    return InkWell(
       onTap: onTap,
-      child: Padding(
-        padding: const EdgeInsets.only(right: TSizes.spaceBtwItems),
-        child: Column(
-          children: [
-            Container(
-              width: 56,
-              height: 56,
-              padding: const EdgeInsets.all(TSizes.sm),
-              decoration: BoxDecoration(
-                color: backgroundColor,
-                borderRadius: BorderRadius.circular(100),
-              ),
-              child: Center(
-                child: Image(
-                  image: AssetImage(image),
-                  fit: BoxFit.cover,
-                  color: TColors.dark,
-                ),
-              ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Container(
+            width: 56,
+            height: 56,
+            decoration: BoxDecoration(
+              color: Colors.grey.shade200,
+              borderRadius: BorderRadius.circular(12),
             ),
-
-            const SizedBox(height: TSizes.spaceBtwItems / 2),
-            SizedBox(
-              width: 55,
-              child: Text(
-                title,
-                style: Theme.of(
-                  context,
-                ).textTheme.labelMedium!.apply(color: textColor),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-              ),
+            child: image != null && image!.isNotEmpty
+                ? Image.network(image!, fit: BoxFit.cover)
+                : Icon(iconData ?? Iconsax.category, size: 32, color: Colors.grey.shade800),
+          ),
+          const SizedBox(height: 4),
+          SizedBox(
+            width: 60,
+            child: Text(
+              title,
+              textAlign: TextAlign.center,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: const TextStyle(fontSize: 12),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
