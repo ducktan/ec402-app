@@ -65,6 +65,18 @@ const User = {
 
     await pool.query(sql, values);
   },
+  // Lấy tất cả user
+  async getAll() {
+    const [rows] = await pool.query("SELECT * FROM users ORDER BY created_at DESC");
+    return rows;
+  },
+
+  // Xoá user
+  async deleteUser(id) {
+    await pool.query("DELETE FROM users WHERE id = ?", [id]);
+  },
+
 };
+
 
 module.exports = User;

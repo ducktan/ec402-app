@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const brandController = require('../controllers/brand.controller');
+const productController = require('../controllers/product.controller');
 const { authMiddleware } = require("../middlewares/auth.middleware");
 const authorizeRole = require("../middlewares/authorizeRole");
 
@@ -20,5 +21,8 @@ router.put('/:id', authMiddleware, authorizeRole(["admin"]), brandController.upd
 
 // DELETE: DELETE /api/v1/brands/:id
 router.delete('/:id', authMiddleware, authorizeRole(["admin"]), brandController.deleteBrand);
+
+// GET PRODUCTS BY BRAND ID: GET /api/v1/brands/:id/products
+router.get('/:id/products', productController.getProductsByBrandId);
 
 module.exports = router;

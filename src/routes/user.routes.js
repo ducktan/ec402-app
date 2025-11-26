@@ -2,7 +2,6 @@ const express = require("express");
 const router = express.Router();
 const userController = require("../controllers/user.controller");
 const { authMiddleware } = require("../middlewares/auth.middleware");
-const UserAddress = require("../models/userAddress.model");
 const { uploadAvatar } = require("../controllers/user.controller");
 const upload = require("../middlewares/upload");
 

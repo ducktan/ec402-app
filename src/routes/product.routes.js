@@ -4,13 +4,15 @@ const ProductController = require("../controllers/product.controller");
 const { authMiddleware } = require("../middlewares/auth.middleware");
 const authorizeRole = require("../middlewares/authorizeRole");
 
+// --- Search phải đặt trước ---
+router.get("/search", ProductController.searchProducts);
+
 router.post("/", authMiddleware, authorizeRole(["admin"]), ProductController.createProduct);
 router.get("/", ProductController.getAllProducts);
 router.get("/:id", ProductController.getProductById);
-router.put("/:id", authMiddleware, authorizeRole(["admin"]), authMiddleware, ProductController.updateProduct);
-router.delete("/:id", authMiddleware, authorizeRole(["admin"]), authMiddleware, ProductController.deleteProduct);
-
 router.get("/:id/images", ProductController.getImagesByProductId);
 
+router.put("/:id", authMiddleware, authorizeRole(["admin"]), ProductController.updateProduct);
+router.delete("/:id", authMiddleware, authorizeRole(["admin"]), ProductController.deleteProduct);
 
 module.exports = router;

@@ -3,6 +3,17 @@ const UserAddress = require("../models/userAddress.model");
 const path = require("path");
 const pool = require("../config/db");
 
+// Lấy danh sách user (ADMIN)
+exports.getAllUsers = async (req, res) => {
+  try {
+    const [rows] = await require("../config/db").query("SELECT * FROM users");
+    res.json({ data: rows });
+  } catch (error) {
+    console.error("Lỗi getAllUsers:", error);
+    res.status(500).json({ message: "Lỗi server." });
+  }
+};
+
 // Cập nhật thông tin user
 exports.updateUser = async (req, res) => {
   try {

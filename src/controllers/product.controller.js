@@ -3,7 +3,7 @@ const Product = require("../models/product.model");
 // ====== CREATE PRODUCT ======
 exports.createProduct = async (req, res) => {
   try {
-    const { brand_id, category_id, name, description, price, stock } = req.body;
+    const { brand_id, category_id, name, description, price, stock, image_url } = req.body;
 
     if (!brand_id || !name || !price) {
       return res.status(400).json({ message: "Thiếu thông tin bắt buộc (brand_id, name, price)." });
@@ -16,6 +16,7 @@ exports.createProduct = async (req, res) => {
       description,
       price,
       stock: stock || 0,
+      image_url: image_url || null,
     });
 
     res.status(201).json({
@@ -73,6 +74,7 @@ exports.getProductById = async (req, res) => {
   };
 
 // ====== UPDATE PRODUCT ======
+// ====== UPDATE PRODUCT ======
 exports.updateProduct = async (req, res) => {
   try {
     const id = req.params.id;
@@ -83,6 +85,7 @@ exports.updateProduct = async (req, res) => {
       return res.status(404).json({ message: "Không tìm thấy sản phẩm." });
     }
 
+    // Cho phép update cả image_url
     const updated = await Product.updateProduct(id, fieldsToUpdate);
     res.json({
       message: "Cập nhật sản phẩm thành công",
@@ -109,5 +112,62 @@ exports.deleteProduct = async (req, res) => {
   } catch (error) {
     console.error("Lỗi deleteProduct:", error);
     res.status(500).json({ message: "Lỗi server", error: error.message });
+  }
+};
+
+// ====== GET PRODUCTS BY BRAND ID ======
+exports.getProductsByBrandId = async (req, res) => {
+    const brandId = req.params.id; // /api/brands/:id/products
+    try {
+        const products = await Product.findByBrandId(brandId);
+
+        res.status(200).json({
+            success: true,
+            count: products.length,
+            data: products,
+        });
+    } catch (error) {
+        console.log("!!! LỖI TẠI getProductsByBrandId:", error);
+        res.status(500).json({ success: false, message: 'Server Error', error: error.message });
+    }
+};
+
+// ====== GET PRODUCTS BY CATEGORY ID ======
+exports.getProductsByCategoryId = async (req, res) => {
+    const categoryId = req.params.id; // /api/categories/:id/products
+    try {
+        const products = await Product.findByCategoryId(categoryId);
+
+        res.status(200).json({
+            success: true,
+            count: products.length,
+            data: products,
+        });
+    } catch (error) {
+        console.log("!!! LỖI TẠI getProductsByCategoryId:", error);
+        res.status(500).json({ success: false, message: 'Server Error', error: error.message });
+    }
+};
+
+exports.searchProducts = async (req, res) => {
+  try {
+    const { query, minPrice, maxPrice, categoryId, sort } = req.query;
+
+    const products = await Product.search({
+      query,
+      minPrice,
+      maxPrice,
+      categoryId,
+      sort,
+    });
+
+    return res.status(200).json({
+      success: true,
+      count: products.length,
+      data: products,
+    });
+  } catch (error) {
+    console.error("❌ Lỗi searchProducts:", error);
+    res.status(500).json({ success: false, message: "Server error" });
   }
 };

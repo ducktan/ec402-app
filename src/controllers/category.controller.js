@@ -4,12 +4,11 @@ const Category = require("../models/category.model");
 // TẠO DANH MỤC MỚI (ADMIN)
 // ==========================
 exports.createCategory = async (req, res) => {
-    console.log(req.body);
-    try {
-    const { name, parent_id } = req.body;
+  try {
+    const { name, parent_id, avatar_url, banner_url } = req.body;
     if (!name) return res.status(400).json({ message: "Tên danh mục là bắt buộc." });
 
-    const newCategory = await Category.create({ name, parent_id });
+    const newCategory = await Category.create({ name, parent_id, avatar_url, banner_url });
     res.status(201).json({ message: "Tạo danh mục thành công.", data: newCategory });
   } catch (error) {
     console.error("Lỗi createCategory:", error);
@@ -50,14 +49,13 @@ exports.getCategoryById = async (req, res) => {
 // ==========================
 exports.updateCategory = async (req, res) => {
   try {
-
     const { id } = req.params;
-    const { name, parent_id } = req.body;
+    const { name, parent_id, avatar_url, banner_url } = req.body;
 
     const category = await Category.getById(id);
     if (!category) return res.status(404).json({ message: "Không tìm thấy danh mục." });
 
-    const updated = await Category.update(id, { name, parent_id });
+    const updated = await Category.update(id, { name, parent_id, avatar_url, banner_url });
     res.json({ message: "Cập nhật danh mục thành công.", data: updated });
   } catch (error) {
     console.error("Lỗi updateCategory:", error);
@@ -94,5 +92,3 @@ exports.getCategoryTree = async (req, res) => {
     res.status(500).json({ message: "Lỗi server." });
   }
 };
-
-

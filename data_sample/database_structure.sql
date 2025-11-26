@@ -36,6 +36,8 @@ CREATE TABLE categories (
     id INT AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(100) NOT NULL,
     parent_id INT NULL,
+    avatar_url VARCHAR(255) DEFAULT NULL,
+    banner_url VARCHAR(255) DEFAULT NULL;
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (parent_id) REFERENCES categories(id) ON DELETE SET NULL
@@ -49,6 +51,7 @@ CREATE TABLE products (
     name VARCHAR(200) NOT NULL,
     description TEXT,
     price DECIMAL(12,2) NOT NULL,
+    image_url VARCHAR(255) NULL AFTER stock
     stock INT DEFAULT 0,
     rating_avg DECIMAL(3,2) DEFAULT 0,
     review_count INT DEFAULT 0,
@@ -189,3 +192,22 @@ CREATE TABLE wishlist (
 
 
 
+-- Voucher
+CREATE TABLE user_vouchers (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    
+    user_id INT NOT NULL,          -- ID người dùng
+    code VARCHAR(50) NOT NULL,     -- Mã voucher, ví dụ: WELCOME10
+    description VARCHAR(255),      -- Mô tả voucher (tuỳ chọn)
+    
+    discount_type ENUM('percent','fixed') NOT NULL DEFAULT 'percent',  
+    discount_value DECIMAL(12,2) NOT NULL,  -- Giá trị giảm giá
+    
+    min_order_amount DECIMAL(12,2) DEFAULT 0,  -- Đơn tối thiểu áp dụng
+    
+    is_used BOOLEAN DEFAULT FALSE,  -- Đã dùng chưa
+    used_at TIMESTAMP NULL,         -- Thời điểm dùng voucher
+    
+    expires_at DATETIME,            -- Hạn dùng voucher
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
