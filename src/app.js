@@ -8,6 +8,7 @@ const product_imagesRoutes = require("./routes/product_images.routes");
 const CartRoutes = require("./routes/cart.routes");
 const WishlistRoutes = require("./routes/wishlist.routes");
 const VoucherRoutes = require("./routes/voucher.routes");
+const ReviewRoutes = require("./routes/review.routes");
 const path = require("path");
 const adminUserRoutes = require("./routes/admin.user.routes");
 
@@ -36,6 +37,7 @@ app.use("/api/product_images", product_imagesRoutes);
 app.use("/api/cart", CartRoutes);
 app.use("/api/wishlist", WishlistRoutes);
 app.use("/api/vouchers", VoucherRoutes);
+app.use("/api/reviews", ReviewRoutes);
 
 // Admin routes
 app.use("/api/admin", adminUserRoutes);

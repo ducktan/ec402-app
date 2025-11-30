@@ -36,12 +36,20 @@ exports.createBrand = async (req, res) => {
 // READ: Lấy tất cả brands
 exports.getAllBrands = async (req, res) => {
     try {
-        const brands = await Brand.findAll();
-        res.status(200).json({ success: true, count: brands.length, data: brands });
+        const brands = await Brand.findAllWithProductCount();
+
+        res.status(200).json({
+            success: true,
+            count: brands.length,
+            data: brands
+        });
     } catch (error) {
         console.log("!!! LỖI TẠI getAllBrands:", error);
-
-        res.status(500).json({ success: false, message: 'Server Error', error: error.message });
+        res.status(500).json({
+            success: false,
+            message: 'Server Error',
+            error: error.message
+        });
     }
 };
 

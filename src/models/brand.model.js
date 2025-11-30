@@ -56,6 +56,19 @@ class Brand {
         const [result] = await pool.execute('DELETE FROM brands WHERE id = ?', [id]);
         return result.affectedRows > 0; // Trả về true nếu delete thành công
     }
+
+    static async findAllWithProductCount() {
+        const [rows] = await pool.execute(`
+            SELECT 
+                b.*, 
+                COUNT(p.id) AS productCount
+            FROM brands b
+            LEFT JOIN products p ON p.brand_id = b.id
+            GROUP BY b.id
+            ORDER BY b.id ASC;
+        `);
+        return rows;
+    }
 }
 
 module.exports = Brand;
