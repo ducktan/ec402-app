@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import CategoryTable from "../components/CategoryTable";
 import CategoryModal from "../components/CategoryModal";
 import { categoryService } from "../services/categoryService";
+import Swal from 'sweetalert2';
 
 const CategoriesPage = () => {
   const [categories, setCategories] = useState([]);
@@ -50,14 +51,45 @@ const CategoriesPage = () => {
   };
 
   const handleDelete = async (id) => {
-    if (!window.confirm("Bạn có chắc chắn muốn xóa danh mục này?")) return;
-    
-    try {
-      await categoryService.delete(id);
-      setCategories(categories.filter((c) => c.id !== id));
-    } catch (error) {
-      console.error("Lỗi khi xóa danh mục:", error);
-      alert(error.response?.data?.message || "Có lỗi xảy ra khi xóa danh mục");
+    const result = await Swal.fire({
+      title: 'Bạn có chắc chắn?',
+      text: "Bạn sẽ không thể hoàn tác hành động này!",
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Có, xóa danh mục!',
+      cancelButtonText: 'Hủy'
+    });
+
+    if (result.isConfirmed) {
+      try {
+        await categoryService.delete(id);
+        setCategories(categories.filter((c) => c.id !== id));
+        
+        // Show success message
+        await Swal.fire({
+          toast: true,
+          position: 'top-end',
+          icon: 'success',
+          title: 'Đã xóa danh mục thành công',
+          showConfirmButton: false,
+          timer: 2000,
+          timerProgressBar: true
+        });
+      } catch (error) {
+        console.error("Lỗi khi xóa danh mục:", error);
+        // Show error message
+        await Swal.fire({
+          toast: true,
+          position: 'top-end',
+          icon: 'error',
+          title: error.response?.data?.message || 'Có lỗi xảy ra khi xóa danh mục',
+          showConfirmButton: false,
+          timer: 3000,
+          timerProgressBar: true
+        });
+      }
     }
   };
 

@@ -58,7 +58,7 @@ export const userService = {
   // Cập nhật thông tin người dùng
   update: async (id, user) => {
     try {
-      const response = await api.put(`/users`, { ...user, id });
+      const response = await api.put(`/users/${id}`, user);
       return response.data;
     } catch (error) {
       console.error('Lỗi khi cập nhật người dùng:', error);

@@ -5,6 +5,7 @@ import ProductModal from "../components/ProductModal";
 import { productService } from "../services/productService";
 import { categoryService } from "../services/categoryService";
 import { toast } from "react-toastify";
+import Swal from 'sweetalert2';
 
 const ProductsPage = () => {
   const [products, setProducts] = useState([]);
@@ -230,22 +231,49 @@ const ProductsPage = () => {
 };
 
   const handleDeleteProduct = async (id) => {
-    if (!window.confirm("Bạn có chắc chắn muốn xóa sản phẩm này không?")) {
-      return;
-    }
-    
-    try {
-      setIsLoading(true);
-      await productService.delete(id);
-      setProducts(products.filter((p) => p.id !== id));
-      toast.success("Xóa sản phẩm thành công");
-    } catch (error) {
-      console.error("Error deleting product:", error);
-      const errorMessage = error.response?.data?.message || "Có lỗi xảy ra khi xóa sản phẩm";
-      toast.error(errorMessage);
-      throw error;
-    } finally {
-      setIsLoading(false);
+    const result = await Swal.fire({
+      title: 'Bạn có chắc chắn?',
+      text: "Bạn sẽ không thể hoàn tác hành động này!",
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Có, xóa sản phẩm!',
+      cancelButtonText: 'Hủy'
+    });
+
+    if (result.isConfirmed) {
+      try {
+        setIsLoading(true);
+        await productService.delete(id);
+        setProducts(products.filter((p) => p.id !== id));
+        
+        // Show success message
+        await Swal.fire({
+          toast: true,
+          position: 'top-end',
+          icon: 'success',
+          title: 'Đã xóa sản phẩm thành công',
+          showConfirmButton: false,
+          timer: 2000,
+          timerProgressBar: true
+        });
+      } catch (error) {
+        console.error("Lỗi khi xóa sản phẩm:", error);
+        // Show error message
+        await Swal.fire({
+          toast: true,
+          position: 'top-end',
+          icon: 'error',
+          title: error.response?.data?.message || 'Có lỗi xảy ra khi xóa sản phẩm',
+          showConfirmButton: false,
+          timer: 3000,
+          timerProgressBar: true
+        });
+        throw error;
+      } finally {
+        setIsLoading(false);
+      }
     }
   };
 

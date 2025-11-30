@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
+import Swal from 'sweetalert2';
 import { Modal } from 'bootstrap';
 
 const CategoryModal = ({ editingCategory, onAdd, onEdit, onClose }) => {
@@ -29,22 +30,89 @@ const CategoryModal = ({ editingCategory, onAdd, onEdit, onClose }) => {
         : await onAdd(form);
       
       if (result?.success) {
-        // Đóng modal nếu thêm/cập nhật thành công
+        // Close the modal immediately
         const modalElement = document.getElementById('categoryModal');
         if (modalElement) {
           const modal = Modal.getInstance(modalElement) || new Modal(modalElement);
           modal.hide();
+          // Reset form
+          setForm({ name: "", parent_id: "" });
+          cleanupModal();
         }
+
+        // Show success message after closing modal
+        await Swal.fire({
+          toast: true,
+          position: 'top-end',
+          icon: 'success',
+          title: editingCategory ? 'Cập nhật danh mục thành công' : 'Thêm danh mục mới thành công',
+          showConfirmButton: false,
+          timer: 2000,
+          timerProgressBar: true
+        });
       } else if (result?.message) {
         setError(result.message);
       }
     } catch (err) {
       console.error("Lỗi khi lưu danh mục:", err);
-      setError("Có lỗi xảy ra khi lưu danh mục. Vui lòng thử lại sau.");
+      // Show error message as toast
+      await Swal.fire({
+        toast: true,
+        position: 'top-end',
+        icon: 'error',
+        title: 'Có lỗi xảy ra khi lưu danh mục',
+        showConfirmButton: false,
+        timer: 3000,
+        timerProgressBar: true
+      });
     } finally {
       setIsSubmitting(false);
     }
   };
+
+  // Function to clean up modal and backdrop
+  const cleanupModal = () => {
+    // Remove modal-open class from body
+    document.body.classList.remove('modal-open');
+    
+    // Remove any remaining modal backdrop
+    const backdrops = document.getElementsByClassName('modal-backdrop');
+    while (backdrops[0]) {
+      backdrops[0].parentNode.removeChild(backdrops[0]);
+    }
+    
+    // Reset body styles
+    document.body.style.overflow = '';
+    document.body.style.paddingRight = '';
+  };
+
+  // Handle modal show/hide events
+  useEffect(() => {
+    const modal = document.getElementById('categoryModal');
+    if (!modal) return;
+
+    const handleHidden = () => {
+      cleanupModal();
+      setForm({ name: "", parent_id: "" });
+      setError(null);
+    };
+
+    const handleShow = () => {
+      // Ensure body has modal-open class when modal is shown
+      document.body.classList.add('modal-open');
+    };
+    
+    modal.addEventListener('hidden.bs.modal', handleHidden);
+    modal.addEventListener('show.bs.modal', handleShow);
+    
+    // Cleanup function
+    return () => {
+      modal.removeEventListener('hidden.bs.modal', handleHidden);
+      modal.removeEventListener('show.bs.modal', handleShow);
+      // Ensure cleanup when component unmounts
+      cleanupModal();
+    };
+  }, [editingCategory]);
 
   return (
     <div

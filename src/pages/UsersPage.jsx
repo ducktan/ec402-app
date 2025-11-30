@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import UserTable from "../components/UserTable";
 import UserModal from "../components/UserModal";
-import { toast } from "react-toastify";
+import Swal from "sweetalert2";
 import { userService } from "../services/userService";
 
 const UsersPage = () => {
@@ -32,53 +32,77 @@ const UsersPage = () => {
   const handleAddUser = async (user) => {
     try {
       const response = await userService.create(user);
-      // The server should return the created user with the generated ID
       if (response && response.data) {
-        setUsers([...users, response.data]);
+        setUsers(prevUsers => [...prevUsers, response.data]);
         return { success: true };
       } else {
-        // If the response format is different, refetch the users list to ensure we have the latest data
         await fetchUsers();
         return { success: true };
       }
     } catch (error) {
       console.error("Lỗi khi thêm người dùng:", error);
-      return { 
-        success: false, 
-        message: error.response?.data?.message || "Có lỗi xảy ra khi thêm người dùng" 
-      };
+      throw error;
     }
   };
 
   const handleEditUser = async (updated) => {
     try {
-      const updatedUser = await userService.update(updated.id, updated);
-      setUsers(users.map((u) => (u.id === updated.id ? updatedUser : u)));
-      return { success: true };
+      const response = await userService.update(updated.id, updated);
+      // Make sure we're using the updated user data from the response
+      const updatedUser = response.data || response; // Handle both formats
+      
+      // Update the users list with the updated user data
+      setUsers(prevUsers => {
+        const updatedUsers = prevUsers.map((u) => 
+          u.id === updated.id ? { ...u, ...updated, ...updatedUser } : u
+        );
+        return updatedUsers;
+      });
+      
+      // Return success with the updated user data
+      return { success: true, user: { ...updated, ...updatedUser } };
     } catch (error) {
       console.error("Lỗi khi cập nhật người dùng:", error);
-      return { 
-        success: false, 
-        message: error.response?.data?.message || "Có lỗi xảy ra khi cập nhật thông tin" 
-      };
+      throw error;
     }
   };
 
   const handleDeleteUser = async (id) => {
-    if (!window.confirm("Bạn có chắc chắn muốn xóa người dùng này?")) return;
-    
-    try {
-      await userService.delete(id);
-      setUsers(users.filter((u) => u.id !== id));
-    } catch (error) {
-      console.error("Lỗi khi xóa người dùng:", error);
-      const errorMessage = error.response?.data?.message || "Có lỗi xảy ra khi xóa người dùng";
-      toast.error(errorMessage);
+    const result = await Swal.fire({
+      title: 'Bạn có chắc chắn?',
+      text: "Bạn sẽ không thể hoàn tác hành động này!",
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Có, xóa người dùng!',
+      cancelButtonText: 'Hủy'
+    });
+
+    if (result.isConfirmed) {
+      try {
+        await userService.delete(id);
+        setUsers(users.filter((u) => u.id !== id));
+        await Swal.fire(
+          'Đã xóa!',
+          'Người dùng đã được xóa.',
+          'success'
+        );
+      } catch (error) {
+        console.error("Lỗi khi xóa người dùng:", error);
+        Swal.fire(
+          'Lỗi!',
+          error.response?.data?.message || 'Có lỗi xảy ra khi xóa người dùng',
+          'error'
+        );
+      }
     }
   };
 
-  const filteredUsers =
-    filterRole === "all" ? users : users.filter((u) => u.role === filterRole);
+  const filteredUsers = React.useMemo(() => {
+    if (!Array.isArray(users)) return [];
+    return filterRole === "all" ? [...users] : users.filter((u) => u.role === filterRole);
+  }, [users, filterRole]);
 
   if (isLoading) {
     return (
@@ -125,20 +149,25 @@ const UsersPage = () => {
         </select>
       </div>
 
-      {!isLoading && users.length === 0 ? (
-        <div className="alert alert-info">Không có người dùng nào.</div>
-      ) : (
-        <UserTable
-          users={filteredUsers}
-          onEdit={setEditingUser}
-          onDelete={handleDeleteUser}
-        />
+      {isLoading ? null : (
+        filteredUsers.length === 0 ? (
+          <div key="no-users" className="alert alert-info">Không có người dùng nào.</div>
+        ) : (
+          <div key={`user-table-${filteredUsers.length}`}>
+            <UserTable
+              users={filteredUsers}
+              onEdit={setEditingUser}
+              onDelete={handleDeleteUser}
+            />
+          </div>
+        )
       )}
 
       <UserModal
         editingUser={editingUser}
         onAdd={handleAddUser}
         onEdit={handleEditUser}
+        setEditingUser={setEditingUser}
       />
     </>
   );
