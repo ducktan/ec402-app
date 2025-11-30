@@ -15,8 +15,15 @@ const UsersPage = () => {
     try {
       setIsLoading(true);
       setError(null);
+
       const data = await userService.getAll();
-      setUsers(data);
+      if (Array.isArray(data)) {
+        setUsers(data);
+      } else if (Array.isArray(data.data)) {
+        setUsers(data.data);
+      } else {
+        setUsers([]);
+      }
     } catch (err) {
       console.error("Lỗi khi tải người dùng:", err);
       setError("Không thể tải danh sách người dùng. Vui lòng thử lại sau.");

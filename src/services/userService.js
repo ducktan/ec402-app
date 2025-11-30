@@ -1,6 +1,5 @@
 import axios from 'axios';
 
-const API_URL = 'http://localhost:5000/api/users';
 
 // Tạo instance axios với cấu hình mặc định
 const api = axios.create({
@@ -29,7 +28,7 @@ export const userService = {
   // Lấy tất cả người dùng (public endpoint)
   getAll: async () => {
     try {
-      const response = await api.get('/users/public/all');
+      const response = await api.get('/users/admin');
       return response.data; 
     } catch (error) {
       console.error('Lỗi khi lấy danh sách người dùng:', error);
@@ -47,7 +46,7 @@ export const userService = {
         role: user.role || 'buyer' // Vai trò mặc định
       };
       
-      const response = await api.post('/users', userData);
+      const response = await api.post('auth/register', userData);
       return response.data;
     } catch (error) {
       console.error('Lỗi khi thêm người dùng:', error);
