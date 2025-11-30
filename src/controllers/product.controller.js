@@ -5,12 +5,15 @@ exports.createProduct = async (req, res) => {
   try {
     const { brand_id, category_id, name, description, price, stock } = req.body;
 
-    if (!brand_id || !name || !price) {
-      return res.status(400).json({ message: "Thiếu thông tin bắt buộc (brand_id, name, price)." });
+    if (!name || !price) {
+      return res.status(400).json({ message: "Thiếu thông tin bắt buộc (name, price)." });
     }
 
+    // Nếu không có brand_id, sử dụng ID của thương hiệu mặc định (ví dụ: 1)
+    const defaultBrandId = 1; // Thay thế bằng ID của bản ghi 'No Brand' trong bảng brands
+    
     const newProduct = await Product.create({
-      brand_id,
+      brand_id: brand_id || defaultBrandId,
       category_id,
       name,
       description,
@@ -69,6 +72,43 @@ exports.getProductById = async (req, res) => {
     } catch (error) {
       console.error(error);
       res.status(500).json({ message: "Server error" });
+    }
+  };
+
+  // Update product images
+  exports.updateProductImages = async (req, res) => {
+    try {
+      const { id } = req.params;
+      const { images } = req.body;
+
+      if (!images || !Array.isArray(images)) {
+        return res.status(400).json({ 
+          success: false, 
+          message: "Danh sách ảnh không hợp lệ" 
+        });
+      }
+
+      // Xóa tất cả ảnh cũ của sản phẩm
+      await Product.deleteProductImages(id);
+
+      // Thêm các ảnh mới
+      const newImages = [];
+      for (const imageUrl of images) {
+        const newImage = await Product.addProductImage(id, imageUrl);
+        newImages.push(newImage);
+      }
+
+      res.status(200).json({
+        success: true,
+        message: "Cập nhật ảnh sản phẩm thành công",
+        images: newImages
+      });
+    } catch (error) {
+      console.error('Lỗi khi cập nhật ảnh sản phẩm:', error);
+      res.status(500).json({ 
+        success: false, 
+        message: "Lỗi server khi cập nhật ảnh sản phẩm" 
+      });
     }
   };
 

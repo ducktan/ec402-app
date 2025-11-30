@@ -1,6 +1,11 @@
 const pool = require("../config/db");
 
 const User = {
+  // 👥 Lấy tất cả users
+  async getAllUsers() {
+    const [rows] = await pool.query("SELECT * FROM users ORDER BY created_at DESC");
+    return rows;
+  },
   // 🧩 Tạo user mới
   async createUser({ role, name, email, passwordHash, phone, avatar, gender, dob }) {
     const [result] = await pool.query(
@@ -57,6 +62,10 @@ const User = {
       fields.push("dob = ?");
       values.push(data.dob);
     }
+    if (data.role !== undefined) {
+      fields.push("role = ?");
+      values.push(data.role);
+    }
 
     if (fields.length === 0) return; // không có gì để update
 
@@ -65,6 +74,17 @@ const User = {
 
     await pool.query(sql, values);
   },
+
+  // 🗑️ Xóa user
+  async deleteUser(id) {
+    await pool.query("DELETE FROM users WHERE id = ?", [id]);
+    return true;
+  },
+
+  // 🔍 Tìm user theo email (alias cho findUserByEmail để nhất quán)
+  async findByEmail(email) {
+    return this.findUserByEmail(email);
+  }
 };
 
 module.exports = User;

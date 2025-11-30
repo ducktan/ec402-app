@@ -1,13 +1,29 @@
 const express = require("express");
 const router = express.Router();
 const userController = require("../controllers/user.controller");
-const { authMiddleware } = require("../middlewares/auth.middleware");
-const UserAddress = require("../models/userAddress.model");
-const { uploadAvatar } = require("../controllers/user.controller");
+const { authMiddleware, isAdmin } = require("../middlewares/auth.middleware");
 const upload = require("../middlewares/upload");
+const { uploadAvatar } = require("../controllers/user.controller");
 
-// cập nhật user
-router.put("/", authMiddleware, userController.updateUser);
+// 👥 Lấy tất cả users (public - không cần đăng nhập)
+router.get("/public/all", userController.getAllUsersPublic);
+
+// 👥 Lấy tất cả users (chỉ admin)
+router.get("/all", userController.getAllUsers);
+
+// 👤 Tạo người dùng mới (chỉ admin)
+router.post("/", userController.createUser);
+
+// 👤 Xóa người dùng (không cần auth)
+router.delete("/:id", userController.deleteUser);
+
+// Thêm route test không cần auth
+router.get("/test", (req, res) => {
+  console.log("Test endpoint được gọi");
+  res.json({ message: "Kết nối API thành công!" });
+});
+// Cập nhật user (không cần auth)
+router.put("/:id", userController.updateUser);
 
 // get user profile
 router.get("/", authMiddleware, userController.getUserProfile);

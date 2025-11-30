@@ -2,6 +2,14 @@ const jwt = require("jsonwebtoken");
 const SECRET = "EC402_APP_KEY"; // nên để .env
 const db = require("../config/db");
 
+// Middleware kiểm tra quyền admin
+exports.isAdmin = (req, res, next) => {
+  if (req.user && req.user.role === 'admin') {
+    return next();
+  }
+  return res.status(403).json({ message: 'Truy cập bị từ chối. Yêu cầu quyền admin.' });
+};
+
 exports.authMiddleware = (req, res, next) => {
   const authHeader = req.headers["authorization"];
   const token = authHeader && authHeader.split(" ")[1];

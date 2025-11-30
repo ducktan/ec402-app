@@ -2,7 +2,7 @@ const pool = require("../config/db");
 
 class Product {
   // ====== CREATE PRODUCT ======
-  static async create({ brand_id, category_id, name, description, price, stock }) {
+  static async create({ brand_id = null, category_id, name, description, price, stock = 0 }) {
     const [result] = await pool.query(
       `INSERT INTO products (brand_id, category_id, name, description, price, stock)
        VALUES (?, ?, ?, ?, ?, ?)`,

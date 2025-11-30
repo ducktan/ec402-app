@@ -21,14 +21,18 @@ exports.register = async (req, res) => {
 
     // Lưu user vào DB
     const userId = await User.createUser({
-      role: "buyer",
+      role,
       name,
       email,
       passwordHash,
       phone,
     });
 
-    res.status(201).json({ message: "User registered successfully", userId });
+    res.status(201).json({ 
+      message: "User registered successfully", 
+      userId,
+      role // Trả về role để xác nhận
+    });
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: "Server error" });
@@ -36,23 +40,31 @@ exports.register = async (req, res) => {
 };
 
 // Đăng nhập
+// In auth.controller.js
 exports.login = async (req, res) => {
   try {
     const { email, password } = req.body;
 
-    // Tìm user theo email
+    // Find user by email
     const user = await User.findUserByEmail(email);
     if (!user) {
       return res.status(400).json({ message: "Invalid email or password" });
     }
 
-    // Kiểm tra password
+    // Check if user has a password set
+    if (!user.password_hash) {
+      return res.status(400).json({ 
+        message: "Please set a password or use OTP login" 
+      });
+    }
+
+    // Check password
     const isMatch = await comparePassword(password, user.password_hash);
     if (!isMatch) {
       return res.status(400).json({ message: "Invalid email or password" });
     }
 
-    // Tạo token (dùng utils/token.js)
+    // Generate token
     const token = generateToken({ id: user.id, role: user.role });
 
     res.json({
@@ -66,7 +78,7 @@ exports.login = async (req, res) => {
       },
     });
   } catch (err) {
-    console.error(err);
+    console.error('Login error:', err);
     res.status(500).json({ message: "Server error" });
   }
 };
