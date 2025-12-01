@@ -139,6 +139,26 @@ class Product {
     return rows;
   }
 
+
+  // ====== GET RELATED PRODUCTS ======
+  static async findRelated(productId) {
+    const [rows] = await pool.query(
+      `
+        SELECT p.*
+        FROM products p
+        WHERE p.category_id = (
+            SELECT category_id FROM products WHERE id = ?
+        )
+        AND p.id != ?
+        ORDER BY p.id DESC
+        LIMIT 20
+      `,
+      [productId, productId]
+    );
+
+    return rows;
+  }
+
 }
 
 

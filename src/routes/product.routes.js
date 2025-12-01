@@ -15,4 +15,8 @@ router.get("/:id/images", ProductController.getImagesByProductId);
 router.put("/:id", authMiddleware, authorizeRole(["admin"]), ProductController.updateProduct);
 router.delete("/:id", authMiddleware, authorizeRole(["admin"]), ProductController.deleteProduct);
 
+// Related to category
+router.get("/:id/related", ProductController.getRelatedProducts);
+
+
 module.exports = router;
