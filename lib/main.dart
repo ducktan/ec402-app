@@ -15,7 +15,7 @@ import 'package:ec402_app/features/authentication/screens/welcome.dart';
 import 'package:ec402_app/features/personalization/screens/notification/notification.dart';
 import 'package:ec402_app/features/shop/screens/product_review/all_reviews_screen.dart';
 import 'package:ec402_app/features/shop/screens/product_review/create_review_screen.dart';
-
+import 'package:ec402_app/features/shop/screens/search/search_screen.dart'; // ✅ Import SearchScreen
 
 void main() {
   runApp(const MyApp());
@@ -34,106 +34,101 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GetMaterialApp(
-      initialBinding: InitialBindings(),   // 👈 thay MaterialApp bằng GetMaterialApp
+      initialBinding:
+          InitialBindings(), // 👈 thay MaterialApp bằng GetMaterialApp
       debugShowCheckedModeBanner: false,
       title: 'Flutter Demo',
-theme: ThemeData(
-  fontFamily: 'Poppins',
-  brightness: Brightness.light,
-  scaffoldBackgroundColor: const Color(0xFFF8F9FA), // nền sáng nhạt
-  primaryColor: const Color(0xFFFF6B00),             // cam đậm thương hiệu
-  colorScheme: const ColorScheme.light(
-    primary: Color(0xFFFF6B00),   // nút, checkbox, icon
-    secondary: Color(0xFFFF8C1A), // màu nhấn
-    surface: Colors.white,
-    onPrimary: Colors.white,      // chữ trên nút primary
-    onSecondary: Colors.white,    // chữ trên nút secondary
-    onSurface: Color(0xFF2B2B2B),// chữ chính trên nền sáng
-  ),
+      theme: ThemeData(
+        fontFamily: 'Poppins',
+        brightness: Brightness.light,
+        scaffoldBackgroundColor: const Color(0xFFF8F9FA), // nền sáng nhạt
+        primaryColor: const Color(0xFFFF6B00), // cam đậm thương hiệu
+        colorScheme: const ColorScheme.light(
+          primary: Color(0xFFFF6B00), // nút, checkbox, icon
+          secondary: Color(0xFFFF8C1A), // màu nhấn
+          surface: Colors.white,
+          onPrimary: Colors.white, // chữ trên nút primary
+          onSecondary: Colors.white, // chữ trên nút secondary
+          onSurface: Color(0xFF2B2B2B), // chữ chính trên nền sáng
+        ),
 
-  // ===== TextField =====
-  inputDecorationTheme: InputDecorationTheme(
-    filled: true,
-    fillColor: Colors.white,
-    labelStyle: const TextStyle(color: Color(0xFF2B2B2B)),
-    hintStyle: TextStyle(color: Colors.grey.shade500),
-    border: OutlineInputBorder(
-      borderRadius: BorderRadius.circular(12),
-      borderSide: const BorderSide(color: Color(0xFFE0E0E0)),
-    ),
-    focusedBorder: const OutlineInputBorder(
-      borderRadius: BorderRadius.all(Radius.circular(12)),
-      borderSide: BorderSide(color: Color(0xFFFF6B00), width: 2),
-    ),
-  ),
+        // ===== TextField =====
+        inputDecorationTheme: InputDecorationTheme(
+          filled: true,
+          fillColor: Colors.white,
+          labelStyle: const TextStyle(color: Color(0xFF2B2B2B)),
+          hintStyle: TextStyle(color: Colors.grey.shade500),
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(12),
+            borderSide: const BorderSide(color: Color(0xFFE0E0E0)),
+          ),
+          focusedBorder: const OutlineInputBorder(
+            borderRadius: BorderRadius.all(Radius.circular(12)),
+            borderSide: BorderSide(color: Color(0xFFFF6B00), width: 2),
+          ),
+        ),
 
-  // ===== Elevated Button =====
-  elevatedButtonTheme: ElevatedButtonThemeData(
-    style: ElevatedButton.styleFrom(
-      backgroundColor: const Color(0xFFFF6B00),
-      foregroundColor: Colors.white,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
+        // ===== Elevated Button =====
+        elevatedButtonTheme: ElevatedButtonThemeData(
+          style: ElevatedButton.styleFrom(
+            backgroundColor: const Color(0xFFFF6B00),
+            foregroundColor: Colors.white,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
+            padding: const EdgeInsets.symmetric(vertical: 14),
+            elevation: 2,
+            shadowColor: const Color(0x33FF6B00),
+          ),
+        ),
+
+        // ===== Outlined Button =====
+        outlinedButtonTheme: OutlinedButtonThemeData(
+          style: OutlinedButton.styleFrom(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
+            padding: const EdgeInsets.symmetric(vertical: 14),
+            side: const BorderSide(color: Color(0xFFFF6B00)),
+            foregroundColor: const Color(0xFFFF6B00),
+          ),
+        ),
+
+        // ===== Checkbox =====
+        checkboxTheme: CheckboxThemeData(
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
+          fillColor: MaterialStateProperty.resolveWith<Color>((states) {
+            if (states.contains(MaterialState.selected)) {
+              return const Color(0xFFFF6B00);
+            }
+            return Colors.grey;
+          }),
+        ),
+
+        // ===== AppBar =====
+        appBarTheme: const AppBarTheme(
+          backgroundColor: Color(0xFFFF6B00),
+          foregroundColor: Color.fromARGB(0, 255, 255, 255),
+          elevation: 0,
+          centerTitle: true,
+          titleTextStyle: TextStyle(
+            fontWeight: FontWeight.w600,
+            fontSize: 20,
+            color: Colors.white,
+          ),
+        ),
+
+        // ===== Text theme =====
+        textTheme: TextTheme(
+          bodyMedium: TextStyle(color: const Color(0xFF2B2B2B)),
+          bodySmall: TextStyle(color: const Color(0xFF2B2B2B)),
+          labelMedium: TextStyle(color: const Color(0xFF555555)), // text phụ
+          headlineSmall: TextStyle(color: const Color(0xFF2B2B2B)), // tiêu đề
+        ),
       ),
-      padding: const EdgeInsets.symmetric(vertical: 14),
-      elevation: 2,
-      shadowColor: const Color(0x33FF6B00),
-    ),
-  ),
-
-  // ===== Outlined Button =====
-  outlinedButtonTheme: OutlinedButtonThemeData(
-    style: OutlinedButton.styleFrom(
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-      ),
-      padding: const EdgeInsets.symmetric(vertical: 14),
-      side: const BorderSide(color: Color(0xFFFF6B00)),
-      foregroundColor: const Color(0xFFFF6B00),
-    ),
-  ),
-
-  // ===== Checkbox =====
-  checkboxTheme: CheckboxThemeData(
-    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
-    fillColor: MaterialStateProperty.resolveWith<Color>((states) {
-      if (states.contains(MaterialState.selected)) {
-        return const Color(0xFFFF6B00);
-      }
-      return Colors.grey;
-    }),
-  ),
-
-  // ===== AppBar =====
-  appBarTheme: const AppBarTheme(
-    backgroundColor: Color(0xFFFF6B00),
-    foregroundColor: Color.fromARGB(0, 255, 255, 255),
-    elevation: 0,
-    centerTitle: true,
-    titleTextStyle: TextStyle(
-      fontWeight: FontWeight.w600,
-      fontSize: 20,
-      color: Colors.white,
-    ),
-  ),
-
-  // ===== Text theme =====
-  textTheme: TextTheme(
-    bodyMedium: TextStyle(color: const Color(0xFF2B2B2B)),
-    bodySmall: TextStyle(color: const Color(0xFF2B2B2B)),
-    labelMedium: TextStyle(color: const Color(0xFF555555)), // text phụ
-    headlineSmall: TextStyle(color: const Color(0xFF2B2B2B)), // tiêu đề
-  ),
-),
-
-
 
       // home: HomeScreen(),
-      home: CreateReviewScreen(
-        productId: 27,
-        productName: "iPhone 14 Pro",
-        productImage: "https://i.pinimg.com/736x/12/9c/ec/129cecf395cde8f7d3da697749d6fbe4.jpg",
-      )
+      home: const SearchScreen(),
     );
   }
 }

@@ -5,12 +5,13 @@ class ProductController extends GetxController {
   var products = <Map<String, dynamic>>[].obs;
   var isLoading = false.obs;
 
-  /// Lấy dữ liệu từ API
   Future<void> loadProducts() async {
     try {
       isLoading.value = true;
       final fetched = await ProductApi.fetchProducts();
-      products.assignAll(fetched);
+
+      // ✅ SỬA LỖI: Thêm .cast<Map<String, dynamic>>()
+      products.assignAll(fetched.cast<Map<String, dynamic>>());
     } finally {
       isLoading.value = false;
     }
