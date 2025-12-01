@@ -1,100 +1,86 @@
 import 'package:flutter/material.dart';
+import 'package:iconsax/iconsax.dart';
 
 class ReviewItem extends StatelessWidget {
   final String userName;
+  final String comment;
   final int rating;
   final String date;
-  final String comment;
-  final List<String>? imageUrls;
+  final String? avatarUrl;
+  final List<String> imageUrls;
+  final VoidCallback? onDelete; // callback xóa
+  final VoidCallback? onEdit; // callback sửa
 
   const ReviewItem({
     super.key,
     required this.userName,
+    required this.comment,
     required this.rating,
     required this.date,
-    required this.comment,
-    this.imageUrls,
+    this.avatarUrl,
+    required this.imageUrls,
+    this.onDelete,
+    this.onEdit,
   });
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(vertical: 8),
-      decoration: const BoxDecoration(
-        border: Border(
-          bottom: BorderSide(color: Colors.black12, width: 0.3),
-        ),
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey.withOpacity(0.1),
+            blurRadius: 6,
+            offset: const Offset(0, 2),
+          ),
+        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // --- Header ---
           Row(
             children: [
-              const CircleAvatar(
+              CircleAvatar(
                 radius: 18,
                 backgroundImage:
-                    NetworkImage('https://i.pravatar.cc/100?img=5'),
+                    avatarUrl != null ? NetworkImage(avatarUrl!) : null,
+                child: avatarUrl == null ? const Icon(Iconsax.user) : null,
               ),
-              const SizedBox(width: 10),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      userName,
-                      style: const TextStyle(
-                          fontWeight: FontWeight.w600, fontSize: 15),
-                    ),
-                    Row(
-                      children: List.generate(
-                        5,
-                        (index) => Icon(
-                          index < rating ? Icons.star : Icons.star_border,
-                          color: Colors.amber,
-                          size: 16,
-                        ),
-                      ),
-                    ),
-                  ],
+              const SizedBox(width: 8),
+              Text(userName, style: const TextStyle(fontWeight: FontWeight.w600)),
+              const Spacer(),
+              if (onEdit != null)
+                IconButton(
+                  onPressed: onEdit,
+                  icon: const Icon(Iconsax.edit_2, color: Colors.blue),
+                  tooltip: 'Chỉnh sửa đánh giá',
                 ),
-              ),
-              Text(
-                date,
-                style: const TextStyle(color: Colors.grey, fontSize: 13),
-              ),
+              if (onDelete != null)
+                IconButton(
+                  onPressed: onDelete,
+                  icon: const Icon(Iconsax.trash, color: Colors.red),
+                  tooltip: 'Xóa đánh giá',
+                ),
             ],
           ),
-
-          const SizedBox(height: 8),
-
-          // --- Nội dung ---
-          Text(
-            comment,
-            style: const TextStyle(height: 1.4),
-          ),
-
-          // --- Hình ảnh kèm theo ---
-          if (imageUrls != null && imageUrls!.isNotEmpty) ...[
-            const SizedBox(height: 8),
-            SizedBox(
-              height: 80,
-              child: ListView.separated(
-                scrollDirection: Axis.horizontal,
-                itemCount: imageUrls!.length,
-                separatorBuilder: (_, __) => const SizedBox(width: 8),
-                itemBuilder: (context, index) => ClipRRect(
-                  borderRadius: BorderRadius.circular(8),
-                  child: Image.network(
-                    imageUrls![index],
-                    width: 80,
-                    height: 80,
-                    fit: BoxFit.cover,
-                  ),
-                ),
+          const SizedBox(height: 4),
+          Row(
+            children: List.generate(
+              5,
+              (index) => Icon(
+                index < rating ? Icons.star : Icons.star_border,
+                color: Colors.amber,
+                size: 16,
               ),
             ),
-          ],
+          ),
+          const SizedBox(height: 4),
+          Text(comment),
+          const SizedBox(height: 4),
+          Text(date, style: const TextStyle(fontSize: 12, color: Colors.grey)),
         ],
       ),
     );

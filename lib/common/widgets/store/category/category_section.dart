@@ -16,56 +16,34 @@ class CategorySection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SliverToBoxAdapter(
-      child: Padding(
-        padding: const EdgeInsets.all(TSizes.defaultSpace),
-        child: SizedBox(
-          height: 42,
-          child: ListView.builder(
-            scrollDirection: Axis.horizontal,
-            physics: const BouncingScrollPhysics(),
-            itemCount: categories.length,
-            itemBuilder: (context, index) {
-              final name = categories[index];
-              final isSelected = selectedIndex == index;
+    return SizedBox(
+      height: 45,
+      child: ListView.separated(
+        scrollDirection: Axis.horizontal,
+        itemCount: categories.length,
+        separatorBuilder: (_, __) => const SizedBox(width: 10),
+        itemBuilder: (context, index) {
+          final isActive = index == selectedIndex;
 
-              return GestureDetector(
-                onTap: () => onSelect(index),
-                child: AnimatedContainer(
-                  duration: const Duration(milliseconds: 200),
-                  margin: const EdgeInsets.only(right: 12),
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 16,
-                    vertical: 8,
-                  ),
-                  decoration: BoxDecoration(
-                    color: isSelected
-                        ? TColors.primary.withOpacity(0.1)
-                        : Colors.grey.shade200,
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(
-                      color: isSelected ? TColors.primary : Colors.transparent,
-                      width: 1.5,
-                    ),
-                  ),
-                  child: Center(
-                    child: Text(
-                      name,
-                      style: TextStyle(
-                        color: isSelected
-                            ? TColors.primary
-                            : Colors.grey.shade700,
-                        fontWeight: isSelected
-                            ? FontWeight.bold
-                            : FontWeight.normal,
-                      ),
-                    ),
+          return GestureDetector(
+            onTap: () => onSelect(index),
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              decoration: BoxDecoration(
+                color: isActive ? Colors.black : Colors.grey.shade200,
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Center(
+                child: Text(
+                  categories[index],
+                  style: TextStyle(
+                    color: isActive ? Colors.white : Colors.black,
                   ),
                 ),
-              );
-            },
-          ),
-        ),
+              ),
+            ),
+          );
+        },
       ),
     );
   }

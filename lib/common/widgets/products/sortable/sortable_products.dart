@@ -7,10 +7,24 @@ import 'package:flutter/material.dart';
 import 'package:iconsax/iconsax.dart';
 
 class TSortableProducts extends StatelessWidget {
-  const TSortableProducts({super.key});
+  final List<Map<String, dynamic>>? products; // ✅ thêm parameter
+
+  const TSortableProducts({super.key, this.products});
 
   @override
   Widget build(BuildContext context) {
+    // Nếu không truyền products → dùng dữ liệu demo
+    final displayProducts = products ??
+        List.generate(
+          8,
+          (index) => {
+            'name': "Red Shoes $index",
+            'price': "500.000đ",
+            'shop': "Nike Official",
+            'image_url': "https://picsum.photos/id/${index + 10}/200/200",
+          },
+        );
+
     return Column(
       children: [
         DropdownButtonFormField(
@@ -34,14 +48,21 @@ class TSortableProducts extends StatelessWidget {
         const SizedBox(height: TSizes.spaceBtwSections),
 
         TGirdLayout(
-          iTemCount: 8, // ✅ fix chính tả
-          itemBuilder: (_, index) => TProductCardVertical(
-            title: "Red Shoes $index",
-            price: "500.000đ",
-            shop: "Nike Official",
-            imageUrl: "https://picsum.photos/id/${index + 10}/200/200",
-            // onTap: () => Get.to(() => const ProductDetailScreen()),
-          ),
+          iTemCount: displayProducts.length,
+          childAspectRatio: 0.55,
+          itemBuilder: (_, index) {
+            final product = displayProducts[index];
+            return TProductCardVertical(
+              title: product['name'] ?? "Unknown",
+              price: product['price'] ?? "0 VNĐ",
+              shop: product['shop'] ?? "",
+              imageUrl: product['image_url'] ?? "",
+              onTap: () {
+                // nếu có màn product detail
+                Get.to(() => ProductDetailScreen(product: product));
+              },
+            );
+          },
         ),
       ],
     );

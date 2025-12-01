@@ -4,10 +4,11 @@ import '../../../services/category_api.dart';
 class CategoryController extends GetxController {
   final CategoryService _service = CategoryService();
 
-  var isLoading = false.obs;
+  var isLoadingCategories = false.obs;
+  var isLoadingProducts = false.obs;
 
   var categories = <Map<String, dynamic>>[].obs;
-  var selectedCategory = {}.obs;
+  var selectedCategory = <String, dynamic>{}.obs;
 
   var products = <Map<String, dynamic>>[].obs;
   var productCount = 0.obs;
@@ -21,31 +22,34 @@ class CategoryController extends GetxController {
   /// Lấy danh sách category
   Future<void> fetchCategories() async {
     try {
-      isLoading(true);
+      isLoadingCategories(true);
       final data = await _service.fetchCategories();
-      categories.assignAll(List<Map<String, dynamic>>.from(data));
+      categories.assignAll(data);
     } catch (e) {
       print("Error fetching categories: $e");
     } finally {
-      isLoading(false);
+      isLoadingCategories(false);
     }
   }
 
-  /// Chọn category → fetch products luôn
+  /// Chọn category + fetch sản phẩm
   Future<void> selectCategory(int categoryId) async {
     try {
-      isLoading(true);
+      isLoadingProducts(true);
 
+      // Fetch details
       final detail = await _service.fetchCategoryById(categoryId);
-      selectedCategory.value = detail;
+      selectedCategory.assignAll(detail);
 
+      // Fetch sản phẩm theo category
       final prod = await _service.fetchProductsByCategoryId(categoryId);
-      productCount.value = prod['count'];
-      products.assignAll(List<Map<String, dynamic>>.from(prod['data']));
+      productCount.value = prod['count'] ?? 0;
+      products.assignAll(prod['data'] ?? []);
+
     } catch (e) {
       print("Error selecting category: $e");
     } finally {
-      isLoading(false);
+      isLoadingProducts(false);
     }
   }
 }

@@ -1,16 +1,21 @@
+import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:ec402_app/common/widgets/products/product_cards/product_card_vertical.dart';
 import 'package:ec402_app/common/widgets/store/brands/brand_card.dart';
 import 'package:ec402_app/common/widgets/products.card/cart_menu_icon.dart';
+import 'package:ec402_app/common/widgets/store/category/category_section.dart';
+import 'package:ec402_app/utils/constants/colors.dart';
+import 'package:ec402_app/utils/constants/image_strings.dart';
+import 'package:ec402_app/utils/constants/sizes.dart';
 import 'package:ec402_app/features/shop/screens/brand/all_brand.dart';
 import 'package:ec402_app/features/shop/screens/brand/brand_product.dart';
 import 'package:ec402_app/features/shop/screens/cart/cart.dart';
-import 'package:ec402_app/utils/constants/colors.dart';
-import 'package:ec402_app/utils/constants/image_strings.dart';
-import 'package:flutter/material.dart';
-import 'package:ec402_app/utils/constants/sizes.dart';
-import 'package:get/get.dart';
-import 'package:ec402_app/common/widgets/store/category/category_section.dart';
+
 import '../../controllers/brand_controller.dart';
+import '../../controllers/category_controller.dart';
+import '../../../../common/widgets/layouts/gird_layout.dart';
+import '../../screens/product_detail/product_detail_screen.dart';
+import '../../screens/search/search_screen.dart';
 
 class StoreScreen extends StatefulWidget {
   const StoreScreen({super.key});
@@ -21,74 +26,9 @@ class StoreScreen extends StatefulWidget {
 
 class _StoreScreenState extends State<StoreScreen> {
   final brandCtrl = Get.put(BrandController());
-
-  final List<String> _categories = [
-    'Sports',
-    'Jewelery',
-    'Electronics',
-    'Clothes',
-  ];
+  final categoryCtrl = Get.put(CategoryController());
 
   int _selectedCategoryIndex = 0;
-
-  final Map<String, List<Map<String, dynamic>>> _categoryProducts = {
-    'Sports': [
-      {
-        'title': 'Running Shoes',
-        'price': '900.000đ',
-        'shop': 'shop name',
-        'image': TImages.productImage1,
-      },
-      {
-        'title': 'Football',
-        'price': '400.000đ',
-        'shop': 'shop name',
-        'image': TImages.productImage1,
-      },
-    ],
-    'Jewelery': [
-      {
-        'title': 'Gold Ring',
-        'price': '3.200.000đ',
-        'shop': 'shop name',
-        'image': TImages.productImage1,
-      },
-      {
-        'title': 'Silver Necklace',
-        'price': '1.100.000đ',
-        'shop': 'shop name',
-        'image': TImages.productImage1,
-      },
-    ],
-    'Electronics': [
-      {
-        'title': 'Laptop Acer',
-        'price': '15.000.000đ',
-        'shop': 'shop name',
-        'image': TImages.productImage1,
-      },
-      {
-        'title': 'Samsung Phone',
-        'price': '8.500.000đ',
-        'shop': 'shop name',
-        'image': TImages.productImage1,
-      },
-    ],
-    'Clothes': [
-      {
-        'title': 'T-Shirt',
-        'price': '350.000đ',
-        'shop': 'shop name',
-        'image': TImages.productImage1,
-      },
-      {
-        'title': 'Jeans',
-        'price': '600.000đ',
-        'shop': 'shop name',
-        'image': TImages.productImage1,
-      },
-    ],
-  };
 
   @override
   Widget build(BuildContext context) {
@@ -112,26 +52,30 @@ class _StoreScreenState extends State<StoreScreen> {
           ),
         ],
       ),
-
       body: CustomScrollView(
         slivers: [
-
-          // 🔍 SEARCH BAR
+          // SEARCH + FEATURED BRANDS HEADER
           SliverPadding(
             padding: const EdgeInsets.all(TSizes.defaultSpace),
             sliver: SliverList(
               delegate: SliverChildListDelegate([
-                TextField(
-                  decoration: InputDecoration(
-                    hintText: 'Search in Store',
-                    prefixIcon: const Icon(Icons.search),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
+                GestureDetector(
+                  onTap: () {
+                    Get.to(() => SearchScreen()); // Hoặc alias nếu bị conflict
+                  },
+                  child: AbsorbPointer(
+                    child: TextField(
+                      decoration: InputDecoration(
+                        hintText: 'Search in Store',
+                        prefixIcon: const Icon(Icons.search),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
                     ),
                   ),
                 ),
                 const SizedBox(height: TSizes.spaceBtwSections),
-
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -156,9 +100,11 @@ class _StoreScreenState extends State<StoreScreen> {
             ),
           ),
 
-          // ⭐ BRAND GRID - DỮ LIỆU TỪ BRAND CONTROLLER
+          // BRAND GRID
           SliverPadding(
-            padding: const EdgeInsets.symmetric(horizontal: TSizes.defaultSpace),
+            padding: const EdgeInsets.symmetric(
+              horizontal: TSizes.defaultSpace,
+            ),
             sliver: Obx(() {
               if (brandCtrl.isLoading.value) {
                 return const SliverToBoxAdapter(
@@ -173,29 +119,17 @@ class _StoreScreenState extends State<StoreScreen> {
               }
 
               return SliverGrid(
-                delegate: SliverChildBuilderDelegate(
-                  (context, index) {
-                    final brand = brandCtrl.brands[index];
-
-                    return TBrandCard(
-                      showBorder: true,
-                      brandName: brand['name'],
-                      productCount: "", // API chưa có count
-                      icon: brand['logo_url'] ?? TImages.clothIcon,
-                      onTap: () async {
-                        await brandCtrl.fetchProducts(brand['id']);
-
-                        Get.to(() => BrandProducts(
-                              brandName: brand['name'],
-                              icon: brand['logo_url'] ?? TImages.clothIcon,
-                              productCount:
-                                  brandCtrl.productCount.value.toString(),
-                            ));
-                      },
-                    );
-                  },
-                  childCount: brandCtrl.brands.length,
-                ),
+                delegate: SliverChildBuilderDelegate((context, index) {
+                  final brand = brandCtrl.brands[index];
+                  return TBrandCard(
+                    showBorder: true,
+                    brandName: brand['name'],
+                    productCount: "${brand['productCount'] ?? 0} products",
+                    icon: brand['logo_url'] ?? TImages.clothIcon,
+                    onTap: () =>
+                        Get.to(() => BrandProducts(brandId: brand['id'])),
+                  );
+                }, childCount: brandCtrl.brands.length),
                 gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                   crossAxisCount: 2,
                   mainAxisExtent: 80,
@@ -210,41 +144,77 @@ class _StoreScreenState extends State<StoreScreen> {
             child: SizedBox(height: TSizes.spaceBtwSections),
           ),
 
-          // 🔥 CATEGORY SELECTOR
-          CategorySection(
-            categories: _categories,
-            selectedIndex: _selectedCategoryIndex,
-            onSelect: (index) => setState(() => _selectedCategoryIndex = index),
+          // CATEGORY SELECTOR (API) - với padding
+          SliverPadding(
+            padding: const EdgeInsets.symmetric(
+              horizontal: TSizes.defaultSpace,
+              vertical: TSizes.spaceBtwSections / 2,
+            ),
+            sliver: SliverToBoxAdapter(
+              child: Obx(() {
+                if (categoryCtrl.isLoadingCategories.value) {
+                  return const Center(child: CircularProgressIndicator());
+                }
+
+                final parentCategories = categoryCtrl.categories
+                    .where((c) => c['parent_id'] == null)
+                    .toList();
+
+                if (parentCategories.isEmpty) {
+                  return const Center(child: Text("No categories found"));
+                }
+
+                return CategorySection(
+                  categories: parentCategories
+                      .map((c) => c['name'] as String)
+                      .toList(),
+                  selectedIndex: _selectedCategoryIndex,
+                  onSelect: (index) {
+                    setState(() => _selectedCategoryIndex = index);
+                    categoryCtrl.selectCategory(parentCategories[index]['id']);
+                  },
+                );
+              }),
+            ),
           ),
 
-          // 🛍 PRODUCT GRID - STATIC DEMO
+          // PRODUCT GRID (API) - dùng TGirdLayout
           SliverPadding(
-            padding: const EdgeInsets.all(TSizes.defaultSpace),
-            sliver: SliverGrid(
-              delegate: SliverChildBuilderDelegate(
-                (context, index) {
-                  final category = _categories[_selectedCategoryIndex];
-                  final products = _categoryProducts[category] ?? [];
+            padding: const EdgeInsets.symmetric(
+              horizontal: TSizes.defaultSpace,
+              vertical: TSizes.spaceBtwSections / 2,
+            ),
+            sliver: SliverToBoxAdapter(
+              child: Obx(() {
+                if (categoryCtrl.isLoadingProducts.value) {
+                  return const Center(child: CircularProgressIndicator());
+                }
 
-                  if (index >= products.length) return const SizedBox();
+                if (categoryCtrl.products.isEmpty) {
+                  return const Center(child: Text("No products found"));
+                }
 
-                  final p = products[index];
+                final products = categoryCtrl.products;
 
-                  return TProductCardVertical(
-                    title: p['title'],
-                    price: p['price'],
-                    shop: p['shop'],
-                    imageUrl: p['image'],
-                  );
-                },
-                childCount: _categoryProducts[_categories[_selectedCategoryIndex]]?.length ?? 0,
-              ),
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 2,
-                mainAxisSpacing: TSizes.spaceBtwItems,
-                crossAxisSpacing: TSizes.spaceBtwItems,
-                mainAxisExtent: 280,
-              ),
+                return TGirdLayout(
+                  iTemCount: products.length,
+                  childAspectRatio: 0.55,
+                  itemBuilder: (_, index) {
+                    final product = products[index];
+
+                    return TProductCardVertical(
+                      title: product['name'] ?? 'Unknown',
+                      price: "${product['price']} VNĐ",
+                      shop: product['seller_name'] ?? "Shop",
+                      imageUrl: product['image_url'] ?? TImages.productImage1,
+                      onTap: () {
+                        print("→ Tap: ${product['name']}");
+                        Get.to(() => ProductDetailScreen(product: product));
+                      },
+                    );
+                  },
+                );
+              }),
             ),
           ),
         ],

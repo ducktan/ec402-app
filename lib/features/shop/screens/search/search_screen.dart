@@ -7,8 +7,10 @@ import 'package:ec402_app/common/widgets/products/product_cards/product_card_ver
 import 'package:ec402_app/features/shop/screens/filter/filter_screen.dart';
 import 'package:ec402_app/utils/constants/sizes.dart';
 import 'package:ec402_app/common/widgets/appbar/appbar.dart';
+import '../../screens/product_detail/product_detail_screen.dart';
 // Import Controller
 import '../../controllers/search_controller.dart';
+
 
 class SearchScreen extends StatelessWidget {
   const SearchScreen({super.key});
@@ -97,7 +99,7 @@ class SearchScreen extends StatelessWidget {
                         imageUrl: product['image_url'] ?? "",
                         onTap: () {
                           print("→ Tap: ${product['name']}");
-                          // Get.to(() => ProductDetailScreen(product: product));
+                          Get.to(() => ProductDetailScreen(product: product));
                         },
                       );
                     },

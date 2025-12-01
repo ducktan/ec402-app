@@ -5,15 +5,11 @@ class CategoryService {
   final String baseUrl = "http://192.168.23.1:5000/api";
 
   /// Lấy toàn bộ category
-  Future<List<dynamic>> fetchCategories() async {
+  Future<List<Map<String, dynamic>>> fetchCategories() async {
     final res = await http.get(Uri.parse("$baseUrl/categories"));
     if (res.statusCode == 200) {
       final body = jsonDecode(res.body);
-
-      if (body is Map && body.containsKey('data')) {
-        return body['data'];
-      }
-      return body; // fallback
+      return List<Map<String, dynamic>>.from(body['data'] ?? []);
     }
     throw Exception("Failed to fetch categories");
   }
@@ -22,7 +18,8 @@ class CategoryService {
   Future<Map<String, dynamic>> fetchCategoryById(int id) async {
     final res = await http.get(Uri.parse("$baseUrl/categories/$id"));
     if (res.statusCode == 200) {
-      return Map<String, dynamic>.from(jsonDecode(res.body));
+      final body = jsonDecode(res.body);
+      return Map<String, dynamic>.from(body['data'] ?? {});
     }
     throw Exception("Failed to fetch category details");
   }
@@ -30,14 +27,16 @@ class CategoryService {
   /// Lấy sản phẩm theo category ID
   Future<Map<String, dynamic>> fetchProductsByCategoryId(int id) async {
     final res = await http.get(Uri.parse("$baseUrl/categories/$id/products"));
+
     if (res.statusCode == 200) {
       final body = jsonDecode(res.body);
 
       return {
-        'count': body['count'] ?? (body['data']?.length ?? 0),
-        'data': body['data'] ?? []
+        'count': body['count'] ?? 0,
+        'data': List<Map<String, dynamic>>.from(body['data'] ?? [])
       };
     }
+
     throw Exception("Failed to fetch products by category");
   }
 }

@@ -5,11 +5,13 @@ import 'package:ec402_app/features/shop/screens/brand/brand_product.dart';
 class ProductSellerInfo extends StatelessWidget {
   final String sellerName;
   final String sellerAvatar;
+  final int brandId; // Thêm brandId
 
   const ProductSellerInfo({
     super.key,
     required this.sellerName,
     required this.sellerAvatar,
+    required this.brandId, // bắt buộc khi tạo widget
   });
 
   @override
@@ -46,9 +48,7 @@ class ProductSellerInfo extends StatelessWidget {
                 context,
                 MaterialPageRoute(
                   builder: (_) => BrandProducts(
-                    brandName: sellerName,              // từ product.brand
-                    icon: sellerAvatar,                 // logo brand
-                    productCount: "0",                  // tạm thời, sau có thể load từ API
+                    brandId: brandId, // dùng brandId từ parameter
                   ),
                 ),
               );

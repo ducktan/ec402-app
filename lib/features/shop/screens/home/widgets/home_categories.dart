@@ -16,7 +16,7 @@ class THomeCategories extends StatelessWidget {
     return SizedBox(
       height: 100,
       child: Obx(() {
-        if (categoryController.isLoading.value) {
+        if (categoryController.isLoadingCategories.value) {
           return const Center(child: CircularProgressIndicator());
         }
 

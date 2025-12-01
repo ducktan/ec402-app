@@ -4,6 +4,12 @@ import 'package:ec402_app/utils/constants/sizes.dart';
 import 'package:ec402_app/utils/constants/image_strings.dart';
 import 'package:ec402_app/common/widgets/products/product_cards/product_card_vertical.dart';
 import 'package:ec402_app/common/widgets/texts/section_heading.dart';
+import '../../../../common/widgets/layouts/gird_layout.dart';
+import '../../controllers/brand_controller.dart';
+import 'package:get/get.dart';
+
+import '../../controllers/category_controller.dart';
+import '../product_detail/product_detail_screen.dart';
 
 class CategoryProductsScreen extends StatelessWidget {
   final String categoryName;
@@ -17,8 +23,10 @@ class CategoryProductsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final brandController = Get.put(BrandController());
+    final categoryController = Get.put(CategoryController());
+
     return Scaffold(
-      // ==== AppBar bình thường ở trên ====
       appBar: AppBar(
         backgroundColor: Colors.white,
         iconTheme: const IconThemeData(color: TColors.black),
@@ -35,51 +43,77 @@ class CategoryProductsScreen extends StatelessWidget {
       body: SingleChildScrollView(
         child: Column(
           children: [
-            // ==== Banner full width, cách xa AppBar ====
-            Padding(
-              padding: const EdgeInsets.only(top: TSizes.defaultSpace),
-              child: ClipRRect(
-                borderRadius: const BorderRadius.all(Radius.circular(16)),
-                child: Image.asset(
-                  TImages.promoBanner1,
-                  width: double.infinity,
-                  height: 180,
-                  fit: BoxFit.cover,
-                ),
-              ),
-            ),
+            // Banner
+            // Banner của category
+Padding(
+  padding: const EdgeInsets.only(top: TSizes.defaultSpace),
+  child: ClipRRect(
+    borderRadius: const BorderRadius.all(Radius.circular(16)),
+    child: Obx(() {
+      // Lấy banner_url từ category đã chọn
+      final bannerUrl = categoryController.selectedCategory['banner_url'] ??
+          "https://i.pinimg.com/736x/3c/d6/b0/3cd6b0a044375c3a1b9da0a8c04e91dd.jpg";
+
+      return Image.network(
+        bannerUrl,
+        width: double.infinity,
+        height: 180,
+        fit: BoxFit.cover,
+        errorBuilder: (context, error, stackTrace) {
+          // Fallback nếu load URL lỗi
+          return Image.network(
+            "https://i.pinimg.com/736x/3c/d6/b0/3cd6b0a044375c3a1b9da0a8c04e91dd.jpg",
+            width: double.infinity,
+            height: 180,
+            fit: BoxFit.cover,
+          );
+        },
+      );
+    }),
+  ),
+),
 
             const SizedBox(height: TSizes.spaceBtwSections),
 
-            // ==== Section Heading "Products" ====
+            // Section Heading
             const Padding(
               padding: EdgeInsets.symmetric(horizontal: TSizes.defaultSpace),
-              child: TSectionHeading(title: 'Products', showActionButton: false),
+              child: TSectionHeading(
+                title: 'Products',
+                showActionButton: false,
+              ),
             ),
             const SizedBox(height: TSizes.spaceBtwItems),
 
-            // ==== Grid sản phẩm ====
+            // Grid sản phẩm
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: TSizes.defaultSpace),
+              padding: const EdgeInsets.symmetric(
+                horizontal: TSizes.defaultSpace,
+              ),
               child: products.isNotEmpty
-                  ? GridView.builder(
-                      shrinkWrap: true,
-                      physics: const NeverScrollableScrollPhysics(),
-                      itemCount: products.length,
-                      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                        crossAxisCount: 2,
-                        mainAxisSpacing: TSizes.spaceBtwItems,
-                        crossAxisSpacing: TSizes.spaceBtwItems,
-                        mainAxisExtent: 280,
-                      ),
-                      itemBuilder: (context, index) {
+                  ? TGirdLayout(
+                      iTemCount: products.length,
+                      childAspectRatio: 0.55,
+                      itemBuilder: (_, index) {
                         final product = products[index];
-                        return TProductCardVertical(
-                          title: product['title']!,
-                          price: product['price']!,
-                          shop: product['shop'],
-                          imageUrl: product['image']!,
-                        );
+
+                        // Trả về Obx widget trực tiếp
+                        return Obx(() {
+                          
+                          final shopName = brandController
+                              .getBrandName(product['brand_id']);
+
+                          return TProductCardVertical(
+                            title: product['name'] ?? "Unknown",
+                            price: "${product['price'] ?? 0} VNĐ",
+                            shop: shopName,
+                            imageUrl: product['image_url'] ?? "",
+                            onTap: () {
+                              print("→ Tap: ${product['name']}");
+                              Get.to(() => ProductDetailScreen(product: product));
+                            },
+                          );
+                        });
                       },
                     )
                   : Padding(
@@ -87,7 +121,10 @@ class CategoryProductsScreen extends StatelessWidget {
                       child: Center(
                         child: Text(
                           'No Data Found!',
-                          style: TextStyle(color: Colors.grey.shade600, fontSize: 16),
+                          style: TextStyle(
+                            color: Colors.grey.shade600,
+                            fontSize: 16,
+                          ),
                         ),
                       ),
                     ),
