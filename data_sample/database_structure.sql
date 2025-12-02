@@ -1,8 +1,8 @@
-create database ec402;
---
-use ec402;
---
---  create table users
+-- 1. Tạo Database
+CREATE DATABASE IF NOT EXISTS ec402;
+USE ec402;
+
+-- 2. Bảng Users
 CREATE TABLE users (
     id INT AUTO_INCREMENT PRIMARY KEY,
     role ENUM('buyer','seller','admin') NOT NULL,
@@ -11,13 +11,13 @@ CREATE TABLE users (
     password_hash VARCHAR(255) NOT NULL,
     phone VARCHAR(20),
     avatar VARCHAR(255),
-    gender ENUM('male', 'female', 'other') DEFAULT 'other'after phone,
-    dob DATE after gender,
+    gender ENUM('male', 'female', 'other') DEFAULT 'other', -- Đã sửa cú pháp
+    dob DATE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
 
--- table user_addresses (1 - n)
+-- 3. Bảng User Addresses
 CREATE TABLE user_addresses (
     id INT AUTO_INCREMENT PRIMARY KEY,
     user_id INT NOT NULL,
@@ -31,19 +31,29 @@ CREATE TABLE user_addresses (
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
--- table categories
+-- 4. Bảng Categories
 CREATE TABLE categories (
     id INT AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(100) NOT NULL,
     parent_id INT NULL,
     avatar_url VARCHAR(255) DEFAULT NULL,
-    banner_url VARCHAR(255) DEFAULT NULL;
+    banner_url VARCHAR(255) DEFAULT NULL, -- Đã sửa dấu chấm phẩy thành phẩy
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (parent_id) REFERENCES categories(id) ON DELETE SET NULL
 );
 
--- table products
+-- 5. Bảng Brands
+CREATE TABLE brands (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(200) NOT NULL,
+    description TEXT,
+    logo_url VARCHAR(255),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+-- 6. Bảng Products
 CREATE TABLE products (
     id INT AUTO_INCREMENT PRIMARY KEY,
     brand_id INT NOT NULL,
@@ -51,7 +61,7 @@ CREATE TABLE products (
     name VARCHAR(200) NOT NULL,
     description TEXT,
     price DECIMAL(12,2) NOT NULL,
-    image_url VARCHAR(255) NULL AFTER stock
+    image_url VARCHAR(255) NULL, -- Đã sửa thiếu dấu phẩy
     stock INT DEFAULT 0,
     rating_avg DECIMAL(3,2) DEFAULT 0,
     review_count INT DEFAULT 0,
@@ -61,19 +71,16 @@ CREATE TABLE products (
     FOREIGN KEY (category_id) REFERENCES categories(id)
 );
 
--- thêm bảng brands để sửa cái không có seller - id
-CREATE TABLE brands (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    name VARCHAR(200) NOT NULL,
-    description TEXT,
-    logo_url VARCHAR(255),  -- link hình ảnh thương hiệu
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-);
+INSERT INTO products (brand_id, category_id, name, description, price, stock, rating_avg, review_count, image_url) VALUES 
+-- Apple Products
+(1, 3, 'iPhone 15 Pro Max', 'Điện thoại thông minh cao cấp nhất của Apple với khung titan, chip A17 Pro mạnh mẽ và hệ thống camera chuyên nghiệp.', 34990000, 50, 4.9, 120, 'https://cdn2.cellphones.com.vn/insecure/rs:fill:358:358/q:90/plain/https://cellphones.com.vn/media/catalog/product/i/p/iphone-15-pro-max_3.png'),
+(1, 4, 'MacBook Air M2 13 inch', 'Laptop mỏng nhẹ, hiệu năng vượt trội với chip M2, màn hình Liquid Retina sắc nét, thời lượng pin cả ngày.', 26990000, 30, 4.8, 85, 'https://cdn2.cellphones.com.vn/insecure/rs:fill:358:358/q:90/plain/https://cellphones.com.vn/media/catalog/product/m/a/macbook-air-m2-2022_1.png'),
+(1, 1, 'AirPods Pro 2', 'Tai nghe chống ồn chủ động thế hệ mới, chất âm tuyệt đỉnh, hộp sạc MagSafe tiện lợi.', 5990000, 100, 4.7, 200, 'https://cdn2.cellphones.com.vn/insecure/rs:fill:358:358/q:90/plain/https://cellphones.com.vn/media/catalog/product/a/i/airpods-pro-2_1.png'),
+(1, 1, 'Apple Watch Series 9', 'Đồng hồ thông minh thông minh hơn, sáng hơn, mạnh mẽ hơn. Theo dõi sức khỏe toàn diện.', 10490000, 40, 4.6, 65, 'https://cdn2.cellphones.com.vn/insecure/rs:fill:358:358/q:90/plain/https://cellphones.com.vn/media/catalog/product/a/p/apple-watch-series-9-41mm-gps-vien-nhom-day-cao-su_2.png'),
 
-
-
--- table product_images (1 product - n images)
+-- Samsung Products
+(2, 3, 'Samsung Galaxy S24 Ultra', 'Quyền năng Galaxy AI, khung viền Titan bền bỉ, camera mắt thần bóng đêm, bút S Pen quyền năng.', 30990000, 45, 4.7, 95, 'https://cdn2.cellphones.com.vn/insecure/rs:fill:358:358/q:90/plain/https://cellphones.com.vn/media/catalog/product/s/s/samsung-galaxy-s24-ultra-grey_2.png');
+-- 7. Bảng Product Images
 CREATE TABLE product_images (
     id INT AUTO_INCREMENT PRIMARY KEY,
     product_id INT NOT NULL,
@@ -81,7 +88,7 @@ CREATE TABLE product_images (
     FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE
 );
 
--- table reviews (1 user - n reviews)
+-- 8. Bảng Reviews
 CREATE TABLE reviews (
     id INT AUTO_INCREMENT PRIMARY KEY,
     product_id INT NOT NULL,
@@ -93,8 +100,7 @@ CREATE TABLE reviews (
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
--- table carts
--- mỗi cart chỉ thuộc về 1 user, lưu thông tin các lần thêm vào giỏ hàng của user thay vì dùng session. 
+-- 9. Bảng Carts
 CREATE TABLE carts (
     id INT AUTO_INCREMENT PRIMARY KEY,
     user_id INT UNIQUE NOT NULL,
@@ -102,8 +108,7 @@ CREATE TABLE carts (
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
--- table cart_items (1 - n)
--- chứa các item trong giỏ hàng. 
+-- 10. Bảng Cart Items
 CREATE TABLE cart_items (
     id INT AUTO_INCREMENT PRIMARY KEY,
     cart_id INT NOT NULL,
@@ -113,8 +118,7 @@ CREATE TABLE cart_items (
     FOREIGN KEY (product_id) REFERENCES products(id)
 );
 
--- table orders
--- sửa orders table 
+-- 11. Bảng Orders
 CREATE TABLE orders (
     id INT AUTO_INCREMENT PRIMARY KEY,
     user_id INT NOT NULL,
@@ -130,7 +134,7 @@ CREATE TABLE orders (
     FOREIGN KEY (brand_id) REFERENCES brands(id)
 );
 
--- table order_items (1 order - n items)
+-- 12. Bảng Order Items
 CREATE TABLE order_items (
     id INT AUTO_INCREMENT PRIMARY KEY,
     order_id INT NOT NULL,
@@ -141,7 +145,8 @@ CREATE TABLE order_items (
     FOREIGN KEY (order_id) REFERENCES orders(id) ON DELETE CASCADE,
     FOREIGN KEY (product_id) REFERENCES products(id)
 );
--- table transactions
+
+-- 13. Bảng Transactions
 CREATE TABLE transactions (
     id INT AUTO_INCREMENT PRIMARY KEY,
     order_id INT NOT NULL,
@@ -155,59 +160,47 @@ CREATE TABLE transactions (
     FOREIGN KEY (user_id) REFERENCES users(id)
 );
 
--- table OTP for login with phone number
+-- 14. Bảng OTPs
 CREATE TABLE otps (
-  id INT AUTO_INCREMENT PRIMARY KEY,
-  user_id INT NOT NULL,
-  otp_code VARCHAR(6) NOT NULL,
-  expires_at DATETIME NOT NULL,
-  is_used BOOLEAN DEFAULT FALSE,
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  FOREIGN KEY (user_id) REFERENCES users(id)
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    otp_code VARCHAR(6) NOT NULL,
+    expires_at DATETIME NOT NULL,
+    is_used BOOLEAN DEFAULT FALSE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id)
 );
 
--- table blacklist_token 
+-- 15. Bảng Token Blacklist
 CREATE TABLE token_blacklist (
-  id INT AUTO_INCREMENT PRIMARY KEY,
-  token TEXT NOT NULL,
-  user_id INT,
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    token TEXT NOT NULL,
+    user_id INT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- Wishlist
+-- 16. Bảng Wishlist
 CREATE TABLE wishlist (
     id INT AUTO_INCREMENT PRIMARY KEY,
     user_id INT NOT NULL,
     product_id INT NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-
-    CONSTRAINT fk_wishlist_user 
-        FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
-
-    CONSTRAINT fk_wishlist_product 
-        FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE,
-
+    CONSTRAINT fk_wishlist_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    CONSTRAINT fk_wishlist_product FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE,
     UNIQUE KEY unique_wishlist (user_id, product_id)
 );
 
-
-
--- Voucher
+-- 17. Bảng User Vouchers (Đã cập nhật tên bảng cho rõ nghĩa)
 CREATE TABLE user_vouchers (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    
-    user_id INT NOT NULL,          -- ID người dùng
-    code VARCHAR(50) NOT NULL,     -- Mã voucher, ví dụ: WELCOME10
-    description VARCHAR(255),      -- Mô tả voucher (tuỳ chọn)
-    
-    discount_type ENUM('percent','fixed') NOT NULL DEFAULT 'percent',  
-    discount_value DECIMAL(12,2) NOT NULL,  -- Giá trị giảm giá
-    
-    min_order_amount DECIMAL(12,2) DEFAULT 0,  -- Đơn tối thiểu áp dụng
-    
-    is_used BOOLEAN DEFAULT FALSE,  -- Đã dùng chưa
-    used_at TIMESTAMP NULL,         -- Thời điểm dùng voucher
-    
-    expires_at DATETIME,            -- Hạn dùng voucher
+    user_id INT NOT NULL,
+    code VARCHAR(50) NOT NULL,
+    description VARCHAR(255),
+    discount_type ENUM('percentage','fixed') NOT NULL DEFAULT 'percentage', -- Thống nhất dùng percentage
+    discount_value DECIMAL(12,2) NOT NULL,
+    min_order_amount DECIMAL(12,2) DEFAULT 0,
+    is_used BOOLEAN DEFAULT FALSE,
+    used_at TIMESTAMP NULL,
+    expires_at DATETIME,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );

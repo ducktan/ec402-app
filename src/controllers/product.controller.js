@@ -1,5 +1,5 @@
 const Product = require("../models/product.model");
-
+const db = require('../config/db');
 // ====== CREATE PRODUCT ======
 exports.createProduct = async (req, res) => {
   try {
@@ -57,21 +57,21 @@ exports.getProductById = async (req, res) => {
   }
 };
 
-  exports.getImagesByProductId = async (req, res) => {
-    try {
-      const { id } = req.params;
-      const images = await Product.findImgByProductId(id);
+exports.getImagesByProductId = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const images = await Product.findImgByProductId(id);
 
-      res.status(200).json({
-        success: true,
-        productId: id,
-        images,
-      });
-    } catch (error) {
-      console.error(error);
-      res.status(500).json({ message: "Server error" });
-    }
-  };
+    res.status(200).json({
+      success: true,
+      productId: id,
+      images,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Server error" });
+  }
+};
 
 // ====== UPDATE PRODUCT ======
 // ====== UPDATE PRODUCT ======
@@ -117,57 +117,99 @@ exports.deleteProduct = async (req, res) => {
 
 // ====== GET PRODUCTS BY BRAND ID ======
 exports.getProductsByBrandId = async (req, res) => {
-    const brandId = req.params.id; // /api/brands/:id/products
-    try {
-        const products = await Product.findByBrandId(brandId);
-
-        res.status(200).json({
-            success: true,
-            count: products.length,
-            data: products,
-        });
-    } catch (error) {
-        console.log("!!! LỖI TẠI getProductsByBrandId:", error);
-        res.status(500).json({ success: false, message: 'Server Error', error: error.message });
-    }
-};
-
-// ====== GET PRODUCTS BY CATEGORY ID ======
-exports.getProductsByCategoryId = async (req, res) => {
-    const categoryId = req.params.id; // /api/categories/:id/products
-    try {
-        const products = await Product.findByCategoryId(categoryId);
-
-        res.status(200).json({
-            success: true,
-            count: products.length,
-            data: products,
-        });
-    } catch (error) {
-        console.log("!!! LỖI TẠI getProductsByCategoryId:", error);
-        res.status(500).json({ success: false, message: 'Server Error', error: error.message });
-    }
-};
-
-exports.searchProducts = async (req, res) => {
+  const brandId = req.params.id; // /api/brands/:id/products
   try {
-    const { query, minPrice, maxPrice, categoryId, sort } = req.query;
+    const products = await Product.findByBrandId(brandId);
 
-    const products = await Product.search({
-      query,
-      minPrice,
-      maxPrice,
-      categoryId,
-      sort,
-    });
-
-    return res.status(200).json({
+    res.status(200).json({
       success: true,
       count: products.length,
       data: products,
     });
   } catch (error) {
-    console.error("❌ Lỗi searchProducts:", error);
-    res.status(500).json({ success: false, message: "Server error" });
+    console.log("!!! LỖI TẠI getProductsByBrandId:", error);
+    res.status(500).json({ success: false, message: 'Server Error', error: error.message });
+  }
+};
+
+// ====== GET PRODUCTS BY CATEGORY ID ======
+exports.getProductsByCategoryId = async (req, res) => {
+  const categoryId = req.params.id; // /api/categories/:id/products
+  try {
+    const products = await Product.findByCategoryId(categoryId);
+
+    res.status(200).json({
+      success: true,
+      count: products.length,
+      data: products,
+    });
+  } catch (error) {
+    console.log("!!! LỖI TẠI getProductsByCategoryId:", error);
+    res.status(500).json({ success: false, message: 'Server Error', error: error.message });
+  }
+};
+
+// API Tìm kiếm & Lọc sản phẩm
+// GET /api/shop/search?query=...&minPrice=...&maxPrice=...&categoryId=...&sort=...
+exports.searchProducts = async (req, res) => {
+  try {
+    const { query, minPrice, maxPrice, categoryId, sort } = req.query;
+
+    console.log("🔍 Search Params:", req.query);
+
+    // Câu truy vấn cơ bản
+    let sql = `
+            SELECT p.*, b.name as brand_name, c.name as category_name 
+            FROM products p
+            LEFT JOIN brands b ON p.brand_id = b.id
+            LEFT JOIN categories c ON p.category_id = c.id
+            WHERE 1=1 
+        `;
+
+    const params = [];
+
+    // 1. Tìm theo từ khóa (Tên hoặc Mô tả)
+    if (query) {
+      sql += ` AND (p.name LIKE ? OR p.description LIKE ?)`;
+      params.push(`%${query}%`, `%${query}%`);
+    }
+
+    // 2. Lọc theo khoảng giá
+    if (minPrice) {
+      sql += ` AND p.price >= ?`;
+      params.push(minPrice);
+    }
+    if (maxPrice) {
+      sql += ` AND p.price <= ?`;
+      params.push(maxPrice);
+    }
+
+    // 3. Lọc theo danh mục
+    if (categoryId) {
+      sql += ` AND p.category_id = ?`;
+      params.push(categoryId);
+    }
+
+    // 4. Sắp xếp (Sort)
+    if (sort) {
+      switch (sort) {
+        case 'Name': sql += ` ORDER BY p.name ASC`; break;
+        case 'Lowest Price': sql += ` ORDER BY p.price ASC`; break;
+        case 'Highest Price': sql += ` ORDER BY p.price DESC`; break;
+        case 'Newest': sql += ` ORDER BY p.created_at DESC`; break;
+        case 'Popular': sql += ` ORDER BY p.review_count DESC`; break; // Giả định có cột review_count
+        case 'Suitable': sql += ` ORDER BY p.rating_avg DESC`; break;   // Giả định có cột rating_avg
+        default: sql += ` ORDER BY p.name ASC`;
+      }
+    } else {
+      sql += ` ORDER BY p.name ASC`;
+    }
+
+    const [products] = await db.query(sql, params);
+    res.status(200).json({ success: true, count: products.length, data: products });
+
+  } catch (error) {
+    console.error("🔴 Lỗi Search:", error);
+    res.status(500).json({ message: "Lỗi Server" });
   }
 };
