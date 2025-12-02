@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+// utils
+import 'package:ec402_app/utils/constants/image_strings.dart';
 
 import 'package:ec402_app/common/widgets/appbar/appbar.dart';
 import 'package:ec402_app/features/shop/screens/product_detail/widget/product_bottom_bar.dart';
@@ -12,6 +14,7 @@ import 'package:ec402_app/features/shop/screens/product_detail/widget/related_pr
 
 import '../../controllers/brand_controller.dart';
 import '../../controllers/product_controller.dart';
+import '../../controllers/wishlist_controller.dart';
 
 class ProductDetailScreen extends StatefulWidget {
   final Map<String, dynamic> product;
@@ -25,24 +28,20 @@ class ProductDetailScreen extends StatefulWidget {
 class _ProductDetailScreenState extends State<ProductDetailScreen> {
   late final BrandController brandController;
   late final ProductController productController;
+  late final WishlistController wishlistController;
 
   @override
   void initState() {
     super.initState();
 
-    // ✅ Check tồn tại trước khi put, tránh duplicate instance
-    brandController = Get.isRegistered<BrandController>()
-        ? Get.find<BrandController>()
-        : Get.put(BrandController());
-
-    productController = Get.isRegistered<ProductController>()
-        ? Get.find<ProductController>()
-        : Get.put(ProductController());
+    // Put controllers (tồn tại hoặc tạo mới)
+    brandController = Get.put(BrandController());
+    productController = Get.put(ProductController());
+    wishlistController = Get.put(WishlistController());
 
     _loadData();
   }
 
-  /// Load product detail, related products và brand info
   Future<void> _loadData() async {
     final productId = widget.product['id'];
     if (productId != null) {
@@ -59,40 +58,45 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
   @override
   Widget build(BuildContext context) {
     final passedData = widget.product;
-    final productId = passedData['id'] ?? 0;
 
-    return Scaffold(
-      appBar: TAppBar(
-        title: Text(passedData['name'] ?? "Chi tiết sản phẩm"),
-        showBackArrow: true,
-      ),
+    // Wrap toàn bộ Scaffold bằng Obx
+    return Obx(() {
+      // Loading
+      if (productController.isLoadingDetail.value) {
+        return const Scaffold(
+          body: Center(child: CircularProgressIndicator()),
+        );
+      }
 
-      body: Obx(() {
-        if (productController.isLoadingDetail.value) {
-          return const Center(child: CircularProgressIndicator());
-        }
+      final detail = productController.productDetail;
+      if (detail.isEmpty) {
+        return const Scaffold(
+          body: Center(child: Text("Không tải được dữ liệu sản phẩm")),
+        );
+      }
 
-        final detail = productController.productDetail;
-        if (detail.isEmpty) {
-          return const Center(child: Text("Không tải được dữ liệu sản phẩm"));
-        }
+      final productId = detail['id'];
+      final productName = detail['name'] ?? "Unknown Product";
+      final productPrice = detail['price']?.toString() ?? "0";
+      final productImage = detail['image_url'] ??
+          TImages.noImage; // Fallback nếu không có ảnh
+      final productStock = detail['stock'] ?? 0;
+      final rating =
+          double.tryParse(detail['rating_avg']?.toString() ?? "0") ?? 0.0;
 
-        // ===== Prepare data =====
-        final productName  = detail['name'] ?? "Unknown Product";
-        final productPrice = detail['price']?.toString() ?? "0";
-        final productImage = detail['image_url'] ?? "https://via.placeholder.com/300";
-        final productStock = detail['stock'] ?? 0;
-        final rating       = double.tryParse(detail['rating_avg']?.toString() ?? "0") ?? 0.0;
-
-        return SingleChildScrollView(
+      return Scaffold(
+        appBar: TAppBar(
+          title: Text(productName),
+          showBackArrow: true,
+        ),
+        body: SingleChildScrollView(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-
-              /// Slider ảnh
+              // Slider ảnh
               ProductImageSlider(images: [productImage]),
 
-              /// Thông tin sản phẩm
+              // Thông tin sản phẩm
               ProductInfoSection(
                 name: productName,
                 price: productPrice,
@@ -100,21 +104,17 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                 stock: productStock,
               ),
 
-              /// Mô tả sản phẩm
+              // Mô tả sản phẩm
               ProductDescription(description: detail['description'] ?? ""),
 
-              /// Thông tin Brand
+              // Thông tin Brand
               Obx(() {
-                final sellerName =
-                    brandController.brand['name'] ??
+                final sellerName = brandController.brand['name'] ??
                     passedData['brand_name'] ??
                     "Loading...";
-
-                final sellerAvatar =
-                    brandController.brand['logo_url'] ??
+                final sellerAvatar = brandController.brand['logo_url'] ??
                     passedData['brand_avatar'] ??
-                    "https://picsum.photos/200";
-
+                    TImages.noImage;
                 final brandId = passedData['brand_id'] ?? 0;
 
                 return ProductSellerInfo(
@@ -124,18 +124,22 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                 );
               }),
 
-              /// Preview đánh giá
+              // Preview đánh giá
               ProductReviewsPreview(productId: productId),
 
-              /// Sản phẩm liên quan
+              // Sản phẩm liên quan
               RelatedProductsSection(
-                relatedProducts: productController.relatedProducts)
+                  relatedProducts: productController.relatedProducts),
             ],
           ),
-        );
-      }),
+        ),
 
-      bottomNavigationBar: const ProductBottomBar(),
-    );
+        // Bottom bar với wishlist controller
+        bottomNavigationBar: ProductBottomBar(
+          productId: productId,
+          wishlistController: wishlistController,
+        ),
+      );
+    });
   }
 }

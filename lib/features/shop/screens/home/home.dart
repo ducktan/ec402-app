@@ -18,10 +18,12 @@ import 'package:ec402_app/features/shop/screens/search/search_screen.dart';
 import 'package:ec402_app/features/shop/screens/product_detail/product_detail_screen.dart';
 import 'package:get/get.dart';
 import '../../controllers/product_controller.dart';
+import '../../controllers/wishlist_controller.dart';
 
 class HomeScreen extends StatelessWidget {
   HomeScreen({super.key});
   final ProductController productController = Get.put(ProductController());
+  final WishlistController wishlistController = Get.put(WishlistController()); 
 
   @override
   Widget build(BuildContext context) {

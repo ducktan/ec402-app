@@ -1,157 +1,155 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import '../../../shop/controllers/wishlist_controller.dart';
+import '../../../shop/screens/product_detail/product_detail_screen.dart';
+import '../../../../utils/constants/image_strings.dart';
 
 class WishlistScreen extends StatelessWidget {
   const WishlistScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final wishlistItems = [
-      {
-        'brand': 'Nike',
-        'name': 'Green Nike sports shoe',
-        'color': 'Green',
-        'size': 'EU 34',
-        'price': 134.0,
-        'image': 'assets/images/product1.png',
-      },
-      {
-        'brand': 'ZARA',
-        'name': 'Blue T-shirt for all ages',
-        'price': 35.0,
-        'size': 'M',
-        'image': 'assets/images/product1.png',
-      },
-      {
-        'brand': 'Apple',
-        'name': 'Iphone 14 Pro 512gb',
-        'price': 1998.0,
-        'color': 'Black',
-        'image': 'assets/images/product1.png',
-      },
-    ];
-
-    final devicePixelRatio = MediaQuery.of(context).devicePixelRatio;
-    final targetCacheSize = (56 * devicePixelRatio).round();
+    final WishlistController wishlistController = Get.put(WishlistController());
 
     return Scaffold(
       appBar: AppBar(title: const Text("Wishlist"), centerTitle: true),
-      body: ListView.separated(
-        padding: const EdgeInsets.all(16),
-        itemCount: wishlistItems.length,
-        separatorBuilder: (_, __) => const SizedBox(height: 12),
-        itemBuilder: (context, index) {
-          final item = wishlistItems[index];
-          return Card(
-            elevation: 2,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12),
+      body: Obx(() {
+        if (wishlistController.wishlistProducts.isEmpty) {
+          return const Center(
+            child: Text(
+              "Your wishlist is empty",
+              style: TextStyle(fontSize: 16),
             ),
-            child: ListTile(
-              contentPadding: const EdgeInsets.symmetric(
-                horizontal: 16,
-                vertical: 8,
+          );
+        }
+
+        final wishlist = wishlistController.wishlistProducts;
+
+        return ListView.separated(
+          padding: const EdgeInsets.all(16),
+          itemCount: wishlist.length,
+          separatorBuilder: (_, __) => const SizedBox(height: 12),
+          itemBuilder: (context, index) {
+            final product = wishlist[index];
+            final productId = product['id'];
+
+            return Card(
+              elevation: 2,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
               ),
-              isThreeLine: true,
-              leading: ClipRRect(
-                borderRadius: BorderRadius.circular(8),
-                child: SizedBox(
-                  width: 56,
-                  height: 56,
-                  child: Image.asset(
-                    item['image']?.toString() ?? 'assets/images/product1.png',
-                    fit: BoxFit.cover,
-                    cacheWidth: targetCacheSize,
-                    cacheHeight: targetCacheSize,
-                    filterQuality: FilterQuality.low,
-                    errorBuilder: (context, error, stackTrace) => Image.asset(
-                      'assets/images/product1.png',
+              child: ListTile(
+                contentPadding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 8,
+                ),
+                isThreeLine: true,
+                leading: ClipRRect(
+                  borderRadius: BorderRadius.circular(8),
+                  child: SizedBox(
+                    width: 56,
+                    height: 56,
+                    child: Image.network(
+                      product['image_url'] ?? TImages.noImage,
                       fit: BoxFit.cover,
-                      cacheWidth: targetCacheSize,
-                      cacheHeight: targetCacheSize,
-                      filterQuality: FilterQuality.low,
+                      errorBuilder: (context, error, stackTrace) =>
+                          Image.network(TImages.noImage, fit: BoxFit.cover),
                     ),
                   ),
                 ),
-              ),
-              title: Text(
-                item['name'].toString(),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: const TextStyle(fontWeight: FontWeight.w600),
-              ),
-              subtitle: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Text(
-                        item['brand']?.toString() ?? '',
-                        style: TextStyle(
-                          color: Colors.grey[700],
-                          fontSize: 12,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                      const SizedBox(width: 4),
-                      const Icon(Icons.verified, size: 14, color: Colors.blue),
-                    ],
-                  ),
-                  if (item['color'] != null || item['size'] != null)
-                    Padding(
-                      padding: const EdgeInsets.only(top: 2),
-                      child: Text(
-                        '${item['color'] != null ? 'Color ${item['color']}' : ''}'
-                        '${item['color'] != null && item['size'] != null ? '   ' : ''}'
-                        '${item['size'] != null ? 'Size ${item['size']}' : ''}',
-                        style: TextStyle(color: Colors.grey[600], fontSize: 12),
-                      ),
+                title: Text(
+                  product['name'] ?? '',
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(fontWeight: FontWeight.w600),
+                ),
+                subtitle: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const SizedBox(height: 4),
+                    Text(
+                      "Brand: ${product['brand_name'] ?? 'Unknown'}",
+                      style: TextStyle(color: Colors.grey[700], fontSize: 12),
                     ),
-                  const SizedBox(height: 8),
-                  Row(
-                    children: [
-                      Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          IconButton(
-                            icon: const Icon(
-                              Icons.shopping_cart_outlined,
-                              color: Colors.blue,
-                            ),
-                            onPressed: () {},
-                            visualDensity: VisualDensity.compact,
-                            padding: EdgeInsets.zero,
-                            constraints: const BoxConstraints(),
-                          ),
-                          const SizedBox(width: 8),
-                          IconButton(
-                            icon: const Icon(Icons.favorite, color: Colors.red),
-                            onPressed: () {},
-                            visualDensity: VisualDensity.compact,
-                            padding: EdgeInsets.zero,
-                            constraints: const BoxConstraints(),
-                          ),
-                        ],
-                      ),
-                      const Spacer(),
-                      if (item['price'] != null)
-                        Text(
-                          "\$${item['price']}",
-                          style: const TextStyle(
-                            color: Colors.black,
-                            fontWeight: FontWeight.bold,
+                    if (product['color'] != null || product['size'] != null)
+                      Padding(
+                        padding: const EdgeInsets.only(top: 2),
+                        child: Text(
+                          '${product['color'] != null ? 'Color ${product['color']}' : ''}'
+                          '${product['color'] != null && product['size'] != null ? '   ' : ''}'
+                          '${product['size'] != null ? 'Size ${product['size']}' : ''}',
+                          style: TextStyle(
+                            color: Colors.grey[600],
+                            fontSize: 12,
                           ),
                         ),
-                    ],
-                  ),
-                ],
+                      ),
+                    const SizedBox(height: 8),
+                    Row(
+                      children: [
+                        IconButton(
+                          icon: const Icon(
+                            Icons.shopping_cart_outlined,
+                            color: Colors.blue,
+                          ),
+                          onPressed: () {
+                            // TODO: thêm sản phẩm vào giỏ
+                          },
+                          visualDensity: VisualDensity.compact,
+                          padding: EdgeInsets.zero,
+                          constraints: const BoxConstraints(),
+                        ),
+                        const SizedBox(width: 8),
+                        Obx(() {
+                          final isFav = wishlistController.isFavorite(
+                            productId,
+                          );
+                          return IconButton(
+                            icon: Icon(
+                              Icons.favorite,
+                              color: isFav ? Colors.red : Colors.grey,
+                            ),
+                            onPressed: () async {
+                              await wishlistController.toggleWishlist(
+                                productId,
+                              );
+
+                              // Hiển thị snackbar thông báo
+                              Get.snackbar(
+                                isFav ? 'Removed' : 'Added',
+                                isFav
+                                    ? 'Product removed from your wishlist'
+                                    : 'Product added to your wishlist',
+                                snackPosition: SnackPosition.BOTTOM,
+                                backgroundColor: Colors.black87,
+                                colorText: Colors.white,
+                                margin: const EdgeInsets.all(12),
+                                duration: const Duration(seconds: 2),
+                              );
+                            },
+                            visualDensity: VisualDensity.compact,
+                            padding: EdgeInsets.zero,
+                            constraints: const BoxConstraints(),
+                          );
+                        }),
+                        const Spacer(),
+                        Text(
+                          "\$${product['price'] ?? '0'}",
+                          style: const TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+                onTap: () {
+                  Get.to(() => ProductDetailScreen(product: product));
+                },
               ),
-              // trailing removed; actions and price are placed in subtitle bottom row
-            ),
-          );
-        },
-      ),
+            );
+          },
+        );
+      }),
     );
   }
 }

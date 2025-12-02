@@ -18,6 +18,8 @@ class TImages {
   static const String jeweleryIcon = "";
   static const String electronicsIcon = "";
 
+  static const String noImage = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTdpU431xPGZoWC2RW7DAlWe29mnpo2z5m13Q&s";
+
   //Banner
   static const String promoBanner1 = "assets/images/banners/banner1.png";
   static const String promoBanner2 = "";

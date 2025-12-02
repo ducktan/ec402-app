@@ -4,6 +4,7 @@ import '../../../services/product_api.dart';
 class ProductController extends GetxController {
   var products = <Map<String, dynamic>>[].obs;
   var isLoading = false.obs;
+  
 
   /// New: sản phẩm chi tiết
   var productDetail = <String, dynamic>{}.obs;
