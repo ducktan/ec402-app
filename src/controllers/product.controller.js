@@ -157,7 +157,6 @@ exports.searchProducts = async (req, res) => {
 
     console.log("🔍 Search Params:", req.query);
 
-    // Câu truy vấn cơ bản
     let sql = `
             SELECT p.*, b.name as brand_name, c.name as category_name 
             FROM products p
@@ -169,36 +168,39 @@ exports.searchProducts = async (req, res) => {
     const params = [];
 
     // 1. Tìm theo từ khóa (Tên hoặc Mô tả)
-    if (query) {
+    if (query && query !== 'null' && query.trim() !== '') {
       sql += ` AND (p.name LIKE ? OR p.description LIKE ?)`;
       params.push(`%${query}%`, `%${query}%`);
     }
 
     // 2. Lọc theo khoảng giá
-    if (minPrice) {
+    const min = parseFloat(minPrice);
+    const max = parseFloat(maxPrice);
+
+    if (!isNaN(min) && min > 0) {
       sql += ` AND p.price >= ?`;
-      params.push(minPrice);
+      params.push(min);
     }
-    if (maxPrice) {
+    if (!isNaN(max) && max > 0) {
       sql += ` AND p.price <= ?`;
-      params.push(maxPrice);
+      params.push(max);
     }
 
     // 3. Lọc theo danh mục
-    if (categoryId) {
+    if (categoryId && categoryId !== 'null') {
       sql += ` AND p.category_id = ?`;
       params.push(categoryId);
     }
 
     // 4. Sắp xếp (Sort)
-    if (sort) {
+    if (sort && sort !== 'null') {
       switch (sort) {
         case 'Name': sql += ` ORDER BY p.name ASC`; break;
         case 'Lowest Price': sql += ` ORDER BY p.price ASC`; break;
         case 'Highest Price': sql += ` ORDER BY p.price DESC`; break;
         case 'Newest': sql += ` ORDER BY p.created_at DESC`; break;
-        case 'Popular': sql += ` ORDER BY p.review_count DESC`; break; // Giả định có cột review_count
-        case 'Suitable': sql += ` ORDER BY p.rating_avg DESC`; break;   // Giả định có cột rating_avg
+        case 'Popular': sql += ` ORDER BY p.review_count DESC`; break;
+        case 'Suitable': sql += ` ORDER BY p.rating_avg DESC`; break;
         default: sql += ` ORDER BY p.name ASC`;
       }
     } else {
