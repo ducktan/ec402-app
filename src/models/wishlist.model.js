@@ -20,18 +20,20 @@ const Wishlist = {
   async findByUser(userId) {
     const [rows] = await pool.query(
       `SELECT
-         p.id,
-         p.name,
-         p.price,
-         p.description,
-         p.brand_id,
-         p.category_id,
-         p.stock,
-         w.created_at
-       FROM products p
-       JOIN wishlist w ON p.id = w.product_id
-       WHERE w.user_id = ?
-       ORDER BY w.created_at DESC`,
+            p.id,
+            p.name,
+            p.price,
+            p.description,
+            b.name AS brand_name,
+            p.category_id,
+            p.stock,
+            p.image_url,
+            w.created_at
+        FROM products p
+        JOIN wishlist w ON p.id = w.product_id
+        JOIN brands b ON p.brand_id = b.id
+        WHERE w.user_id = ?
+        ORDER BY w.created_at DESC;`,
       [userId]
     );
     return rows;
