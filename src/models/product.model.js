@@ -83,61 +83,81 @@ class Product {
   }
 
   // ====== SEARCH PRODUCTS (lọc + sắp xếp) ======
+  // ====== SEARCH PRODUCTS (lọc + sắp xếp) ======
   static async search({ query, minPrice, maxPrice, categoryId, sort }) {
-    let sql = `
-    SELECT p.*, 
-    (SELECT image_url FROM product_images WHERE product_id = p.id LIMIT 1) AS image
-    FROM products p
-    WHERE 1 = 1
-  `;
+    try {
+      let sql = `
+        SELECT p.*, b.name AS brand_name, c.name AS category_name
+        FROM products p
+        LEFT JOIN brands b ON p.brand_id = b.id
+        LEFT JOIN categories c ON p.category_id = c.id
+        WHERE 1 = 1
+      `;
 
-    let params = [];
+      const params = [];
 
-    // Tìm theo tên hoặc mô tả
-    if (query) {
-      sql += ` AND (p.name LIKE ? OR p.description LIKE ?)`;
-      params.push(`%${query}%`, `%${query}%`);
+      // 1. Tìm theo tên hoặc mô tả
+      if (query && query !== "null" && query.trim() !== "") {
+        sql += ` AND (p.name LIKE ? OR p.description LIKE ?)`;
+        params.push(`%${query}%`, `%${query}%`);
+      }
+
+      // 2. Lọc theo khoảng giá
+      const min = parseFloat(minPrice);
+      const max = parseFloat(maxPrice);
+
+      if (!isNaN(min) && min > 0) {
+        sql += ` AND p.price >= ?`;
+        params.push(min);
+      }
+
+      if (!isNaN(max) && max > 0) {
+        sql += ` AND p.price <= ?`;
+        params.push(max);
+      }
+
+      // 3. Lọc theo danh mục
+      if (categoryId && categoryId !== "null") {
+        sql += ` AND p.category_id = ?`;
+        params.push(categoryId);
+      }
+
+      // 4. Sắp xếp
+      if (sort && sort !== "null") {
+        switch (sort) {
+          case "Name":
+            sql += ` ORDER BY p.name ASC`;
+            break;
+          case "Lowest Price":
+            sql += ` ORDER BY p.price ASC`;
+            break;
+          case "Highest Price":
+            sql += ` ORDER BY p.price DESC`;
+            break;
+          case "Newest":
+            sql += ` ORDER BY p.created_at DESC`;
+            break;
+          case "Popular":
+            sql += ` ORDER BY p.review_count DESC`;
+            break;
+          case "Suitable":
+            sql += ` ORDER BY p.rating_avg DESC`;
+            break;
+          default:
+            sql += ` ORDER BY p.name ASC`;
+        }
+      } else {
+        sql += ` ORDER BY p.name ASC`;
+      }
+
+      const [rows] = await pool.query(sql, params);
+      return rows;
+    } catch (error) {
+      console.error("🔴 Lỗi search products:", error);
+      throw error;
     }
-
-    if (minPrice) {
-      sql += ` AND p.price >= ?`;
-      params.push(minPrice);
-    }
-
-    if (maxPrice) {
-      sql += ` AND p.price <= ?`;
-      params.push(maxPrice);
-    }
-
-    if (categoryId) {
-      sql += ` AND p.category_id = ?`;
-      params.push(categoryId);
-    }
-
-    // Sắp xếp
-    switch (sort) {
-      case "price_asc":
-        sql += " ORDER BY p.price ASC";
-        break;
-      case "price_desc":
-        sql += " ORDER BY p.price DESC";
-        break;
-      case "newest":
-        sql += " ORDER BY p.created_at DESC";
-        break;
-      case "rating":
-        sql += " ORDER BY p.rating_avg DESC";
-        break;
-      case "name":
-        sql += " ORDER BY p.name ASC"; // sắp xếp theo tên
-        break;
-      default:
-        sql += " ORDER BY p.id DESC";
-    }
-
-    const [rows] = await pool.query(sql, params);
-    return rows;
   }
+
 
 
   // ====== GET RELATED PRODUCTS ======

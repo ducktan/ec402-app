@@ -24,6 +24,7 @@ class Cart {
              p.name,
              p.price,
              b.name as brand,
+             p.image_url,
              (SELECT image_url FROM product_images WHERE product_id = p.id LIMIT 1) as thumbnail
            FROM cart_items ci
            JOIN products p ON p.id = ci.product_id
@@ -42,6 +43,7 @@ class Cart {
         price: item.price,
         brand: item.brand,
         thumbnail: item.thumbnail,
+        avatar: item.image_url,
       },
     }));
 

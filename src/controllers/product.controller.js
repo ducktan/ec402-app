@@ -153,22 +153,19 @@ exports.searchProducts = async (req, res) => {
   try {
     const { query, minPrice, maxPrice, categoryId, sort } = req.query;
 
-    const products = await Product.search({
-      query,
-      minPrice,
-      maxPrice,
-      categoryId,
-      sort,
-    });
+    console.log("🔍 Search Params:", req.query);
 
-    return res.status(200).json({
+    // Gọi hàm static search của class Product
+    const products = await Product.search({ query, minPrice, maxPrice, categoryId, sort });
+
+    res.status(200).json({
       success: true,
       count: products.length,
       data: products,
     });
   } catch (error) {
-    console.error("❌ Lỗi searchProducts:", error);
-    res.status(500).json({ success: false, message: "Server error" });
+    console.error("🔴 Lỗi Search:", error);
+    res.status(500).json({ message: "Lỗi Server" });
   }
 };
 
