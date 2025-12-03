@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import '../../../controllers/wishlist_controller.dart';
 import 'package:iconsax/iconsax.dart';
+
+import '../../../controllers/wishlist_controller.dart';
+import '../../../controllers/cart_controller.dart';
 
 class ProductBottomBar extends StatelessWidget {
   final int productId;
@@ -15,6 +17,9 @@ class ProductBottomBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Lấy Cart Controller
+    final controller = Get.put(CartController());
+
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
       decoration: BoxDecoration(
@@ -29,30 +34,22 @@ class ProductBottomBar extends StatelessWidget {
       ),
       child: Row(
         children: [
+          /// -----------------------------------------
+          /// ❤️ NÚT WISHLIST
+          /// -----------------------------------------
           Obx(() {
             final isFav = wishlistController.isFavorite(productId);
             return IconButton(
               onPressed: () async {
                 await wishlistController.toggleWishlist(productId);
 
-                // Hiện thông báo
-                if (wishlistController.isFavorite(productId)) {
-                  Get.snackbar(
-                    "Wishlist",
-                    "Đã thêm vào wishlist",
-                    snackPosition: SnackPosition.BOTTOM,
-                    backgroundColor: Theme.of(context).primaryColorLight,
-                    colorText: Colors.black,
-                  );
-                } else {
-                  Get.snackbar(
-                    "Wishlist",
-                    "Đã xóa khỏi wishlist",
-                    snackPosition: SnackPosition.BOTTOM,
-                    backgroundColor: Theme.of(context).primaryColorLight,
-                    colorText: Colors.black,
-                  );
-                }
+                Get.snackbar(
+                  "Wishlist",
+                  isFav ? "Đã xóa khỏi wishlist" : "Đã thêm vào wishlist",
+                  snackPosition: SnackPosition.BOTTOM,
+                  backgroundColor: Theme.of(context).primaryColorLight,
+                  colorText: Colors.black,
+                );
               },
               icon: Icon(
                 Iconsax.heart5,
@@ -60,12 +57,15 @@ class ProductBottomBar extends StatelessWidget {
               ),
             );
           }),
+
           const SizedBox(width: 10),
+
+          /// -----------------------------------------
+          /// 🛒 NÚT THÊM VÀO GIỎ
+          /// -----------------------------------------
           Expanded(
             child: ElevatedButton.icon(
-              onPressed: () {
-                // TODO: thêm vào giỏ
-              },
+              onPressed: () => controller.addToCart(productId: productId),
               icon: const Icon(Iconsax.shopping_cart, size: 18),
               label: const Text("Thêm vào giỏ hàng"),
               style: ElevatedButton.styleFrom(

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../shop/controllers/wishlist_controller.dart';
+import '../../../shop/controllers/cart_controller.dart';
+
 import '../../../shop/screens/product_detail/product_detail_screen.dart';
 import '../../../../utils/constants/image_strings.dart';
 
@@ -10,6 +12,7 @@ class WishlistScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final WishlistController wishlistController = Get.put(WishlistController());
+    final CartController cartController = Get.find<CartController>();
 
     return Scaffold(
       appBar: AppBar(title: const Text("Wishlist"), centerTitle: true),
@@ -93,9 +96,9 @@ class WishlistScreen extends StatelessWidget {
                             Icons.shopping_cart_outlined,
                             color: Colors.blue,
                           ),
-                          onPressed: () {
-                            // TODO: thêm sản phẩm vào giỏ
-                          },
+                          onPressed: () => cartController.addToCart(
+                            productId: productId,
+                          ),
                           visualDensity: VisualDensity.compact,
                           padding: EdgeInsets.zero,
                           constraints: const BoxConstraints(),

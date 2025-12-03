@@ -58,4 +58,37 @@ class ProductApi {
       return [];
     }
   }
+
+  //  Tìm kiếm sản phẩm (Search & Filter)
+  static Future<List<dynamic>> searchProducts({
+    String? query,
+    double? minPrice,
+    double? maxPrice,
+    int? categoryId,
+    String? sort,
+  }) async {
+    try {
+      String url = "$baseUrl/products/search?q=1";
+
+      if (query != null && query.isNotEmpty) url += "&query=$query";
+      if (minPrice != null && minPrice > 0) url += "&minPrice=$minPrice";
+      if (maxPrice != null && maxPrice > 0) url += "&maxPrice=$maxPrice";
+      if (categoryId != null) url += "&categoryId=$categoryId";
+      if (sort != null && sort.isNotEmpty) url += "&sort=$sort";
+
+      print("🔵 [ProductApi] Calling: $url");
+
+      final response = await http.get(Uri.parse(url));
+
+      if (response.statusCode == 200) {
+        final json = jsonDecode(response.body);
+        return json['data'];
+      } else {
+        print("🔴 [ProductApi] Error ${response.statusCode}: ${response.body}");
+      }
+    } catch (e) {
+      print("🔴 [ProductApi] Exception: $e");
+    }
+    return [];
+  }
 }

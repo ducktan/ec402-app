@@ -9,11 +9,15 @@ import 'package:ec402_app/navigation_menu.dart';
 import 'package:ec402_app/features/authentication/screens/welcome.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart'; // 👈 import GetX
-import './features/shop/controllers/home_controller.dart';
 import './features/shop/screens/product_detail/product_detail_screen.dart';
 import 'package:ec402_app/features/shop/screens/product_review/product_review_screen.dart';
 import 'package:ec402_app/features/authentication/screens/welcome.dart';
 import 'package:ec402_app/features/personalization/screens/notification/notification.dart';
+
+// Controller
+import './features/shop/controllers/home_controller.dart';
+import './features/shop/controllers/cart_controller.dart';
+
 
 
 
@@ -25,6 +29,7 @@ class InitialBindings extends Bindings {
   @override
   void dependencies() {
     Get.put(HomeController()); // đăng ký HomeController ở startup
+    Get.put(CartController()); // đăng ký CartController ở startup
   }
 }
 
