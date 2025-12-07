@@ -18,10 +18,15 @@ import 'package:ec402_app/features/personalization/screens/notification/notifica
 import './features/shop/controllers/home_controller.dart';
 import './features/shop/controllers/cart_controller.dart';
 
+// Payment
+import 'package:flutter_stripe/flutter_stripe.dart';
+
 
 
 
 void main() {
+  Stripe.publishableKey = "pk_test_51Sbhsp3Gd6v4W76iBKFlsl1e6FTUEkpIl4iG8UI7qMGLgbT4HYyChpUF6NGxhFFiddP3ngTFpVLMYT6QQvzq3TdZ00cZWk6h0D";
+
   runApp(const MyApp());
 }
 

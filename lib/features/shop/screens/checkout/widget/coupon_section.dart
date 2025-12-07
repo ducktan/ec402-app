@@ -1,9 +1,17 @@
-// widgets/coupon_section.dart
 import 'package:flutter/material.dart';
-import 'package:ec402_app/utils/constants/sizes.dart';
+import '../voucher_select_screen.dart';
 
 class CouponSection extends StatelessWidget {
-  const CouponSection({super.key});
+  final double orderTotal;
+  final Map<String, dynamic>? selectedVoucher;
+  final Function(Map<String, dynamic>) onVoucherApplied;
+
+  const CouponSection({
+    super.key,
+    required this.orderTotal,
+    required this.selectedVoucher,
+    required this.onVoucherApplied,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -22,22 +30,46 @@ class CouponSection extends StatelessWidget {
         children: [
           ListTile(
             contentPadding: EdgeInsets.zero,
-            title: Text('Apply Coupon/Vouchers', style: theme.bodyMedium),
-            trailing: Icon(Icons.arrow_forward_ios_rounded, size: 16, color: colorScheme.onSurfaceVariant),
+            title: Text(
+              'Apply Coupon/Vouchers',
+              style: theme.bodyMedium,
+            ),
+
+            // ---- FIXED SUBTITLE ----
+            subtitle: selectedVoucher != null
+                ? Text(
+                    "Đã áp dụng: ${selectedVoucher!['code']} "
+                    "(-\$${selectedVoucher!['discount_amount'].toStringAsFixed(2)})",
+                    style: TextStyle(
+                      color: Colors.green,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  )
+                : null,
+
+            trailing: Icon(Icons.arrow_forward_ios_rounded, size: 16),
             onTap: () {
-              // TODO: Navigate to coupon screen
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => VoucherSelectScreen(
+                    orderTotal: orderTotal,
+                    onSelected: (voucher) {
+                      onVoucherApplied(voucher);
+                    },
+                  ),
+                ),
+              );
             },
           ),
+
           const Divider(),
+
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text('Available Points: 0', style: theme.bodySmall),
-              Switch(
-                value: false,
-                onChanged: (val) {},
-                activeColor: colorScheme.primary,
-              ),
+              Switch(value: false, onChanged: (val) {}),
             ],
           ),
         ],

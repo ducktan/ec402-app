@@ -9,6 +9,8 @@ import 'package:ec402_app/features/shop/screens/checkout/checkout.dart';
 // utils
 import 'package:ec402_app/utils/constants/image_strings.dart';
 
+
+
 class CartScreen extends StatefulWidget {
   const CartScreen({super.key});
 
@@ -18,6 +20,7 @@ class CartScreen extends StatefulWidget {
 
 class _CartScreenState extends State<CartScreen> {
   final controller = Get.find<CartController>();
+  
 
   @override
   void initState() {
@@ -236,7 +239,7 @@ class _CartScreenState extends State<CartScreen> {
                   height: 50,
                   child: ElevatedButton(
                     onPressed: () {
-                      Get.to(() => CheckoutScreen(cartItems: controller.cartItems));
+                      Get.to(() => CheckoutScreen(cartItems: controller.cartItems, orderTotal: controller.totalPrice.value,));
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: colorScheme.primary,

@@ -18,6 +18,9 @@ class AddNewAddressScreen extends StatefulWidget {
 class _AddNewAddressScreenState extends State<AddNewAddressScreen> {
   final addressCtrl = Get.find<AddressController>();
 
+  final fullNameCtrl = TextEditingController();
+  final phoneCtrl = TextEditingController();
+
   final streetCtrl = TextEditingController();
   final postalCodeCtrl = TextEditingController();
 
@@ -29,7 +32,7 @@ class _AddNewAddressScreenState extends State<AddNewAddressScreen> {
   String? selectedDistrictCode;
   String? selectedWardCode;
 
-  Map<String, dynamic>? editingAddress; // ✅ Dữ liệu edit (nếu có)
+  Map<String, dynamic>? editingAddress;
 
   @override
   void initState() {
@@ -37,24 +40,26 @@ class _AddNewAddressScreenState extends State<AddNewAddressScreen> {
     loadProvinceData();
   }
 
-  /// ✅ Load dữ liệu tỉnh/thành từ file JSON
   Future<void> loadProvinceData() async {
-    final jsonString = await rootBundle.loadString('assets/data/vn_provinces.json');
+    final jsonString =
+        await rootBundle.loadString('assets/data/vn_provinces.json');
     final data = json.decode(jsonString) as List;
     provinces = data;
 
-    // Nếu có địa chỉ cần chỉnh sửa, fill vào
     final args = Get.arguments;
     if (args != null && args is Map<String, dynamic>) {
       editingAddress = args;
       fillFormWithData();
     }
+
     setState(() {});
   }
 
-  /// ✅ Điền dữ liệu cũ vào form khi edit
   void fillFormWithData() {
     if (editingAddress == null) return;
+
+    fullNameCtrl.text = editingAddress!['full_name'] ?? '';
+    phoneCtrl.text = editingAddress!['phone'] ?? '';
 
     streetCtrl.text = editingAddress!['street'] ?? '';
     postalCodeCtrl.text = editingAddress!['postal_code'] ?? '';
@@ -63,25 +68,32 @@ class _AddNewAddressScreenState extends State<AddNewAddressScreen> {
     final districtName = editingAddress!['district'];
     final wardName = editingAddress!['ward'];
 
-    // Tìm code của city, district, ward tương ứng theo name
-    final city = provinces.firstWhereOrNull((p) => p['name'] == cityName);
+    final city =
+        provinces.firstWhereOrNull((p) => p['name'] == cityName);
     if (city != null) {
       selectedProvinceCode = city['code'].toString();
       districts = city['districts'] ?? [];
 
-      final district = districts.firstWhereOrNull((d) => d['name'] == districtName);
+      final district =
+          districts.firstWhereOrNull((d) => d['name'] == districtName);
+
       if (district != null) {
         selectedDistrictCode = district['code'].toString();
         wards = district['wards'] ?? [];
 
-        final ward = wards.firstWhereOrNull((w) => w['name'] == wardName);
-        if (ward != null) selectedWardCode = ward['code'].toString();
+        final ward =
+            wards.firstWhereOrNull((w) => w['name'] == wardName);
+        if (ward != null) {
+          selectedWardCode = ward['code'].toString();
+        }
       }
     }
   }
 
   void selectProvince(String code) {
-    final selected = provinces.firstWhere((p) => p['code'].toString() == code);
+    final selected =
+        provinces.firstWhere((p) => p['code'].toString() == code);
+
     setState(() {
       selectedProvinceCode = code;
       districts = selected['districts'] ?? [];
@@ -92,7 +104,9 @@ class _AddNewAddressScreenState extends State<AddNewAddressScreen> {
   }
 
   void selectDistrict(String code) {
-    final selected = districts.firstWhere((d) => d['code'].toString() == code);
+    final selected =
+        districts.firstWhere((d) => d['code'].toString() == code);
+
     setState(() {
       selectedDistrictCode = code;
       wards = selected['wards'] ?? [];
@@ -114,7 +128,28 @@ class _AddNewAddressScreenState extends State<AddNewAddressScreen> {
         padding: const EdgeInsets.all(TSizes.defaultSpace),
         child: Column(
           children: [
-            // Street
+            // FULL NAME
+            TextFormField(
+              controller: fullNameCtrl,
+              decoration: const InputDecoration(
+                prefixIcon: Icon(Iconsax.user),
+                labelText: 'Full Name',
+              ),
+            ),
+            const SizedBox(height: TSizes.spaceBtwInputFields),
+
+            // PHONE
+            TextFormField(
+              controller: phoneCtrl,
+              decoration: const InputDecoration(
+                prefixIcon: Icon(Iconsax.call),
+                labelText: 'Phone Number',
+              ),
+              keyboardType: TextInputType.phone,
+            ),
+            const SizedBox(height: TSizes.spaceBtwInputFields),
+
+            // STREET
             TextFormField(
               controller: streetCtrl,
               decoration: const InputDecoration(
@@ -124,7 +159,7 @@ class _AddNewAddressScreenState extends State<AddNewAddressScreen> {
             ),
             const SizedBox(height: TSizes.spaceBtwInputFields),
 
-            // Province
+            // PROVINCE
             DropdownButtonFormField<String>(
               value: selectedProvinceCode,
               decoration: const InputDecoration(
@@ -143,7 +178,7 @@ class _AddNewAddressScreenState extends State<AddNewAddressScreen> {
             ),
             const SizedBox(height: TSizes.spaceBtwInputFields),
 
-            // District
+            // DISTRICT
             DropdownButtonFormField<String>(
               value: selectedDistrictCode,
               decoration: const InputDecoration(
@@ -162,7 +197,7 @@ class _AddNewAddressScreenState extends State<AddNewAddressScreen> {
             ),
             const SizedBox(height: TSizes.spaceBtwInputFields),
 
-            // Ward
+            // WARD
             DropdownButtonFormField<String>(
               value: selectedWardCode,
               decoration: const InputDecoration(
@@ -183,7 +218,7 @@ class _AddNewAddressScreenState extends State<AddNewAddressScreen> {
             ),
             const SizedBox(height: TSizes.spaceBtwInputFields),
 
-            // Postal Code
+            // POSTAL CODE
             TextFormField(
               controller: postalCodeCtrl,
               decoration: const InputDecoration(
@@ -194,7 +229,7 @@ class _AddNewAddressScreenState extends State<AddNewAddressScreen> {
             ),
             const SizedBox(height: TSizes.spaceBtwInputFields),
 
-            // Country
+            // COUNTRY
             TextFormField(
               initialValue: "Việt Nam",
               decoration: const InputDecoration(
@@ -205,7 +240,7 @@ class _AddNewAddressScreenState extends State<AddNewAddressScreen> {
             ),
             const SizedBox(height: TSizes.spaceBtwInputFields),
 
-            // Save Button
+            // SAVE BUTTON
             SizedBox(
               width: double.infinity,
               height: 48,
@@ -216,24 +251,31 @@ class _AddNewAddressScreenState extends State<AddNewAddressScreen> {
                   if (selectedProvinceCode == null ||
                       selectedDistrictCode == null ||
                       selectedWardCode == null) {
-                    Get.snackbar("Error", "Please select Province, District and Ward",
-                        backgroundColor: Colors.red.withOpacity(0.8),
-                        colorText: Colors.white,
-                        snackPosition: SnackPosition.BOTTOM);
+                    Get.snackbar(
+                      "Error",
+                      "Please select Province, District and Ward",
+                      backgroundColor: Colors.red.withOpacity(0.8),
+                      colorText: Colors.white,
+                      snackPosition: SnackPosition.BOTTOM,
+                    );
                     return;
                   }
 
                   final selectedProvinceName = provinces.firstWhere(
                     (e) => e['code'].toString() == selectedProvinceCode,
                   )['name'];
+
                   final selectedDistrictName = districts.firstWhere(
                     (e) => e['code'].toString() == selectedDistrictCode,
                   )['name'];
+
                   final selectedWardName = wards.firstWhere(
                     (e) => e['code'].toString() == selectedWardCode,
                   )['name'];
 
                   final data = {
+                    "full_name": fullNameCtrl.text.trim(),
+                    "phone": phoneCtrl.text.trim(),
                     "street": streetCtrl.text.trim(),
                     "ward": selectedWardName,
                     "district": selectedDistrictName,
@@ -244,11 +286,11 @@ class _AddNewAddressScreenState extends State<AddNewAddressScreen> {
 
                   try {
                     bool success;
+
                     if (isEditing) {
-                      // ✅ Cập nhật địa chỉ
-                      success = await addressCtrl.updateAddress(editingAddress!['id'], data);
+                      success = await addressCtrl
+                          .updateAddress(editingAddress!['id'], data);
                     } else {
-                      // ✅ Thêm mới địa chỉ
                       success = await addressCtrl.addAddress(data);
                     }
 
@@ -256,17 +298,22 @@ class _AddNewAddressScreenState extends State<AddNewAddressScreen> {
                       Get.back();
                       Get.snackbar(
                         "Success",
-                        isEditing ? "Address updated successfully!" : "Address added successfully!",
+                        isEditing
+                            ? "Address updated successfully!"
+                            : "Address added successfully!",
                         backgroundColor: Colors.green.withOpacity(0.8),
                         colorText: Colors.white,
                         snackPosition: SnackPosition.BOTTOM,
                       );
                     }
                   } catch (e) {
-                    Get.snackbar("Error", "Failed to save address. Please try again.",
-                        backgroundColor: Colors.red.withOpacity(0.8),
-                        colorText: Colors.white,
-                        snackPosition: SnackPosition.BOTTOM);
+                    Get.snackbar(
+                      "Error",
+                      "Failed to save address. Please try again.",
+                      backgroundColor: Colors.red.withOpacity(0.8),
+                      colorText: Colors.white,
+                      snackPosition: SnackPosition.BOTTOM,
+                    );
                   }
                 },
               ),

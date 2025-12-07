@@ -1,118 +1,70 @@
-import 'package:ec402_app/common/widgets/custom_shapes/containers/rounded_container.dart';
-import 'package:ec402_app/features/personalization/screens/order/order_detail.dart';
-import 'package:ec402_app/utils/constants/sizes.dart';
-import 'package:ec402_app/utils/helpers/helper_functions.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
-import 'package:iconsax/iconsax.dart';
+import 'package:ec402_app/services/order_api.dart';
+import 'package:ec402_app/features/personalization/screens/order/order_detail.dart';
 
-class TOrderListItems extends StatelessWidget {
-  const TOrderListItems({super.key});
+class TOrderListItems extends StatefulWidget {
+  const TOrderListItems({Key? key}) : super(key: key);
+
+  @override
+  State<TOrderListItems> createState() => _TOrderListItemsState();
+}
+
+class _TOrderListItemsState extends State<TOrderListItems> {
+  late Future<List<dynamic>> _orders;
+
+  @override
+  void initState() {
+    super.initState();
+    _orders = OrderService.getMyOrders();
+  }
 
   @override
   Widget build(BuildContext context) {
-    final dark = THelperFunctions.isDarkMode(context);
-    final colorScheme = Theme.of(context).colorScheme;
-    final textTheme = Theme.of(context).textTheme;
+    return FutureBuilder(
+      future: _orders,
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Center(child: CircularProgressIndicator());
+        }
 
-    return ListView.separated(
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      itemCount: 10,
-      separatorBuilder: (_, __) => const SizedBox(height: TSizes.spaceBtwItems),
-      itemBuilder: (_, index) => TRoundedContainer(
-        showBorder: true,
-        padding: const EdgeInsets.all(TSizes.md),
-        backgroundColor: colorScheme.surface,
-        borderColor: colorScheme.outlineVariant.withOpacity(0.3),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            /// Row 1: Trạng thái + Ngày
-            Row(
-              children: [
-                Icon(Iconsax.ship, color: colorScheme.primary),
-                const SizedBox(width: TSizes.spaceBtwItems / 2),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Processing',
-                        style: textTheme.bodyLarge?.copyWith(
-                          color: colorScheme.primary,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                      Text(
-                        '12 Jan, 2024',
-                        style: textTheme.bodyMedium?.copyWith(
-                          color: colorScheme.onSurfaceVariant,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                IconButton(
-                  onPressed: () => Get.to(() => const OrderDetailScreen()),
-                  icon: Icon(Iconsax.arrow_right_34,
-                      size: TSizes.iconSm, color: colorScheme.onSurface),
-                ),
-              ],
-            ),
-            const SizedBox(height: TSizes.spaceBtwItems),
+        if (snapshot.hasError) {
+          return Center(child: Text("Failed: ${snapshot.error}"));
+        }
 
-            /// Row 2: Mã đơn + Ngày giao
-            Row(
-              children: [
-                /// Mã đơn
-                Expanded(
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Icon(Iconsax.tag, color: colorScheme.primary),
-                      const SizedBox(width: TSizes.spaceBtwItems / 2),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text('Order',
-                              style: textTheme.labelMedium?.copyWith(
-                                  color: colorScheme.onSurfaceVariant)),
-                          Text('#123456',
-                              style: textTheme.titleMedium?.copyWith(
-                                  color: colorScheme.onSurface)),
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
+        final orders = snapshot.data as List;
 
-                /// Ngày giao
-                Expanded(
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Icon(Iconsax.calendar, color: colorScheme.primary),
-                      const SizedBox(width: TSizes.spaceBtwItems / 2),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text('Shipping Date',
-                              style: textTheme.labelMedium?.copyWith(
-                                  color: colorScheme.onSurfaceVariant)),
-                          Text('03 Feb, 2024',
-                              style: textTheme.titleMedium?.copyWith(
-                                  color: colorScheme.onSurface)),
-                        ],
-                      ),
-                    ],
+        return ListView.separated(
+          itemCount: orders.length,
+          separatorBuilder: (_, __) => const SizedBox(height: 15),
+          itemBuilder: (context, index) {
+            final order = orders[index];
+
+            return ListTile(
+              tileColor: Colors.grey.shade100,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+              title: Text("Order #${order["id"]}"),
+              subtitle: Text("Total: \$${order["total_amount"]}"),
+              trailing: Text(order["order_status"]),
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => OrderDetailScreen(orderId: order['id']),
                   ),
-                ),
-              ],
-            ),
-          ],
-        ),
-      ),
+                ).then((result) {
+                  if (result == true) {
+                    setState(() {
+                      _orders = OrderService.getMyOrders(); // Reload list
+                    });
+                  }
+                });
+              },
+            );
+          },
+        );
+      },
     );
   }
 }

@@ -8,12 +8,17 @@ class OrderSummary extends StatelessWidget {
   final double taxFee;
   final double total;
 
+  final double voucherDiscount;   // <--- NEW
+  final double finalTotal;        // <--- NEW
+
   const OrderSummary({
     super.key,
     required this.subtotal,
     required this.shippingFee,
     required this.taxFee,
     required this.total,
+    required this.voucherDiscount,   // <--- NEW
+    required this.finalTotal,        // <--- NEW
   });
 
   @override
@@ -33,14 +38,32 @@ class OrderSummary extends StatelessWidget {
           _buildRow("Subtotal", subtotal, context),
           _buildRow("Shipping Fee", shippingFee, context),
           _buildRow("Tax Fee", taxFee, context),
+
+          // ----- NEW: voucher discount -----
+          if (voucherDiscount > 0)
+            _buildRow(
+              "Voucher Discount",
+              -voucherDiscount,
+              context,
+              bold: true,
+              highlight: true,
+            ),
+
           const Divider(),
-          _buildRow("Order Total", total, context, bold: true),
+
+          _buildRow("Order Total", finalTotal, context, bold: true),
         ],
       ),
     );
   }
 
-  Widget _buildRow(String label, double value, BuildContext context, {bool bold = false}) {
+  Widget _buildRow(
+    String label,
+    double value,
+    BuildContext context, {
+    bool bold = false,
+    bool highlight = false,
+  }) {
     final theme = Theme.of(context).textTheme;
     final colorScheme = Theme.of(context).colorScheme;
 
@@ -49,16 +72,20 @@ class OrderSummary extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(label,
-              style: theme.bodyMedium?.copyWith(
-                color: colorScheme.onSurfaceVariant,
-                fontWeight: bold ? FontWeight.bold : FontWeight.normal,
-              )),
-          Text("\$${value.toStringAsFixed(2)}",
-              style: theme.bodyMedium?.copyWith(
-                color: colorScheme.onBackground,
-                fontWeight: bold ? FontWeight.bold : FontWeight.w600,
-              )),
+          Text(
+            label,
+            style: theme.bodyMedium?.copyWith(
+              color: highlight ? Colors.green : colorScheme.onSurfaceVariant,
+              fontWeight: bold ? FontWeight.bold : FontWeight.normal,
+            ),
+          ),
+          Text(
+            "${value < 0 ? '-' : ''}\$${value.abs().toStringAsFixed(2)}",
+            style: theme.bodyMedium?.copyWith(
+              color: highlight ? Colors.green : colorScheme.onBackground,
+              fontWeight: bold ? FontWeight.w700 : FontWeight.w600,
+            ),
+          ),
         ],
       ),
     );
