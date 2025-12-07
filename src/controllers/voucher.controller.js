@@ -1,4 +1,6 @@
 const Voucher = require('../models/voucher.model');
+const db = require("../config/db");
+
 
 // GET ALL
 exports.getAllVouchers = async (req, res) => {
@@ -126,5 +128,32 @@ exports.applyVoucher = async (req, res) => {
     } catch (error) {
         console.error('applyVoucher error:', error);
         res.status(500).json({ success: false, message: error.message });
+    }
+};
+
+exports.getAvailableVouchers = async (req, res) => {
+    try {
+        const orderTotal = Number(req.query.orderTotal || 0);
+
+        const [rows] = await db.query(
+            `SELECT *
+             FROM vouchers
+             WHERE status = 'active'
+               AND (usage_limit IS NULL OR used_count < usage_limit)
+               AND start_at <= NOW()
+               AND (expires_at IS NULL OR expires_at > NOW())
+               AND min_order_amount <= ?
+             ORDER BY discount_value DESC`,
+            [orderTotal]
+        );
+
+        return res.json({
+            success: true,
+            data: rows,
+        });
+
+    } catch (err) {
+        console.error("getAvailableVouchers error:", err);
+        return res.status(500).json({ success: false, message: "Lỗi máy chủ" });
     }
 };

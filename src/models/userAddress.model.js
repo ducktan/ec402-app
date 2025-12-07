@@ -1,14 +1,18 @@
+// models/UserAddress.js
 const pool = require("../config/db");
 
 class UserAddress {
   // Thêm địa chỉ mới
   static async create(userId, data) {
     const sql = `
-      INSERT INTO user_addresses (user_id, street, ward, district, city, country, postal_code)
-      VALUES (?, ?, ?, ?, ?, ?, ?)
+      INSERT INTO user_addresses 
+      (user_id, full_name, phone, street, ward, district, city, country, postal_code)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
     `;
     const [result] = await pool.query(sql, [
       userId,
+      data.full_name,
+      data.phone,
       data.street,
       data.ward,
       data.district,
@@ -21,13 +25,19 @@ class UserAddress {
 
   // Lấy tất cả địa chỉ theo user
   static async findByUserId(userId) {
-    const [rows] = await pool.query("SELECT * FROM user_addresses WHERE user_id = ?", [userId]);
+    const [rows] = await pool.query(
+      "SELECT * FROM user_addresses WHERE user_id = ? ORDER BY id DESC",
+      [userId]
+    );
     return rows;
   }
 
   // Lấy địa chỉ cụ thể
   static async findById(id, userId) {
-    const [rows] = await pool.query("SELECT * FROM user_addresses WHERE id = ? AND user_id = ?", [id, userId]);
+    const [rows] = await pool.query(
+      "SELECT * FROM user_addresses WHERE id = ? AND user_id = ?",
+      [id, userId]
+    );
     return rows[0];
   }
 
@@ -36,7 +46,16 @@ class UserAddress {
     const fields = [];
     const values = [];
 
-    ["street", "ward", "district", "city", "country", "postal_code"].forEach((key) => {
+    [
+      "full_name",
+      "phone",
+      "street",
+      "ward",
+      "district",
+      "city",
+      "country",
+      "postal_code",
+    ].forEach((key) => {
       if (data[key] !== undefined) {
         fields.push(`${key} = ?`);
         values.push(data[key]);
@@ -47,12 +66,16 @@ class UserAddress {
 
     const sql = `UPDATE user_addresses SET ${fields.join(", ")} WHERE id = ? AND user_id = ?`;
     values.push(id, userId);
+
     await pool.query(sql, values);
   }
 
   // Xóa
   static async delete(id, userId) {
-    await pool.query("DELETE FROM user_addresses WHERE id = ? AND user_id = ?", [id, userId]);
+    await pool.query("DELETE FROM user_addresses WHERE id = ? AND user_id = ?", [
+      id,
+      userId,
+    ]);
   }
 }
 

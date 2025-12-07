@@ -119,7 +119,9 @@ exports.getAddressById = async (req, res) => {
   try {
     const userId = req.user.id;
     const address = await UserAddress.findById(req.params.id, userId);
-    if (!address) return res.status(404).json({ message: "Không tìm thấy địa chỉ" });
+    if (!address)
+      return res.status(404).json({ message: "Không tìm thấy địa chỉ" });
+
     res.json(address);
   } catch (err) {
     console.error(err);
@@ -127,7 +129,7 @@ exports.getAddressById = async (req, res) => {
   }
 };
 
-// 4️⃣ Cập nhật địa chỉ
+// 4️⃣ Cập nhật
 exports.updateAddress = async (req, res) => {
   try {
     const userId = req.user.id;
@@ -139,7 +141,7 @@ exports.updateAddress = async (req, res) => {
   }
 };
 
-// 5️⃣ Xóa địa chỉ
+// 5️⃣ Xóa
 exports.deleteAddress = async (req, res) => {
   try {
     const userId = req.user.id;
@@ -150,6 +152,7 @@ exports.deleteAddress = async (req, res) => {
     res.status(500).json({ message: "Lỗi server" });
   }
 };
+
 
 
 

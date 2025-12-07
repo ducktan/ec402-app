@@ -21,6 +21,8 @@ CREATE TABLE users (
 CREATE TABLE user_addresses (
     id INT AUTO_INCREMENT PRIMARY KEY,
     user_id INT NOT NULL,
+    full_name VARCHAR(100) NOT NULL,
+    phone VARCHAR(20) NOT NULL,
     street VARCHAR(255),
     ward VARCHAR(100),
     district VARCHAR(100),
@@ -30,6 +32,7 @@ CREATE TABLE user_addresses (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
+
 
 -- table categories
 CREATE TABLE categories (
@@ -51,7 +54,7 @@ CREATE TABLE products (
     name VARCHAR(200) NOT NULL,
     description TEXT,
     price DECIMAL(12,2) NOT NULL,
-    image_url VARCHAR(255) NULL AFTER stock
+    image_url VARCHAR(255) NULL,
     stock INT DEFAULT 0,
     rating_avg DECIMAL(3,2) DEFAULT 0,
     review_count INT DEFAULT 0,
@@ -118,10 +121,8 @@ CREATE TABLE cart_items (
 CREATE TABLE orders (
     id INT AUTO_INCREMENT PRIMARY KEY,
     user_id INT NOT NULL,
-    brand_id INT NOT NULL,
     total_amount DECIMAL(12,2) NOT NULL,
-    payment_method ENUM('momo','vnpay','stripe','cod'),
-    payment_status ENUM('pending','paid','failed') DEFAULT 'pending',
+    payment_method ENUM('direct','banking'),
     order_status ENUM('pending','confirmed','shipping','delivered','cancelled') DEFAULT 'pending',
     shipping_address JSON,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,

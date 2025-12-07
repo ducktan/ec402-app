@@ -13,6 +13,7 @@ const authorize = (...allowedRoles) => (req, res, next) => {
 
 // USER
 router.post('/apply', verifyToken, voucherController.applyVoucher);
+router.get('/available', verifyToken, voucherController.getAvailableVouchers);
 
 // ADMIN/SELLER
 router.get('/', verifyToken, authorize('admin', 'seller'), voucherController.getAllVouchers);

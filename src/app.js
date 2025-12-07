@@ -9,9 +9,11 @@ const CartRoutes = require("./routes/cart.routes");
 const WishlistRoutes = require("./routes/wishlist.routes");
 const VoucherRoutes = require("./routes/voucher.routes");
 const ReviewRoutes = require("./routes/review.routes");
+const OrderRoutes = require("./routes/order.routes");
 const path = require("path");
 const adminUserRoutes = require("./routes/admin.user.routes");
-
+const dotenv = require("dotenv");
+dotenv.config();
 
 const morgan = require("morgan");
 const cors = require("cors");
@@ -38,6 +40,7 @@ app.use("/api/cart", CartRoutes);
 app.use("/api/wishlist", WishlistRoutes);
 app.use("/api/vouchers", VoucherRoutes);
 app.use("/api/reviews", ReviewRoutes);
+app.use("/api/orders", OrderRoutes);
 
 // Admin routes
 app.use("/api/admin", adminUserRoutes);
