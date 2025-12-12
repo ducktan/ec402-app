@@ -9,6 +9,8 @@ import '../../../navigation_menu.dart'; // ✅ import NavigationScreen
 import 'package:get/get.dart';
 import '../../shop/controllers/home_controller.dart';
 
+import 'package:ec402_app/services/fcm_service.dart';
+
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
 
@@ -148,7 +150,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(content: Text("Welcome ${user['name']}!")),
                       );
-
+                      await FCMService.initFCM(res.token);
                       // 👉 Điều hướng sang màn hình Navigation
                       Get.offAll(() => const NavigationMenu());
                       HomeController.instance.setUser(

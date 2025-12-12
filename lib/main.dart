@@ -21,11 +21,28 @@ import './features/shop/controllers/cart_controller.dart';
 // Payment
 import 'package:flutter_stripe/flutter_stripe.dart';
 
+// Firebase
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
+import 'firebase_options.dart'; // nếu bạn dùng FlutterFire CLI
 
 
 
-void main() {
+Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
+  await Firebase.initializeApp();
+  print("Background message: ${message.messageId}");
+}
+
+
+void main() async {
   Stripe.publishableKey = "pk_test_51Sbhsp3Gd6v4W76iBKFlsl1e6FTUEkpIl4iG8UI7qMGLgbT4HYyChpUF6NGxhFFiddP3ngTFpVLMYT6QQvzq3TdZ00cZWk6h0D";
+
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
+
+  FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
 
   runApp(const MyApp());
 }

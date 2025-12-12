@@ -1,101 +1,85 @@
 import 'package:flutter/material.dart';
-import 'package:ec402_app/common/widgets/appbar/appbar.dart';
-import 'package:ec402_app/utils/constants/sizes.dart';
-import 'package:ec402_app/utils/helpers/helper_functions.dart';
-import 'package:iconsax/iconsax.dart';
+import 'package:ec402_app/services/notification_service.dart';
+import 'package:ec402_app/utils/helpers/user_session.dart'; // nếu bạn lưu JWT
 
-class NotificationScreen extends StatelessWidget {
+// TAppBar
+import 'package:ec402_app/common/widgets/appbar/appbar.dart';
+
+class NotificationScreen extends StatefulWidget {
   const NotificationScreen({super.key});
+
+  @override
+  State<NotificationScreen> createState() => _NotificationScreenState();
+}
+
+class _NotificationScreenState extends State<NotificationScreen> {
+  List<dynamic> notifications = [];
+  bool loading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    loadNotifications();
+  }
+
+  Future<void> loadNotifications() async {
+    final jwt = await UserSession.getToken();   // tuỳ theo bạn lưu token
+    final data = await NotificationService.fetchNotifications(jwt.toString());
+    setState(() {
+      notifications = data;
+      loading = false;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final dark = THelperFunctions.isDarkMode(context);
 
-    // Fake notifications
-    final notifications = [
-      {
-        'title': 'Order Placed',
-        'message': 'Your order #123456 has been placed successfully.',
-        'isRead': false,
-        'time': '2h ago',
-      },
-      {
-        'title': 'Discount Coupon',
-        'message': 'You received a new coupon OFF50!',
-        'isRead': true,
-        'time': '1d ago',
-      },
-      {
-        'title': 'Order Shipped',
-        'message': 'Your order #123456 is on the way.',
-        'isRead': false,
-        'time': '3d ago',
-      },
-    ];
+    if (loading) {
+      return Scaffold(
+        appBar: TAppBar(title: const Text("Notifications"), showBackArrow: true),
+        body: const Center(child: CircularProgressIndicator()),
+      );
+    }
 
     return Scaffold(
-      appBar: TAppBar(
-        showBackArrow: true,
-        title: Text('Notifications', style: theme.textTheme.headlineSmall),
-      ),
+      appBar: TAppBar(title: const Text("Notifications"), showBackArrow: true),
       body: ListView.separated(
-        padding: const EdgeInsets.all(TSizes.defaultSpace),
+        padding: const EdgeInsets.all(16),
         itemCount: notifications.length,
-        separatorBuilder: (_, __) => const SizedBox(height: TSizes.spaceBtwItems),
+        separatorBuilder: (_, __) => const SizedBox(height: 12),
         itemBuilder: (_, index) {
-          final notification = notifications[index];
-          final isRead = notification['isRead'] as bool;
-
-          // Màu nền dựa vào trạng thái read/unread và theme
-          final bgColor = isRead
-              ? theme.cardColor
-              : theme.colorScheme.primary.withOpacity(0.1);
-
-          final iconColor = isRead
-              ? theme.iconTheme.color?.withOpacity(0.6)
-              : theme.colorScheme.primary;
+          final item = notifications[index];
+          final isRead = item["is_read"] == 1;
 
           return Container(
+            padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: bgColor,
+              color: isRead
+                  ? theme.cardColor
+                  : theme.colorScheme.primary.withOpacity(0.1),
               borderRadius: BorderRadius.circular(12),
             ),
-            padding: const EdgeInsets.all(TSizes.md),
-            child: Row(
+            child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Icon(
-                  Iconsax.notification,
-                  color: iconColor,
-                  size: 28,
-                ),
-                const SizedBox(width: TSizes.spaceBtwItems),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        notification['title'] as String,
-                        style: theme.textTheme.titleMedium!.copyWith(
-                          fontWeight: isRead ? FontWeight.normal : FontWeight.bold,
-                        ),
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        notification['message'] as String,
-                        style: theme.textTheme.bodyMedium,
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        notification['time'] as String,
-                        style: theme.textTheme.bodySmall!.copyWith(
-                          color: theme.textTheme.bodySmall!.color?.withOpacity(0.6),
-                        ),
-                      ),
-                    ],
+                Text(
+                  item["title"],
+                  style: TextStyle(
+                    fontWeight: isRead ? FontWeight.normal : FontWeight.bold,
+                    fontSize: 16,
                   ),
                 ),
+                const SizedBox(height: 6),
+                Text(item["body"]),
+                const SizedBox(height: 6),
+                Text(
+                  item["created_at"],
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: Colors.grey[600],
+                  ),
+                )
               ],
             ),
           );
