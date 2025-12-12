@@ -17,6 +17,8 @@ CREATE TABLE users (
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
 
+ALTER TABLE users ADD COLUMN fcm_token TEXT;
+
 -- table user_addresses (1 - n)
 CREATE TABLE user_addresses (
     id INT AUTO_INCREMENT PRIMARY KEY,
@@ -73,7 +75,6 @@ CREATE TABLE brands (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
-
 
 
 -- table product_images (1 product - n images)
@@ -211,4 +212,16 @@ CREATE TABLE user_vouchers (
     
     expires_at DATETIME,            -- Hạn dùng voucher
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Notifications
+CREATE TABLE notifications (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    title VARCHAR(255) NOT NULL,
+    body TEXT,
+    type VARCHAR(50),  -- ví dụ: 'order_update', 'system', 'promo'
+    is_read BOOLEAN DEFAULT FALSE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id)
 );

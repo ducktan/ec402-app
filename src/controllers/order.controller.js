@@ -1,5 +1,6 @@
 const OrderModel = require("../models/order.model");
 const CartModel = require("../models/cart.model");
+const { sendNotificationToUser } = require("../utils/notificationService");
 
 // ====================== CREATE ORDER ======================
 exports.createOrder = async (req, res) => {
@@ -43,6 +44,11 @@ exports.createOrder = async (req, res) => {
 
     // Xóa giỏ hàng
     await CartModel.clearCart(user_id);
+    
+    // --- Gửi notification realtime ---
+    const title = "Đơn hàng đã được tạo";
+    const body = `Đơn hàng #${order.id} của bạn đã được tạo thành công.`;
+    sendNotificationToUser(user_id, title, body);
 
     res.status(201).json({
       message: "Tạo đơn hàng thành công.",

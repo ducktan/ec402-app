@@ -10,6 +10,8 @@ const WishlistRoutes = require("./routes/wishlist.routes");
 const VoucherRoutes = require("./routes/voucher.routes");
 const ReviewRoutes = require("./routes/review.routes");
 const OrderRoutes = require("./routes/order.routes");
+const notificationRoute = require("./routes/notification.route");
+
 const path = require("path");
 const adminUserRoutes = require("./routes/admin.user.routes");
 const dotenv = require("dotenv");
@@ -41,6 +43,7 @@ app.use("/api/wishlist", WishlistRoutes);
 app.use("/api/vouchers", VoucherRoutes);
 app.use("/api/reviews", ReviewRoutes);
 app.use("/api/orders", OrderRoutes);
+app.use("/api/notifications", notificationRoute)
 
 // Admin routes
 app.use("/api/admin", adminUserRoutes);

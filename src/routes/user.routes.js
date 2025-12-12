@@ -1,3 +1,4 @@
+const db = require("../config/db");
 const express = require("express");
 const router = express.Router();
 const userController = require("../controllers/user.controller");
@@ -19,6 +20,14 @@ router.get("/addresses/:id", authMiddleware, userController.getAddressById);
 router.put("/addresses/:id", authMiddleware, userController.updateAddress);
 router.delete("/addresses/:id", authMiddleware, userController.deleteAddress);
 router.post("/upload-avatar", authMiddleware, upload.single("avatar"), uploadAvatar);
+
+// Firebase notification 
+// routes/users.js
+router.post("/save-fcm-token", authMiddleware, async (req, res) => {
+  const { fcmToken } = req.body;
+  await db.query("UPDATE users SET fcm_token = ? WHERE id = ?", [fcmToken, req.user.id]);
+  res.json({ success: true, message: "Token saved" });
+});
 
 
 module.exports = router;
