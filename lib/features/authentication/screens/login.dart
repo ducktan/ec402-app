@@ -1,14 +1,16 @@
 import 'package:ec402_app/utils/constants/colors.dart';
 import 'package:flutter/material.dart';
 import 'package:iconsax/iconsax.dart';
+import 'package:shared_preferences/shared_preferences.dart'; // ✅ Import SharedPreferences
+import 'package:get/get.dart';
+
+// Import các màn hình và service của dự án
 import 'signup.dart';
 import 'welcome.dart';
 import '../../../models/login_model.dart';
-import '../../../services/api_service.dart'; // ✅ import ApiService
-import '../../../navigation_menu.dart'; // ✅ import NavigationScreen
-import 'package:get/get.dart';
+import '../../../services/api_service.dart';
+import '../../../navigation_menu.dart';
 import '../../shop/controllers/home_controller.dart';
-
 import 'package:ec402_app/services/fcm_service.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -21,8 +23,9 @@ class LoginScreen extends StatefulWidget {
 class _LoginScreenState extends State<LoginScreen> {
   bool rememberMe = false;
   bool obscurePass = true;
+  bool isLoading = false; // ✅ Biến trạng thái loading cho nút bấm
 
-  // --- TextEditingController cho email & password
+  // Controller
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
 
@@ -74,7 +77,7 @@ class _LoginScreenState extends State<LoginScreen> {
             ),
             const SizedBox(height: 32),
 
-            /// --- Email
+            /// --- Email Input
             TextFormField(
               controller: emailController,
               decoration: const InputDecoration(
@@ -84,7 +87,7 @@ class _LoginScreenState extends State<LoginScreen> {
             ),
             const SizedBox(height: 16),
 
-            /// --- Password
+            /// --- Password Input
             TextFormField(
               controller: passwordController,
               obscureText: obscurePass,
@@ -124,48 +127,17 @@ class _LoginScreenState extends State<LoginScreen> {
             ),
             const SizedBox(height: 24),
 
-            /// --- Login Button
+            /// --- Login Button (Logic chính nằm ở đây)
             SizedBox(
               width: double.infinity,
               child: ElevatedButton(
-                onPressed: () async {
-                  final email = emailController.text.trim();
-                  final password = passwordController.text.trim();
-
-                  if (email.isEmpty || password.isEmpty) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text("Please fill all fields")),
-                    );
-                    return;
-                  }
-
-                  final res = await ApiService.login(
-                    email,
-                    password,
-                  ); // ✅ gọi ApiService
-
-                  if (res != null) {
-                    final user = await ApiService.getUserProfile(res.token);
-                    if (user != null) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text("Welcome ${user['name']}!")),
-                      );
-                      await FCMService.initFCM(res.token);
-                      // 👉 Điều hướng sang màn hình Navigation
-                      Get.offAll(() => const NavigationMenu());
-                      HomeController.instance.setUser(
-                        user['name'],
-                        user['email'],
-                        user['avatar'],
-                      );
-                    }
-                  } else {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text("Login failed")),
-                    );
-                  }
-                },
-                child: const Text("Login"),
+                onPressed: isLoading ? null : _handleLogin, // Disable khi đang load
+                child: isLoading 
+                  ? const SizedBox(
+                      height: 20, width: 20, 
+                      child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2)
+                    )
+                  : const Text("Login"),
               ),
             ),
             const SizedBox(height: 12),
@@ -189,5 +161,97 @@ class _LoginScreenState extends State<LoginScreen> {
         ),
       ),
     );
+  }
+
+  // --- HÀM XỬ LÝ LOGIN RIÊNG ---
+  Future<void> _handleLogin() async {
+    final email = emailController.text.trim();
+    final password = passwordController.text.trim();
+
+    if (email.isEmpty || password.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Please fill all fields")),
+      );
+      return;
+    }
+
+    setState(() => isLoading = true); // Bắt đầu loading
+    print(" [Login] Bắt đầu xử lý đăng nhập...");
+
+    try {
+      // 1. Gọi API Login
+      final res = await ApiService.login(email, password);
+
+      if (res != null) {
+        print(" [Login] API Login thành công. Token nhận được.");
+
+        // 2. Lưu Token vào SharedPreferences (QUAN TRỌNG)
+        final prefs = await SharedPreferences.getInstance();
+        await prefs.setString('accessToken', res.token);
+        print(" [Login] Đã lưu token vào bộ nhớ máy.");
+
+        // 3. Lấy thông tin User Profile
+        // (Bọc try-catch riêng để nếu lỗi lấy profile thì vẫn cho login)
+        Map<String, dynamic>? user;
+        try {
+           user = await ApiService.getUserProfile(res.token);
+        } catch (e) {
+           print("[Login] Lỗi lấy profile: $e");
+        }
+
+        if (user != null) {
+          print("👤 [Login] Lấy thông tin user thành công: ${user['name']}");
+          
+          // Cập nhật Controller GetX
+          HomeController.instance.setUser(
+            user['name'],
+            user['email'],
+            user['avatar'],
+          );
+
+          // 4. Init FCM (Notification)
+          try {
+            print("[Login] Đang khởi tạo FCM...");
+            await FCMService.initFCM(res.token);
+          } catch (e) {
+            print("[Login] Lỗi FCM (Bỏ qua): $e");
+          }
+
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text("Welcome back, ${user['name']}!")),
+            );
+          }
+        } else {
+           print("[Login] Không lấy được profile, dùng thông tin mặc định.");
+        }
+
+        // 5. CHUYỂN HƯỚNG (Navigation)
+        print(" [Login] Chuyển hướng sang NavigationMenu...");
+        
+        // Sử dụng Get.offAll để xóa màn hình Login khỏi stack (không back lại được)
+        Get.offAll(() => const NavigationMenu());
+        
+      } else {
+        // Login thất bại (res == null)
+        print(" [Login] API trả về null (Sai tài khoản/mật khẩu)");
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text("Login failed: Invalid email or password")),
+          );
+        }
+      }
+    } catch (e) {
+      print(" [Login] Lỗi hệ thống: $e");
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("System Error: $e")),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() => isLoading = false); // Tắt loading dù thành công hay thất bại
+      }
+    }
   }
 }

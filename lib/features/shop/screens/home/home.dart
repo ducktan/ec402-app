@@ -16,6 +16,9 @@ import 'package:ec402_app/utils/constants/sizes.dart';
 import 'package:flutter/material.dart';
 import 'package:ec402_app/features/shop/screens/search/search_screen.dart';
 import 'package:ec402_app/features/shop/screens/product_detail/product_detail_screen.dart';
+// --- THÊM IMPORT NÀY ---
+import 'package:ec402_app/features/game/screen/lucky_wheel_screen.dart'; 
+// -----------------------
 import 'package:get/get.dart';
 import '../../controllers/product_controller.dart';
 import '../../controllers/wishlist_controller.dart';
@@ -27,9 +30,17 @@ class HomeScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Load data ngay khi screen mở
     productController.loadProducts();
     return Scaffold(
+      // --- THÊM NÚT VÀO GAME Ở ĐÂY ---
+      floatingActionButton: FloatingActionButton(
+        onPressed: () => Get.to(() => const LuckyWheelScreen()),
+        backgroundColor: TColors.primary, // Hoặc Colors.amber
+        child: const Icon(Icons.card_giftcard, color: Colors.white),
+        tooltip: 'Vòng quay may mắn',
+      ),
+      // -------------------------------
+      
       body: SingleChildScrollView(
         child: Column(
           children: [
@@ -98,7 +109,7 @@ class HomeScreen extends StatelessWidget {
                           shop: "Brand ${product['brand_id'] ?? ''}",
                           imageUrl:
                               product['image_url'] ??
-                              "https://via.placeholder.com/150", // fallback nếu null
+                              "https://via.placeholder.com/150", 
                           onTap: () => Get.to(() => ProductDetailScreen(product: product)),
                         );
                       },

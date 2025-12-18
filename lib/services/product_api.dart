@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 
 class ProductApi {
-  static const String baseUrl = "http://192.168.23.1:5000/api";
+  static const String baseUrl = "http://10.0.2.2:5000/api";
 
   /// Fetch danh sách sản phẩm
   static Future<List<Map<String, dynamic>>> fetchProducts() async {

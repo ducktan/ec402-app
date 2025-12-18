@@ -2,7 +2,8 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 
 class ReviewApi {
-  static const String baseUrl = "http://192.168.23.1:5000/api"; // đổi thành backend URL
+  static const String baseUrl =
+      "http://10.0.2.2:5000/api"; // đổi thành backend URL
 
   /// 1. Lấy tất cả review
   static Future<List<dynamic>> getAllReviews() async {
@@ -48,8 +49,9 @@ class ReviewApi {
     String? comment,
     required String token,
   }) async {
-
-    print ("debug api: adding review for product $productId by user $userId with rating $rating and comment: $comment");
+    print(
+      "debug api: adding review for product $productId by user $userId with rating $rating and comment: $comment",
+    );
     final url = Uri.parse("$baseUrl/reviews");
     final response = await http.post(
       url,
@@ -86,10 +88,7 @@ class ReviewApi {
         "Content-Type": "application/json",
         "Authorization": "Bearer $token",
       },
-      body: jsonEncode({
-        "rating": rating,
-        "comment": comment ?? "",
-      }),
+      body: jsonEncode({"rating": rating, "comment": comment ?? ""}),
     );
 
     if (response.statusCode == 200) {
@@ -107,9 +106,7 @@ class ReviewApi {
     final url = Uri.parse("$baseUrl/reviews/$reviewId");
     final response = await http.delete(
       url,
-      headers: {
-        "Authorization": "Bearer $token",
-      },
+      headers: {"Authorization": "Bearer $token"},
     );
 
     if (response.statusCode == 200) {

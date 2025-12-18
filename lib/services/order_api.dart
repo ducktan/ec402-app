@@ -4,7 +4,7 @@ import 'package:ec402_app/utils/helpers/user_session.dart';
 
 class OrderService {
   static const String baseUrl =
-      "http://192.168.23.1:5000/api/orders"; // Android emulator
+      "http://10.0.2.2:5000/api"; // Android emulator
 
   static Future<Map<String, dynamic>> createOrder({
     required String token,

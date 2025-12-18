@@ -4,7 +4,7 @@ import 'package:ec402_app/utils/helpers/user_session.dart';
 
 
 class WishlistApi {
-  final String baseUrl = "http://192.168.23.1:5000/api/wishlist";
+  final String baseUrl = "http://10.0.2.2:5000/api";
 
   /// Lấy wishlist của chính mình
   Future<List<Map<String, dynamic>>> fetchMyWishlist() async {

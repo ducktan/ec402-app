@@ -2,10 +2,10 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 
 class VoucherService {
-  static const String baseUrl = "http://192.168.23.1:5000/api/vouchers";
+  static const String baseUrl = "http://10.0.2.2:5000/api";
 
   static Future<List<dynamic>> fetchVouchers(String token) async {
-    print("debug voucher: $token"); 
+    print("debug voucher: $token");
     final res = await http.get(
       Uri.parse("$baseUrl/available"),
       headers: {"Authorization": "Bearer $token"},
@@ -27,10 +27,7 @@ class VoucherService {
         "Content-Type": "application/json",
         "Authorization": "Bearer $token",
       },
-      body: jsonEncode({
-        "code": code,
-        "orderTotal": orderTotal,
-      }),
+      body: jsonEncode({"code": code, "orderTotal": orderTotal}),
     );
 
     return jsonDecode(res.body);
