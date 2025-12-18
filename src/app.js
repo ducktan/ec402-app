@@ -11,6 +11,7 @@ const VoucherRoutes = require("./routes/voucher.routes");
 const ReviewRoutes = require("./routes/review.routes");
 const OrderRoutes = require("./routes/order.routes");
 const notificationRoute = require("./routes/notification.route");
+const gameRoutes = require('./routes/gameRoutes');
 
 const path = require("path");
 const adminUserRoutes = require("./routes/admin.user.routes");
@@ -44,7 +45,7 @@ app.use("/api/vouchers", VoucherRoutes);
 app.use("/api/reviews", ReviewRoutes);
 app.use("/api/orders", OrderRoutes);
 app.use("/api/notifications", notificationRoute)
-
+app.use('/api/game', gameRoutes);
 // Admin routes
 app.use("/api/admin", adminUserRoutes);
 

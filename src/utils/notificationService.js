@@ -1,15 +1,23 @@
-import { readFileSync } from "fs";
-import { GoogleAuth } from "google-auth-library";
-import pool from "../config/db.js";
+const fs = require("fs");
+const path = require("path");
+const { GoogleAuth } = require("google-auth-library");
+const pool = require("../config/db");
 
-const serviceAccount = JSON.parse(
-  readFileSync("./src/serviceAccountKey.json", "utf8")
-);
+let serviceAccount = null;
 
-const PROJECT_ID = serviceAccount.project_id;
-const SCOPE = "https://www.googleapis.com/auth/firebase.messaging";
+try {
+  const serviceAccountPath = path.join(__dirname, "../serviceAccountKey.json");
+  serviceAccount = JSON.parse(fs.readFileSync(serviceAccountPath, "utf8"));
+} catch (e) {
+  console.warn("⚠️ Missing serviceAccountKey.json, notifications disabled.");
+}
 
-async function getAccessToken() {
+async function sendNotificationToUser(userId, title, body) {
+  if (!serviceAccount) return; // không có key thì skip
+
+  const PROJECT_ID = serviceAccount.project_id;
+  const SCOPE = "https://www.googleapis.com/auth/firebase.messaging";
+
   const auth = new GoogleAuth({
     credentials: serviceAccount,
     scopes: [SCOPE],
@@ -17,24 +25,14 @@ async function getAccessToken() {
 
   const client = await auth.getClient();
   const token = await client.getAccessToken();
-  return token.token;
-}
+  const accessToken = token.token;
 
-export async function sendNotificationToUser(userId, title, body) {
-  // 1) Query FCM token
-  const [rows] = await pool.query(
-    "SELECT fcm_token FROM users WHERE id = ?",
-    [userId]
-  );
+  const [rows] = await pool.query("SELECT fcm_token FROM users WHERE id = ?", [
+    userId,
+  ]);
   if (!rows.length || !rows[0].fcm_token) return;
 
-  const fcmToken = rows[0].fcm_token;
-
-  // 2) Get access token
-  const accessToken = await getAccessToken();
-
-  // 3) Call FCM HTTP v1
-  const response = await fetch(
+  await fetch(
     `https://fcm.googleapis.com/v1/projects/${PROJECT_ID}/messages:send`,
     {
       method: "POST",
@@ -44,16 +42,12 @@ export async function sendNotificationToUser(userId, title, body) {
       },
       body: JSON.stringify({
         message: {
-          token: fcmToken,
-          notification: {
-            title,
-            body,
-          },
+          token: rows[0].fcm_token,
+          notification: { title, body },
         },
       }),
     }
   );
-
-  const result = await response.json();
-  console.log("FCM response:", result);
 }
+
+module.exports = { sendNotificationToUser };
