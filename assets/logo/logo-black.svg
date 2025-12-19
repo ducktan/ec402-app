@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="400" height="400" viewBox="0 0 400 400" role="img" aria-labelledby="title desc">
+  <title id="title">easyMart</title>
+  <desc id="desc">Stacked logo with gradient shopping bag above centered text easyMart.</desc>
+
+  <!-- Gradient + Shadow -->
+  <defs>
+    <linearGradient id="shopeeStyle" x1="0" x2="1" y1="0" y2="1">
+      <stop offset="0%" stop-color="#FF6B00"/>
+      <stop offset="50%" stop-color="#FF8C1A"/>
+      <stop offset="100%" stop-color="#FFD55A"/>
+    </linearGradient>
+
+    <filter id="shadow" x="-50%" y="-50%" width="200%" height="200%">
+      <feDropShadow dx="0" dy="8" stdDeviation="10" flood-color="#000" flood-opacity="0.15"/>
+    </filter>
+  </defs>
+
+  <!-- Icon -->
+  <g transform="translate(140,40)" filter="url(#shadow)">
+    <rect x="0" y="30" rx="18" ry="18" width="120" height="120" fill="url(#shopeeStyle)"/>
+    <path d="M25 30 C25 10, 95 10, 95 30" fill="none" stroke="#E85A00" stroke-width="8" stroke-linecap="round"/>
+    <g transform="translate(14,40)">
+      <path d="M40 62 C55 62, 67 50, 67 35 C67 20, 55 8, 40 8 C25 8, 13 20, 13 35" fill="none" stroke="#ffffff" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M30 46 L65 46" stroke="#ffffff" stroke-width="8" stroke-linecap="round"/>
+    </g>
+  </g>
+
+  <!-- Wordmark centered below -->
+  <g transform="translate(200,260)" text-anchor="middle">
+    <text font-family="Poppins, Segoe UI, Roboto, sans-serif"
+          font-weight="600"
+          font-size="52"
+          fill="#2b2b2b">
+      easy
+      <tspan font-weight="700" fill="url(#shopeeStyle)">Mart</tspan>
+    </text>
+  </g>
+</svg>
