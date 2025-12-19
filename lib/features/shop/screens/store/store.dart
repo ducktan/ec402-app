@@ -119,17 +119,22 @@ class _StoreScreenState extends State<StoreScreen> {
               }
 
               return SliverGrid(
-                delegate: SliverChildBuilderDelegate((context, index) {
-                  final brand = brandCtrl.brands[index];
-                  return TBrandCard(
-                    showBorder: true,
-                    brandName: brand['name'],
-                    productCount: "${brand['productCount'] ?? 0} products",
-                    icon: brand['logo_url'] ?? TImages.clothIcon,
-                    onTap: () =>
-                        Get.to(() => BrandProducts(brandId: brand['id'])),
-                  );
-                }, childCount: brandCtrl.brands.length),
+                delegate: SliverChildBuilderDelegate(
+                  (context, index) {
+                    final brand = brandCtrl.brands[index];
+                    return TBrandCard(
+                      showBorder: true,
+                      brandName: brand['name'],
+                      productCount: "${brand['productCount'] ?? 0} products",
+                      icon: brand['logo_url'] ?? TImages.clothIcon,
+                      onTap: () =>
+                          Get.to(() => BrandProducts(brandId: brand['id'])),
+                    );
+                  },
+                  childCount: brandCtrl.brands.length > 6
+                      ? 6
+                      : brandCtrl.brands.length,
+                ),
                 gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                   crossAxisCount: 2,
                   mainAxisExtent: 80,

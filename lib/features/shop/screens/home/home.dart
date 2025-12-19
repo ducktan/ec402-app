@@ -20,6 +20,12 @@ import 'package:get/get.dart';
 import '../../controllers/product_controller.dart';
 import '../../controllers/wishlist_controller.dart';
 
+
+// game
+import 'package:ec402_app/features/shop/screens/home/widgets/lucky_wheel_section.dart'; 
+import 'package:ec402_app/common/widgets/chat.dart';
+// -----------------------
+
 class HomeScreen extends StatelessWidget {
   HomeScreen({super.key});
   final ProductController productController = Get.put(ProductController());
@@ -30,6 +36,17 @@ class HomeScreen extends StatelessWidget {
     // Load data ngay khi screen mở
     productController.loadProducts();
     return Scaffold(
+      floatingActionButton: FloatingActionButton(
+        backgroundColor: TColors.primary,
+        child: const Icon(Icons.smart_toy),
+        onPressed: () {
+          showDialog(
+            context: context,
+            builder: (_) => const AiChatPopup(),
+          );
+        },
+      ),
+      // -------------------------------
       body: SingleChildScrollView(
         child: Column(
           children: [
@@ -74,11 +91,16 @@ class HomeScreen extends StatelessWidget {
                   TPromoSlider(
                     banners: [
                       TImages.promoBanner1,
-                      TImages.promoBanner1,
-                      TImages.promoBanner1,
+                      TImages.promoBanner2,
+                      TImages.promoBanner3,
                     ],
                   ),
                   const SizedBox(height: TSizes.spaceBtwItems),
+                  const LuckyWheelSection(), // 🎁 GAME Ở ĐÂY
+
+                   const SizedBox(height: TSizes.spaceBtwItems),
+
+
 
                   Obx(() {
                     if (productController.isLoading.value) {
