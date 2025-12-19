@@ -1,4 +1,5 @@
 const TransactionModel = require("../models/transaction.model");
+const crypto = require("crypto");
 
 // ====================== CREATE TRANSACTION ======================
 exports.createTransaction = async (req, res) => {
@@ -10,13 +11,15 @@ exports.createTransaction = async (req, res) => {
       return res.status(400).json({ message: "Thiếu thông tin bắt buộc." });
     }
 
+    const transaction_code = `TXN-${crypto.randomUUID()}`;
+
     const transaction = await TransactionModel.create({
       order_id,
       user_id,
       provider,
       amount,
       status,
-      transaction_code: "",
+      transaction_code: transaction_code,
     });
 
     res.status(201).json({
